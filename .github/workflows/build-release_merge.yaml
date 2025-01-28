@@ -1,4 +1,4 @@
-name: Release manually by merging any branch into the default branch
+name: Manual Release (Merge to Default)
 
 on:
   workflow_dispatch:
@@ -14,7 +14,6 @@ on:
       fast-forward:
         description: 'Allow fast-forward merge'
         type: boolean
-        required: false
         default: false
       include-default-branch:
         description: 'Include default branch in the action behavior. Set to true to include it.'
@@ -22,8 +21,12 @@ on:
         default: false
       dry-run:
         description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
-        default: false
         type: boolean
+        default: false
+      draft-release:
+        description: 'true = Draft release; false = Non-draft release.'
+        type: boolean
+        default: false
 
 jobs:
   validate-branch:
@@ -83,6 +86,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
       tag: ${{ inputs.tag }}
       release-note: ${{ needs.release-notes.outputs.notes }}
+      draft-release: ${{ inputs.draft-release }}
 
   clean-branch:
     needs: [validate-branch, update-packagejson, merge-and-push, release-notes]

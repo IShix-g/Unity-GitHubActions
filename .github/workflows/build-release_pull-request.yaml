@@ -61,3 +61,4 @@ jobs:
       dry-run: false
       tag: ${{ needs.extract-tag.outputs.tag }}
       release-note: ${{ needs.release-notes.outputs.notes }}
+      draft-release: false
