@@ -11,10 +11,6 @@ on:
         description: 'Delete the branch? All branches except the default branch will be deleted.'
         default: false
         type: boolean
-      dry-run:
-        description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
-        default: false
-        type: boolean
       fast-forward:
         description: 'Allow fast-forward merge'
         type: boolean
@@ -24,6 +20,10 @@ on:
         description: 'Include default branch in the action behavior. Set to true to include it.'
         type: boolean
         default: false
+      dry-run:
+        description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
+        default: false
+        type: boolean
 
 jobs:
   validate-branch:
