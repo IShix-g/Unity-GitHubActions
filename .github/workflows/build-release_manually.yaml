@@ -11,11 +11,6 @@ on:
         description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
         default: false
         type: boolean
-      fast-forward:
-        description: 'Allow fast-forward merge'
-        type: boolean
-        required: false
-        default: false
 
 jobs:
   update-packagejson:
