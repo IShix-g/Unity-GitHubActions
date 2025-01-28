@@ -1,0 +1,150 @@
+name: (Reusable) Create Release
+
+on:
+  workflow_call:
+    inputs:
+      commit-id:
+        description: 'Commit ID to create a release and tag.'
+        required: true
+        type: string
+      dry-run:
+        description: 'true = no upload; false = draft changes and delete the release after WAIT_BEFORE_DELETE seconds.'
+        required: true
+        type: boolean
+      require-validation:
+        description: 'true requires validation to pass; false allows continuing even if validation fails.'
+        required: false
+        type: boolean
+        default: true
+      wait-before-delete:
+        description: 'Wait time in seconds before deleting the branch'
+        required: false
+        default: 25
+        type: number
+      tag:
+        description: 'Git tag to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      release-format: # see: https://docs.github.com/en/actions/learn-github-actions/expressions#format
+        description: 'Format of the release title. If "Ver.{0}" is specified, the title will be "Ver.1.0.0". Use "{0}" for no prefix.'
+        required: false
+        type: string
+        default: 'Ver.{0}'
+      release-note:
+        description: 'Custom release note to include in the release.'
+        required: false
+        type: string
+      draft-release:
+        description: 'true = Draft release; false = Non-draft release.'
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+
+jobs:
+  validate:
+    uses: ./.github/workflows/reusable-validate-tag.yaml
+    with:
+      tag: ${{ inputs.tag }}
+      require-validation: ${{ inputs.require-validation }}
+    secrets: inherit
+
+  create-release:
+    needs: [validate]
+    env:
+      GH_REPO: ${{ github.repository }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit-id }}
+          persist-credentials: false
+
+      - name: Configure Git Authentication with Custom Token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        run: |
+          git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Create Tag
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          git tag ${{ needs.validate.outputs.normalized-tag }}
+          git push origin ${{ needs.validate.outputs.normalized-tag }}
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ needs.validate.outputs.normalized-tag }} $([[ "${{ inputs.dry-run || inputs.draft-release }}" = "true" ]] && echo "--draft") \
+            --verify-tag \
+            --title "${{ format(inputs.release-format, needs.validate.outputs.normalized-tag) }}" \
+            --generate-notes \
+            --notes "${{ inputs.release-note }}"
+
+          echo "::notice::Release '${{ needs.validate.outputs.normalized-tag }}' has been successfully created!"
+
+      - name: Wait and Verify Release Name is expected
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 5s
+          actual=$(gh api --paginate /repos/${{ github.repository }}/releases?per_page=100 --jq '.[] | select(.tag_name == "${{ needs.validate.outputs.normalized-tag }}") | .name')
+          expected="${{ format(inputs.release-format, needs.validate.outputs.normalized-tag) }}"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "::error::Error: The release name does not match the expected value. Expected: '$expected', Actual: '$actual'."
+            exit 1
+          else
+            echo "::notice::Success: The release name matches the expected value! Expected: '$expected', Actual: '$actual'."
+          fi
+
+      - name: Clean up. Wait ${{ inputs.wait-before-delete }}s and delete release if dry-run. (dry-run=${{ inputs.dry-run }}})
+        if: ${{ inputs.dry-run && success() }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release list | grep Draft | grep ${{ needs.validate.outputs.normalized-tag }}; then
+            echo "::notice::Release '${{ needs.validate.outputs.normalized-tag }}' found. Waiting ${{ inputs.wait-before-delete }} seconds before initiating deletion..."
+            sleep ${{ inputs.wait-before-delete }}
+            if gh release list | grep Draft | grep ${{ needs.validate.outputs.normalized-tag }}; then
+              gh release delete ${{ needs.validate.outputs.normalized-tag }} --yes --cleanup-tag
+              echo "::notice::Release '${{ needs.validate.outputs.normalized-tag }}' successfully deleted."
+            else
+              echo "::notice::Release '${{ needs.validate.outputs.normalized-tag }}' no longer exists. Skipping deletion."
+            fi
+          else
+            echo "::warning::Release '${{ needs.validate.outputs.normalized-tag }}' does not exist. Skipping cleanup."
+          fi
+
+      - name: Clean up release after failure
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release list | grep Draft | grep ${{ needs.validate.outputs.normalized-tag }}; then
+            echo "::notice::Detected failure. Skipping wait and proceeding to deletion."
+            gh release delete ${{ needs.validate.outputs.normalized-tag }} --yes --cleanup-tag
+          else
+            echo "::notice::Release '${{ needs.validate.outputs.normalized-tag }}' does not exist. Skipping cleanup."
+          fi

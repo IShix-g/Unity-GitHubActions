@@ -1,0 +1,48 @@
+name: (Test) Release Notes Generator
+
+env:
+  COMMIT_MESSAGE_FORMAT: '- %s by %cn (%h)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      from-tag:
+        description: 'Start tag (default: first commit if unset)'
+        type: string
+        default: ''
+      to-tag:
+        description: 'End tag (default: latest commit if unset)'
+        type: string
+        default: ''
+      commit-message-format:
+        description: 'Commit message format (see https://git-scm.com/docs/pretty-formats)'
+        type: string
+        default: ${{ env.COMMIT_MESSAGE_FORMAT }}
+      derive-from-tag:
+        description: 'true = Auto-determine from-tag using previous tags; false = Set manually.'
+        type: boolean
+        default: true
+
+jobs:
+  release-notes:
+    uses: ./.github/workflows/reusable-release-notes.yaml
+    with:
+      from-tag: ${{ inputs.from-tag }}
+      to-tag: ${{ inputs.to-tag }}
+      commit-message-format: ${{ inputs.commit-message-format }}
+      commit-id: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
+      derive-from-tag: ${{ inputs.derive-from-tag }}
+
+  print:
+    needs: [release-notes]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Echo release notes
+        run: |
+          notes="${{ needs.release-notes.outputs.notes }}"
+          length=$(echo "$notes" | wc -l)
+          echo "::notice::Release Note: $length items"
+          IFS=$'\n'
+          for line in $notes; do
+          echo $line
+          done

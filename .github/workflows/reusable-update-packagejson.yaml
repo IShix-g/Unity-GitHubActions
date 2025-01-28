@@ -1,0 +1,162 @@
+name: (Reusable) Update package.json
+
+on:
+  workflow_call:
+    inputs:
+      file-path:
+        description: 'Path to package.json to update. You can input multiline paths. Supported file is `package.json`.'
+        required: true
+        type: string
+      tag:
+        description: 'Git tag you want to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      dry-run:
+        description: 'Set to true to simulate the commit without pushing changes.'
+        required: true
+        type: boolean
+      require-validation:
+        description: 'true requires validation to pass; false allows continuing even if validation fails.'
+        required: false
+        type: boolean
+        default: true
+      ref:
+        description: 'Checkout ref.'
+        required: false
+        type: string
+        default: ''
+      commit-message-format:
+        description: 'Format for the commit message when updating package.json'
+        required: false
+        type: string
+        default: 'feat: Update package.json to {v}'
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+    outputs:
+      normalized-tag:
+        description: 'normalized tag, tag without v prefix.'
+        value: ${{ jobs.validate-tag.outputs.normalized-tag }}
+      sha:
+        description: 'Git commit SHA after package.json is updated.'
+        value: ${{ jobs.update-packagejson.outputs.sha }}
+      changed:
+        description: 'Indicates if the Git branch was created or not.'
+        value: ${{ jobs.update-packagejson.outputs.changed }}
+
+jobs:
+  validate-tag:
+    uses: ./.github/workflows/reusable-validate-tag.yaml
+    with:
+      tag: ${{ inputs.tag }}
+      require-validation: ${{ inputs.require-validation }}
+    secrets: inherit
+
+  update-packagejson:
+    needs: [validate-tag]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+      changed: ${{ steps.check-update.outputs.changed }}
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+
+      - name: Update files to version ${{ needs.validate-tag.outputs.normalized-tag }}
+        run: |
+          expected="${{ needs.validate-tag.outputs.normalized-tag }}"
+          while read -r file_path; do
+
+            if [[ -z "$file_path" ]]; then
+              continue
+            fi
+
+            echo "Start $file_path"
+            file_name=$(basename "$file_path")
+
+            echo "::group::Before"
+              cat "$file_path"
+            echo "::endgroup::"
+
+            echo "::group::Updating"
+              if [[ "${file_name}" == "package.json" ]]; then
+                # Unity `"version": "VersionString",`
+                sed -i -e "s/\(\"version\":\) \"\(.*\)\",/\1 \"${{ needs.validate-tag.outputs.normalized-tag }}\",/" "${file_path}"
+                actual=$(grep "version" "$file_path" | cut -d ':' -f 2 | tr -d ',' | tr -d '"' | tr -d ' ')
+              else
+                echo "Unknown file name ${file_name} is specified."
+                exit 1
+              fi
+            echo "::endgroup::"
+
+            echo "::group::After"
+              cat "$file_path"
+            echo "::endgroup::"
+
+            echo "::group::Validate Change"
+              if [[ "$actual" != "$expected" ]]; then
+                echo "Failed. Path: $file_path, Expected: $expected, Actual: $actual"
+                exit 1
+              else
+                echo "Success. Path: $file_path, Expected: $expected, Actual: $actual"
+              fi
+            echo "::endgroup::"
+          done <<< "${{ inputs.file-path }}"
+
+      - name: Check update on git
+        id: check-update
+        run: git diff --exit-code || echo "changed=1" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Format commit message
+        id: commit-format
+        env:
+          COMMIT_FORMAT: ${{ inputs.commit-message-format }}
+          VERSION: ${{ needs.validate-tag.outputs.normalized-tag }}
+        run: |
+          commit_message=${COMMIT_FORMAT//\{v\}/$VERSION}
+          echo "::notice::Formatted commit message: $commit_message"
+          echo "message=$commit_message" >> "$GITHUB_OUTPUT"
+
+      - name: Commit files (updated? = ${{ steps.check-update.outputs.changed == '1' }} / dry-run = ${{ inputs.dry-run }})
+        id: commit
+        run: |
+          if [[ "${{ inputs.dry-run }}" == "true" ]]; then
+            echo "::notice::Dry-run enabled. No commit will be made."
+            echo "Changed files (dry-run):"
+            git diff --name-only || echo "No changes detected."
+          elif [[ "${{ steps.check-update.outputs.changed }}" == "1" ]]; then
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git commit -m "${{ steps.commit-format.outputs.message }}" -m "Commit by [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" -a
+            echo "sha=$(git rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+          else
+            echo "sha=$(git rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push changes
+        if: ${{ inputs.dry-run == false && steps.check-update.outputs.changed == '1' }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          branch: ${{ inputs.ref }}
+          tags: false

@@ -1,0 +1,210 @@
+name: (Reusable) Merge and Push
+
+on:
+  workflow_call:
+    inputs:
+      target-branch:
+        description: 'Branch from target repository to merge'
+        required: true
+        type: string
+      push-branch:
+        description: 'Branch to push into'
+        required: false
+        type: string
+        default: ''
+      commit-id:
+        description: 'Commit ID to create a release and tag.'
+        required: false
+        type: string
+        default: ''
+      dry-run:
+        description: 'Dry-run mode (simulate without committing)'
+        required: false
+        type: boolean
+        default: false
+      fast-forward:
+        description: 'Allow fast-forward merge'
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+    outputs:
+      sha:
+        description: 'Git commit SHA after package.json is updated.'
+        value: ${{ jobs.merge-and-push.outputs.sha }}
+      has-merged:
+        description: 'Whether the branches were merged successfully'
+        value: ${{ jobs.merge-and-push.outputs.has-merged }}
+
+jobs:
+  merge-and-push:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.set-sha.outputs.sha }}
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Set Default Push Branch
+        id: set-push-branch
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          echo "push-branch=${{ inputs.push-branch || github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+
+      - name: Normalize Branch Names
+        id: normalize-branches
+        run: |
+          normalize_branch() {
+            echo "$1" | sed 's|^refs/heads/||'
+          }
+          target_branch_normalized=$(normalize_branch "${{ inputs.target-branch }}")
+          push_branch_normalized=$(normalize_branch "${{ steps.set-push-branch.outputs.push-branch }}")
+
+          echo "target-branch=${target_branch_normalized}" >> "$GITHUB_OUTPUT"
+          echo "push-branch=${push_branch_normalized}" >> "$GITHUB_OUTPUT"
+
+      - name: Check and Exit if Branches Match
+        id: branches-match
+        run: |
+          if [ "${{ steps.normalize-branches.outputs.target-branch }}" = "${{ steps.normalize-branches.outputs.push-branch }}" ]; then
+          echo "::notice::The push-branch and target-branch are the same after normalization. Exiting the workflow early because merge is unnecessary."
+          echo "identical=1" >> "$GITHUB_OUTPUT"
+          exit 0
+          fi
+
+      - name: Checkout Repository and Target Branch
+        if: ${{ inputs.dry-run || steps.branches-match.outputs.identical != '1' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.normalize-branches.outputs.push-branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch and prepare Target Branch (${{ steps.normalize-branches.outputs.target-branch }})
+        if: ${{ inputs.dry-run || steps.branches-match.outputs.identical != '1' }}
+        run: |
+          set -e
+          git fetch origin ${{ inputs.commit-id || steps.normalize-branches.outputs.target-branch }}
+
+      - name: Dry Run Merge
+        id: dry-run-merge
+        if: ${{ inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git fetch origin
+          merge_log=$(git merge --no-commit --no-ff origin/${{ steps.normalize-branches.outputs.target-branch }} 2>&1)
+
+          log_length=$(echo "$merge_log" | wc -c)
+      
+          if [ "$log_length" -ge 100 ]; then
+            echo "$merge_log" > dry-run-log.txt
+            echo "log-exists=1" >> "$GITHUB_OUTPUT"
+            echo "::notice::Merge log is too large. Saved to 'dry-run-log.txt'."
+          else
+            echo "$merge_log"
+          fi
+
+      - name: Save Dry-Run Log
+        if: ${{ inputs.dry-run && steps.dry-run-merge.outputs.log-exists == '1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-log
+          path: dry-run-log.txt
+
+      - name: Merge Target Branch (${{ steps.normalize-branches.outputs.target-branch }}) to Push Branch (${{ steps.normalize-branches.outputs.push-branch }})
+        id: merge-branch
+        if: ${{ steps.branches-match.outputs.identical != '1' && !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          merge_target="origin/${{ steps.normalize-branches.outputs.target-branch }}"
+          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          
+          if git log ${current_branch}..${merge_target} --oneline | grep -q .; then
+            echo "Changes detected. Proceeding with merge..."
+
+            if [ "${{ inputs.fast-forward }}" == "true" ]; then
+              echo "::notice::Allowing Fast-Forward merge..."
+              git merge --ff-only $merge_target && {
+                echo "::notice::Fast-Forward merge completed successfully."
+                exit 0
+              } || echo "::notice::Fast-Forward not possible, falling back to regular merge."
+            fi
+
+            git merge --no-commit --no-ff $merge_target || {
+              echo "::error::Merge failed. Retrieving error details..."
+              echo "Git Status:"
+              git status
+
+              echo "Last Commit Log:"
+              git log -1
+          
+              echo "Available branches:"
+              git branch -a
+          
+              exit 1
+            }
+            git commit -m "Merge branch '${{ steps.normalize-branches.outputs.target-branch }}' into '${{ steps.normalize-branches.outputs.push-branch }}'"
+          else
+            echo "No changes to merge. Skipping."
+          fi
+
+      - name: Check update on git
+        id: check-update
+        if: ${{ steps.branches-match.outputs.identical != '1' }}
+        run: |
+          if git diff HEAD^1 HEAD --exit-code; then
+            echo "::notice::No changes detected after merge."
+          else
+            echo "changed=1" >> "$GITHUB_OUTPUT"
+            echo "::notice::Changes detected after merge."
+          fi
+
+      - name: Get Current Commit SHA
+        id: set-sha
+        run: |
+          if ([ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.branches-match.outputs.identical }}" == "1" ]) \
+              || ([ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.check-update.outputs.changed }}" != "1" ]); then
+            echo "sha=${{ inputs.commit-id }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure Git Authentication with Custom Token
+        if: ${{ steps.check-update.outputs.changed == '1' && steps.branches-match.outputs.identical != '1' && steps.check-secrets.outputs.available == '1' }}
+        run: |
+          git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Push to Branch (${{ steps.set-push-branch.outputs.push-branch }})
+        if: ${{ steps.check-update.outputs.changed == '1' && steps.branches-match.outputs.identical != '1' && !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git fetch origin
+          git push origin ${{ steps.normalize-branches.outputs.push-branch }}
+          echo "has-merged=1" >> "$GITHUB_OUTPUT"
+          echo "::notice::Merged: ${{ steps.normalize-branches.outputs.target-branch }} -> ${{ steps.normalize-branches.outputs.push-branch }}"

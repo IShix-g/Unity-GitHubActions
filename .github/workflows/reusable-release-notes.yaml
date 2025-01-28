@@ -1,0 +1,152 @@
+name: (Reusable) Release Notes Generator
+
+on:
+  workflow_call:
+    inputs:
+      from-tag:
+        description: 'Start tag (default: first commit if unset)'
+        required: false
+        type: string
+      to-tag:
+        description: 'End tag (default: latest commit if unset)'
+        required: false
+        type: string
+      commit-message-format:
+        description: 'Commit message format (see https://git-scm.com/docs/pretty-formats)'
+        required: false
+        type: string
+        default: '- %s (%h)'
+      commit-id:
+        description: 'Commit ID for release and tag.'
+        required: false
+        type: string
+      derive-from-tag:
+        description: 'true = Auto-determine from-tag using previous tags; false = Set manually.'
+        required: false
+        default: true
+        type: boolean
+    outputs:
+      notes:
+        description: 'Generated release notes'
+        value: ${{ jobs.generate-notes.outputs.notes }}
+
+jobs:
+  generate-notes:
+    runs-on: ubuntu-22.04
+    outputs:
+      notes: ${{ steps.release-notes.outputs.notes }}
+    env:
+      FILTER_CONDITION: 'fix|feat|docs|style|refactor|perf'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit-id }}
+          fetch-depth: 0
+
+      - name: Fetch all tags
+        run: git fetch --tags
+        
+      - name: Verify existence of from-tag (${{ inputs.from-tag || 'Empty' }})
+        if: ${{ inputs.from-tag != '' }}
+        run: |
+          if ! git tag --list | grep -q "^${{ inputs.from-tag }}$"; then
+            echo "::error::Specified from-tag '${{ inputs.from-tag }}' does not exist in the repository."
+            exit 1
+          fi
+
+      - name: Verify existence of to-tag (${{ inputs.to-tag || 'Empty' }})
+        if: ${{ inputs.to-tag != '' }}
+        run: |
+          if ! git tag --list | grep -q "^${{ inputs.to-tag }}$"; then
+            echo "::error::Specified to-tag '${{ inputs.to-tag }}' does not exist in the repository."
+            exit 1
+          fi
+
+      - name: Override from-tag
+        if: ${{ inputs.derive-from-tag == true && inputs.from-tag == '' }}
+        run: |
+          all_tags=$(git tag --sort=-creatordate || echo "")
+
+          if [ -z "$all_tags" ]; then
+            echo "No tags found in the repository. Skipping from-tag override."
+            exit 0
+          fi
+
+          tags=($all_tags)
+
+          if [ -z "${{ inputs.to-tag }}" ]; then
+            from_tag=${tags[0]}
+            echo "No to-tag specified. Using latest tag as from-tag: $from_tag"
+          else
+            for i in "${!tags[@]}"; do
+              if [ "${tags[$i]}" == "${{ inputs.to-tag }}" ]; then
+                if [ $i -lt $((${#tags[@]} - 1)) ]; then
+                  from_tag=${tags[$((i+1))]}
+                  echo "Using previous tag as from-tag: $from_tag"
+                else
+                  echo "Error: to-tag is the first tag, no previous tags available."
+                  exit 0
+                fi
+                break
+              fi
+            done
+          fi
+          
+          echo "from-tag=$from_tag" >> "$GITHUB_ENV"
+
+      - name: Ensure from-tag is set
+        if: ${{ inputs.derive-from-tag == false || env.from-tag == '' }}
+        run: |
+          echo "from-tag=${{ inputs.from-tag }}" >> "$GITHUB_ENV"
+
+      - name: Determine range
+        id: determine-range
+        run: |
+          echo "Checking the specified tags..."
+          # If the start tag is empty, fetch the hash of the first commit
+          if [ -z "${{ env.from-tag }}" ]; then
+            from_commit=$(git rev-list --max-parents=0 HEAD)
+            echo "Start tag is not specified. Using the first commit ($from_commit) as the start point."
+          else
+            from_commit="${{ env.from-tag }}"
+            echo "Specified start tag: $from_commit"
+          fi
+
+          if [ -z "${{ inputs.to-tag }}" ]; then
+            to_commit=$(git rev-parse HEAD)
+            echo "End tag is not specified. Using HEAD ($to_commit) as the end point."
+          else
+            to_commit="${{ inputs.to-tag }}"
+            echo "Specified end tag: $to_commit"
+          fi
+
+          echo "from_commit=$from_commit" >> "$GITHUB_OUTPUT"
+          echo "to_commit=$to_commit" >> "$GITHUB_OUTPUT"
+
+      - name: Generate filtered release notes
+        id: release-notes
+        run: |
+          echo "Fetching commit range:"
+          echo "Start: ${{ steps.determine-range.outputs.from_commit }}"
+          echo "End: ${{ steps.determine-range.outputs.to_commit }}"
+          echo "Filter conditions: $FILTER_CONDITION"
+
+          notes=$(
+            git log ${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }} \
+            --pretty=format:"${{ inputs.commit-message-format }}" \
+            | grep -iE "$FILTER_CONDITION" \
+            | grep -v "github-actions" \
+            || echo "No matching commits found."
+          )
+          length=$(echo "$notes" | wc -l)
+          echo "::notice::Release Note: $length items"
+          
+          echo "::group::Notebook Contents"
+          echo "$notes"
+          echo "::endgroup::"
+          
+          {
+            echo "notes<<EOF"
+            echo "$notes"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"

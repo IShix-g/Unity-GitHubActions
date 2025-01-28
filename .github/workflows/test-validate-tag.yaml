@@ -1,0 +1,52 @@
+name: (Test) Validate Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      require-validation:
+        description: 'true to disallow old tags or any invalid tags. false to proceed even if validation fails.'
+        type: boolean
+        default: true
+      validate-semantic-versioning:
+        description: 'Specifies whether to validate the tag format using Semantic Versioning.'
+        type: boolean
+        default: true
+      tag:
+        description: 'The tag to validate (e.g., 1.0.0).'
+        type: string
+        default: ''
+
+jobs:
+  set-tag:
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - name: Set tag
+        id: set-tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="12.12.${{ github.run_number }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "::notice::tag:$tag"
+
+  validate-tag:
+    needs: [set-tag]
+    uses: ./.github/workflows/reusable-validate-tag.yaml
+    with:
+      require-validation: ${{ inputs.require-validation }}
+      validate-semantic-versioning: ${{ inputs.validate-semantic-versioning }}
+      tag: ${{ needs.set-tag.outputs.tag }}
+  
+  print:
+    needs: [set-tag, validate-tag]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Echo release notes
+        run: |
+          echo "::notice::normalized-tag: ${{ needs.validate-tag.outputs.normalized-tag }}, \
+          tag: ${{ needs.validate-tag.outputs.tag }}, \
+          validated: ${{ needs.validate-tag.outputs.validated }}"

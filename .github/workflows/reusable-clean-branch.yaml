@@ -1,0 +1,92 @@
+name: (Reusable) Clean package.json branch
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch name to delete. Only deletes branches created by github-actions[bot] and not the default branch.'
+        required: true
+        type: string
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+    outputs:
+      branch-deleted:
+        description: 'Indicates if the branch was deleted (true = deleted, false = not deleted).'
+        value: ${{ jobs.cleanup.outputs.branch-deleted }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      branch-deleted: ${{ steps.check-branch.outputs.deletable }}
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Check branch is deletable
+        id: check-branch
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          #!/bin/bash
+          set -euo pipefail
+
+          if [ -z "${{ inputs.branch }}" ]; then
+            echo "::error::Branch input is missing or undefined."
+            exit 1
+          fi
+
+          default_branch=$(gh api /repos/${{ github.repository }} --jq '.default_branch')
+          if [[ $? -ne 0 || -z "$default_branch" ]]; then
+            echo "::error::Failed to get default branch. Ensure authentication and repository exist."
+            exit 1
+          fi
+
+          branch="${{ inputs.branch }}"
+          branch_info=$(gh api /repos/${{ github.repository }}/branches/$branch 2>/dev/null)
+          if [[ $? -ne 0 ]]; then
+            echo "::notice::Branch does not exist or failed to fetch branch info for '$branch'."
+          fi
+
+          if [[ "$branch" =~ ^refs/heads/ ]]; then
+            clean_branch=${branch#refs/heads/}
+            elif [[ "$branch" =~ ^[a-zA-Z0-9/_-]+$ ]]; then
+              clean_branch="$branch"
+          else
+            clean_branch="$branch"
+          fi
+
+          if [[ "$default_branch" == "$clean_branch" ]]; then
+            echo "::notice::Branch cannot be deleted because it is the default branch ($default_branch)."
+            exit 0
+          fi
+
+          if [[ -z "$branch_info" ]]; then
+            echo "::notice::Branch cannot be deleted because it does not exist."
+            exit 0
+          fi
+
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Verified: Branch '$clean_branch' is safe to delete."
+          echo "deletable=1" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Delete branch
+        if: ${{ steps.check-branch.outputs.deletable == '1' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: gh api -X DELETE /repos/${{ github.repository }}/git/refs/heads/${{ inputs.branch }}

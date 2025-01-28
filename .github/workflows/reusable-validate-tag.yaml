@@ -1,0 +1,108 @@
+name: (Reusable) Validate Tag
+
+on:
+  workflow_call:
+    inputs:
+      require-validation:
+        description: 'true to disallow old tags or any invalid tags. false to proceed even if validation fails.'
+        required: false
+        default: true
+        type: boolean
+      validate-semantic-versioning:
+        description: 'Specifies whether to validate the tag format using Semantic Versioning.'
+        required: false
+        default: true
+        type: boolean
+      tag:
+        description: 'The tag to validate (e.g., 1.0.0).'
+        required: true
+        type: string
+    outputs:
+      normalized-tag:
+        description: 'normalized tag, tag without v prefix.'
+        value: ${{ jobs.validate.outputs.normalized-tag }}
+      tag:
+        description: 'same as input tag'
+        value: ${{ jobs.validate.outputs.tag }}
+      validated:
+        description: 'result of the validation is validated or not'
+        value: ${{ jobs.validate.outputs.validated }}
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.trim.outputs.tag }}
+      normalized-tag: ${{ steps.trim.outputs.normalized-tag }}
+      validated: ${{ steps.set-validated.outputs.validated }}
+    steps:
+      - name: Set version without "v" prefix
+        id: trim
+        run: |
+          input_tag="${{ inputs.tag }}"
+          normalized_tag=${input_tag#v}
+          echo "normalized-tag=$normalized_tag" | tee -a "$GITHUB_OUTPUT"
+          echo "tag=$input_tag" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Validate tag format (Semantic Versioning)
+        id: validate-format
+        if: ${{ inputs.validate-semantic-versioning == true }}
+        run: |
+          normalized_tag="${{ steps.trim.outputs.normalized-tag }}"
+          if ! echo "$normalized_tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+-?)*(\+[0-9A-Za-z.]+)?$'; then
+            if [[ "${{ inputs.require-validation }}" == "true" ]]; then
+              message_type="::error::"
+            else
+              message_type="::warning::"
+            fi
+            echo "$message_type Tag format is invalid. Expected Semantic Version (e.g., 1.0.0 or 1.0.0-alpha+build), but got: $normalized_tag"
+            echo "validated=false" | tee -a "$GITHUB_OUTPUT"
+            if [[ "${{ inputs.require-validation }}" == "true" ]]; then
+              exit 1
+            fi
+          else
+            echo "::notice::Tag format is valid: $normalized_tag"
+            echo "validated=true" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate tag is not reverting
+        id: validate-tag
+        if: ${{ inputs.validate-semantic-versioning == false || steps.validate-format.outputs.validated == 'true' }}
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          release_latest=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName,isLatest | jq -r '.[] | select(.isLatest) | .tagName')
+          [[ -z "$release_latest" ]] && echo "There is not release tag." && echo "validated=true" | tee -a "$GITHUB_OUTPUT" && exit 0
+
+          sorted_latest=$(echo -e "$release_latest\n${{ steps.trim.outputs.normalized-tag }}" | sort -V | tail -n1)
+          if [[ "$sorted_latest" == "$release_latest" ]]; then
+            if [[ "${{ inputs.require-validation }}" == "true" ]]; then
+              message_type="::error::"
+            else
+              message_type="::warning::"
+            fi
+            echo "$message_type Tag is reverting. Bump version. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $release_latest"
+            echo "validated=false" | tee -a "$GITHUB_OUTPUT"
+            if [[ "${{ inputs.require-validation }}" == "true" ]]; then
+              exit 1
+            fi
+          else
+            echo "::notice::Great, tag is latest. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $release_latest"
+            echo "validated=true" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set validated result
+        id: set-validated
+        run: |
+          if [ -n "${{ steps.validate-tag.outputs.validated }}" ]; then
+            echo "validated=${{ steps.validate-tag.outputs.validated }}" >> $GITHUB_OUTPUT
+          else
+            echo "validated=${{ steps.validate-format.outputs.validated }}" >> $GITHUB_OUTPUT
+          fi

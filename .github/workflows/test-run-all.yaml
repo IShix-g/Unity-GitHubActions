@@ -1,0 +1,29 @@
+name: (Test) Run All Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-update-packagejson:
+    uses: ./.github/workflows/test-update-packagejson.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+
+  test-create-release:
+    uses: ./.github/workflows/test-create-release.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+
+  test-merge-and-push:
+    uses: ./.github/workflows/test-merge-and-push.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+
+  test-clean-branch:
+    uses: ./.github/workflows/test-clean-branch.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}

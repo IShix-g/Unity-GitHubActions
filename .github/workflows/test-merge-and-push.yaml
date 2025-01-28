@@ -1,0 +1,130 @@
+name: (Test) Merge and Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete-branch:
+        description: 'Delete the branch after execution'
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      delete-branch:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      BOT_APP_ID:
+        required: true
+      BOT_PRIVATE_KEY:
+        required: true
+
+jobs:
+  create-branches:
+    runs-on: ubuntu-22.04
+    outputs:
+      target-branch: ${{ steps.generate-branches.outputs.target-branch }}
+      push-branch: ${{ steps.generate-branches.outputs.push-branch }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Branch Names
+        id: generate-branches
+        run: |
+          target_branch="test-merge-and-push/v1.1.${{ github.run_number }}.target"
+          push_branch="test-merge-and-push/v1.1.${{ github.run_number }}.push"
+          echo "target-branch=$target_branch" >> "$GITHUB_OUTPUT"
+          echo "push-branch=$push_branch" >> "$GITHUB_OUTPUT"
+
+      - name: Create Target Branch (${{ steps.generate-branches.outputs.target-branch }})
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          target_branch=${{ steps.generate-branches.outputs.target-branch }}
+
+          if git ls-remote --heads origin "$target_branch" | grep "$target_branch"; then
+            echo "Target branch $target_branch already exists. Skipping branch creation."
+          else
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git checkout -b $target_branch
+            echo "This is the target branch" > target-branch.txt
+            git add target-branch.txt
+            git commit -m "Add target branch file" || { echo "Failed to create branch $target_branch"; exit 1; }
+            git push origin $target_branch || { echo "Failed to push branch $target_branch"; exit 1; }
+          fi
+
+      - name: Check and Create Push Branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          push_branch=${{ steps.generate-branches.outputs.push-branch }}
+
+          if git ls-remote --heads origin "$push_branch" | grep "$push_branch"; then
+            echo "Push branch $push_branch already exists. Skipping branch creation."
+          else
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git checkout -b $push_branch || { echo "Failed to create branch $push_branch"; exit 1; }
+            git push origin $push_branch || { echo "Failed to push branch $push_branch"; exit 1; }
+          fi
+
+  merge-and-push:
+    needs: [create-branches]
+    uses: ./.github/workflows/reusable-merge-and-push.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      target-branch: ${{ needs.create-branches.outputs.target-branch }}
+      push-branch: ${{ needs.create-branches.outputs.push-branch }}
+
+  verify-merge:
+    needs: [create-branches, merge-and-push]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify Merge (${{ needs.create-branches.outputs.target-branch }} -> ${{ needs.create-branches.outputs.push-branch }})
+        id: verify-merge-target-branch
+        run: |
+          set -e
+          target_branch=${{ needs.create-branches.outputs.target-branch }}
+          push_branch=${{ needs.create-branches.outputs.push-branch }}
+  
+          git fetch origin $push_branch
+  
+          if git merge-base --is-ancestor origin/$target_branch origin/$push_branch; then
+            echo "$target_branch is already merged into $push_branch."
+            echo "can-delete=true" >> $GITHUB_OUTPUT
+          else
+            echo "::error::$target_branch is not merged into $push_branch. Aborting deletion."
+            echo "can-delete=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  delete-target-branch:
+    needs: [create-branches, merge-and-push, verify-merge]
+    if: ${{ inputs.delete-branch && always() }}
+    uses: ./.github/workflows/reusable-clean-branch.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ needs.create-branches.outputs.target-branch }}
+
+  delete-push-branch:
+    needs: [create-branches, merge-and-push, verify-merge]
+    if: ${{ inputs.delete-branch && always() }}
+    uses: ./.github/workflows/reusable-clean-branch.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ needs.create-branches.outputs.push-branch }}

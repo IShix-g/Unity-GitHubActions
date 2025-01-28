@@ -1,0 +1,75 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag you want to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      clean-branch:
+        description: 'Delete the branch? All branches except the default branch will be deleted.'
+        default: false
+        type: boolean
+      dry-run:
+        description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
+        default: false
+        type: boolean
+      fast-forward:
+        description: 'Allow fast-forward merge'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  update-packagejson:
+    uses: ./.github/workflows/reusable-update-packagejson.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      ref: ${{ github.ref }}
+      file-path: ./Packages/SimplePackage/package.json
+      tag: ${{ inputs.tag }}
+      dry-run: ${{ inputs.dry-run }}
+
+  merge-and-push:
+    needs: [update-packagejson]
+    uses: ./.github/workflows/reusable-merge-and-push.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      target-branch: ${{ github.ref }}
+      push-branch: ${{ github.event.repository.default_branch }}
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+      dry-run: ${{ inputs.dry-run }}
+      fast-forward: ${{ inputs.fast-forward }}
+
+  release-notes:
+    needs: [update-packagejson, merge-and-push]
+    uses: ./.github/workflows/reusable-release-notes.yaml
+    with:
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
+
+  create-release:
+    needs: [update-packagejson, merge-and-push, release-notes]
+    uses: ./.github/workflows/reusable-create-release.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      commit-id: ${{ needs.merge-and-push.outputs.sha }}
+      dry-run: ${{ inputs.dry-run }}
+      tag: ${{ inputs.tag }}
+      release-note: ${{ needs.release-notes.outputs.notes }}
+
+  clean-branch:
+    needs: [update-packagejson, merge-and-push, release-notes, create-release]
+    if: ${{ inputs.clean-branch && needs.update-packagejson.outputs.changed == '1' }}
+    uses: ./.github/workflows/reusable-clean-branch.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ github.ref }}

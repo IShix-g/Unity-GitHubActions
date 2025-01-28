@@ -1,0 +1,123 @@
+name: (Test) Clean package.json branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name (optional). If left empty, an appropriate test branch will be created.'
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        default: ''
+    secrets:
+      BOT_APP_ID:
+        required: true
+      BOT_PRIVATE_KEY:
+        required: true
+
+jobs:
+  set-branch:
+    runs-on: ubuntu-24.04
+    outputs:
+      branch: ${{ steps.set-branch.outputs.branch }}
+    steps:
+      - name: Set branch
+        id: set-branch
+        run: |
+          if [ -n "${{ inputs.branch }}" ]; then
+            branch="${{ inputs.branch }}"
+          else
+            branch="test-clean-package-branch/v1.1.${{ github.run_number }}"
+          fi
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+  create-branch:
+    needs: [set-branch]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if branch exists locally or remotely
+        id: check-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch_name="${{ needs.set-branch.outputs.branch }}"
+          is_remote_exist=false
+          is_local_exist=false
+
+          # Check for local branch
+          if git rev-parse --verify "$branch_name" &>/dev/null; then
+            echo "Local branch '$branch_name' exists."
+            is_local_exist=true
+          fi
+
+          # Check for remote branch
+          if git ls-remote --heads origin "$branch_name" | grep "$branch_name" &>/dev/null; then
+            echo "Remote branch '$branch_name' exists."
+            is_remote_exist=true
+          fi
+
+          if [ "$is_local_exist" = true ] || [ "$is_remote_exist" = true ]; then
+            echo "Branch '$branch_name' exists, skipping creation."
+            echo "branch-exists=true" >> $GITHUB_ENV
+          else
+            echo "Branch '$branch_name' does not exist."
+            echo "branch-exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create branch - ${{ needs.set-branch.outputs.branch }}
+        if: env.branch-exists == 'false'
+        id: create-branch
+        run: |
+          branch_name="${{ needs.set-branch.outputs.branch }}"
+          git checkout -b "$branch_name"
+
+      - name: Push branch to remote - ${{ needs.set-branch.outputs.branch }}
+        if: env.branch-exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin "${{ needs.set-branch.outputs.branch }}"
+
+  clean-branch:
+    needs: [set-branch, create-branch]
+    uses: ./.github/workflows/reusable-clean-branch.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ needs.set-branch.outputs.branch }}
+
+  check-branch-existence:
+    needs: [set-branch, create-branch, clean-branch]
+    if: ${{ needs.clean-packagejson-branch.outputs.branch-deleted == '1' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if branch exists
+        id: check-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch_name="${{ needs.set-branch.outputs.branch }}"
+          if git ls-remote --heads origin "$branch_name" | grep "$branch_name"; then
+            echo "::error::Branch exists: $branch_name"
+            exit 1
+          fi
+
+          branch_deleted=${{ needs.clean-packagejson-branch.outputs.branch-deleted }}
+          echo "branch_deleted=$branch_deleted"
+
+          if [ "$branch_deleted" -ne 1 ]; then
+            echo "::error::Branch deletion failed or not successful."
+            exit 1
+          fi
+          
+          echo "::notice::Branch successfully deleted. $branch_deleted"
