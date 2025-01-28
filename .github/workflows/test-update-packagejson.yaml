@@ -52,7 +52,7 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       ref: ${{ github.ref }}
-      file-path: ./Packages/TestSimplePackage/package.json
+      file-path: ./Packages/TestPackage/package.json
       tag: ${{ needs.set-tag.outputs.tag }}
       dry-run: true
       require-validation: ${{ inputs.require-validation }}
