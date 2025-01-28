@@ -1,4 +1,4 @@
-name: Release manually by merging any branch into the default branch
+name: Manual Release (Merge to Default)
 
 on:
   workflow_dispatch:
