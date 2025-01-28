@@ -1,2 +1,102 @@
 # Unity-GitHubActions
 GitHub Actions for Unity
+
+## What does this action do?
+
+Automate Unity Package Releases Using GitHub Actions
+
+**This action automates the following tasks:**
+- Updates the version in the [Package manifest](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)
+- Generates a release
+- Creates tags
+
+### Release Notes
+
+By starting commit messages with keywords like `feat` or `fix`, they will be automatically included in the release notes.
+
+![](Docs/release-note.jpg)
+
+### When branch or tag protection is enabled
+
+If branch or tag protection is enabled, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
+
+- Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
+- Set `BOT_APP_ID` and `BOT_PRIVATE_KEY` in the repository's Secrets
+- Update the protection rules to allow the GitHub App to bypass them
+
+![](Docs/bot-setting.jpg)
+
+## Required Configuration
+
+Enable the **Read and write permissions** setting under `Settings > Actions > General > Workflow permissions`.
+
+![](Docs/settings_action.jpg)
+
+## Manual Release
+
+Navigate to the Actions tab and trigger the manual release by selecting `Run workflow`.
+
+![](Docs/release_manually.jpg)
+
+| Option                | Description  | Default | Example  |
+|-----------------------|--------------|---------|----------|
+| tag                  | Git tag you want to create  |         | 1.0.0    |
+| clean-branch         | Delete the branch? All branches except the default branch will be deleted.  | false   |          |
+| fast-forward         | Allow fast-forward merge   | false   |          |
+| include-default-branch | Include the default branch in the workflow behavior | false   |          |
+| dry-run              | Simulate the merge without committing or pushing changes | false   |          |
+| draft-release        | `true` for Draft release, `false` for Non-draft release | false   |          |
+
+### Steps to Release Manually
+
+1. Create a branch (e.g., `release`)
+2. Prepare the release in this branch
+3. Trigger the manual release via `Run workflow`
+
+![](Docs/release_manually2.jpg)
+
+### Setup Guide
+
+1. Copy the code from [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) and create a YAML file in your project’s Actions folder.
+2. Update the `file-path` in `update-packagejson` to fit your project structure.
+3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
+4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+
+---
+
+## Release via Pull Request
+
+Create a pull request from a prepared branch to the default branch with the **release title as the tag name**. Once the pull request is merged, the release will be created automatically.
+
+![](Docs/pull_request.jpg)
+
+After merging, the release will be created automatically.
+
+![](Docs/pull_request2.jpg)
+
+### Conditions for Release Creation
+
+A release will be triggered when the following conditions are met:
+- The pull request title contains a version number (e.g., `1.0.0`)
+- The base branch is the [default branch](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch)
+
+### Steps to Release via Pull Request
+
+1. Create a branch (e.g., `release`)
+2. Prepare the release in this branch
+3. Create a pull request to merge this branch into the default branch. Use the version number as the pull request title.
+4. Merge the pull request.
+5. The release will be generated automatically.
+
+### Setup Guide
+
+1. Copy the code from [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) and create a YAML file in your project’s Actions folder.
+2. Update the `file-path` in `update-packagejson` to match your project’s file structure.
+3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
+4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+
+---
+
+## Recommendation
+
+Even when using the pull request release method, it is advisable to configure the manual release option as a fallback mechanism. Otherwise, creating new pull requests will be the only way to create releases.
