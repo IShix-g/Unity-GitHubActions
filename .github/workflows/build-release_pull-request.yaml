@@ -1,4 +1,4 @@
-name: Release via PR (Default Branch)
+name: Release from default branch via pull request
 
 on:
   pull_request:
