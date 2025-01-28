@@ -1,8 +1,8 @@
 name: Release from default branch via commit
 
 on:
-  branches:
-    - main
+  push:
+    branches: main
 
 jobs:
   extract-tag:
