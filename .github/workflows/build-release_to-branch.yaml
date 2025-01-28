@@ -35,6 +35,7 @@ jobs:
           target_branch="${{ github.ref }}"
           default_branch="${{ github.event.repository.default_branch }}"
           echo "::error::Cannot proceed on default branch. ($default_branch)"
+          echo "::error::If you want to target the default branch ($default_branch), please turn on 'Include default branch'."
           echo "Target branch: $target_branch"
           echo "Default branch: $default_branch"
           exit 1
