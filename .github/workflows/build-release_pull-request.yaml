@@ -17,9 +17,12 @@ jobs:
         run: |
           pr_title="${{ github.event.pull_request.title }}"
           echo "Pull Request title: $pr_title"
-
-          tag_regex='(?i)(v|ver\.|version)?\s*\.?\s*([0-9]+\.[0-9]+\.[0-9]+)'
-          if [[ "$pr_title" =~ $tag_regex ]]; then
+          pr_title_lower=$(echo "$pr_title" | tr '[:upper:]' '[:lower:]')
+          echo "Pull Request title (lowercase): $pr_title_lower"
+          
+          tag_regex='(v|ver\.|version)?\s*([0-9]+\.[0-9]+\.[0-9]+)(\s|$)'
+          
+          if [[ $pr_title_lower =~ $tag_regex ]]; then
             extracted_tag="${BASH_REMATCH[2]}"
             echo "Extracted tag: $extracted_tag"
             echo "tag=$extracted_tag" >> "$GITHUB_OUTPUT"
