@@ -21,6 +21,9 @@ on:
         required: false
         default: false
 
+env:
+  PACKAGE_JSON_PATH: './Packages/SimplePackage/package.json'
+
 jobs:
   validate-branch:
     runs-on: ubuntu-22.04
@@ -43,7 +46,7 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       ref: ${{ github.ref }}
-      file-path: ./Packages/SimplePackage/package.json
+      file-path: ${{ env.PACKAGE_JSON_PATH }}
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
 

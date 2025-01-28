@@ -21,40 +21,29 @@ on:
         required: false
         default: false
 
-jobs:
-  validate-branch:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Check if ref is default branch
-        if: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-        run: |
-          target_branch="${{ github.ref }}"
-          default_branch="${{ github.event.repository.default_branch }}"
-          echo "::error::Please specify the default branch to proceed. (target:$target_branch | default:$default_branch)"
-          echo "Target branch: $target_branch"
-          echo "Default branch: $default_branch"
-          exit 1
+env:
+  PACKAGEJSON_PATH: './Packages/SimplePackage/package.json'
 
+jobs:
   update-packagejson:
-    needs: [validate-branch]
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-packagejson.yaml@main
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
-      ref: ${{ github.ref }}
-      file-path: ./Packages/SimplePackage/package.json
+      ref: ${{ github.event.repository.default_branch }}
+      file-path: ${{ env.PACKAGEJSON_PATH }}
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
 
   release-notes:
-    needs: [validate-branch, update-packagejson]
+    needs: [update-packagejson]
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@main
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   create-release:
-    needs: [validate-branch, update-packagejson, release-notes]
+    needs: [update-packagejson, release-notes]
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@main
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
