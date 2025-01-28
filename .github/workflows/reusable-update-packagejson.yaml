@@ -29,7 +29,7 @@ on:
         description: 'Format for the commit message when updating package.json'
         required: false
         type: string
-        default: 'feat: Update package.json to {v}'
+        default: 'Update package.json to {v}'
     secrets:
       BOT_APP_ID:
         required: false

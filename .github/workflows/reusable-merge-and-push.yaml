@@ -36,9 +36,9 @@ on:
       sha:
         description: 'Git commit SHA after package.json is updated.'
         value: ${{ jobs.merge-and-push.outputs.sha }}
-      has-merged:
+      merged:
         description: 'Whether the branches were merged successfully'
-        value: ${{ jobs.merge-and-push.outputs.has-merged }}
+        value: ${{ jobs.merge-and-push.outputs.merged }}
 
 jobs:
   merge-and-push:
@@ -115,7 +115,7 @@ jobs:
           merge_log=$(git merge --no-commit --no-ff origin/${{ steps.normalize-branches.outputs.target-branch }} 2>&1)
 
           log_length=$(echo "$merge_log" | wc -c)
-      
+          
           if [ "$log_length" -ge 100 ]; then
             echo "$merge_log" > dry-run-log.txt
             echo "log-exists=1" >> "$GITHUB_OUTPUT"
@@ -206,5 +206,5 @@ jobs:
           set -e
           git fetch origin
           git push origin ${{ steps.normalize-branches.outputs.push-branch }}
-          echo "has-merged=1" >> "$GITHUB_OUTPUT"
+          echo "merged=1" >> "$GITHUB_OUTPUT"
           echo "::notice::Merged: ${{ steps.normalize-branches.outputs.target-branch }} -> ${{ steps.normalize-branches.outputs.push-branch }}"

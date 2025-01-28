@@ -98,14 +98,17 @@ jobs:
           target_branch=${{ needs.create-branches.outputs.target-branch }}
           push_branch=${{ needs.create-branches.outputs.push-branch }}
   
+          if [ "${{ needs.merge-and-push.outputs.merged }}" != "1" ]; then
+            echo "::error::Merge has not been completed."
+            exit 1
+          fi
+  
           git fetch origin $push_branch
   
           if git merge-base --is-ancestor origin/$target_branch origin/$push_branch; then
             echo "$target_branch is already merged into $push_branch."
-            echo "can-delete=true" >> $GITHUB_OUTPUT
           else
             echo "::error::$target_branch is not merged into $push_branch. Aborting deletion."
-            echo "can-delete=false" >> $GITHUB_OUTPUT
             exit 1
           fi
 

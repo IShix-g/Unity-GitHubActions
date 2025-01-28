@@ -35,6 +35,7 @@ jobs:
 
   merge-and-push:
     needs: [update-packagejson]
+    if: ${{ needs.update-packagejson.outputs.changed == '1' }}
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -46,14 +47,29 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
       fast-forward: ${{ inputs.fast-forward }}
 
-  release-notes:
+  validate-outputs:
     needs: [update-packagejson, merge-and-push]
+    if: ${{ needs.update-packagejson.outputs.changed != '1' || needs.merge-and-push.outputs.merged != '1' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Validate Outputs
+        run: |
+          target_branch="${{ needs.create-branches.outputs.target-branch }}"
+          push_branch="${{ needs.create-branches.outputs.push-branch }}"
+          
+          echo "::error::Conditions not met. Exiting..."
+          echo "Target branch: $target_branch"
+          echo "Push branch: $push_branch"
+          exit 1
+
+  release-notes:
+    needs: [update-packagejson, merge-and-push, validate-outputs]
     uses: ./.github/workflows/reusable-release-notes.yaml
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   create-release:
-    needs: [update-packagejson, merge-and-push, release-notes]
+    needs: [update-packagejson, merge-and-push, validate-outputs, release-notes]
     uses: ./.github/workflows/reusable-create-release.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -65,8 +81,8 @@ jobs:
       release-note: ${{ needs.release-notes.outputs.notes }}
 
   clean-branch:
-    needs: [update-packagejson, merge-and-push, release-notes, create-release]
-    if: ${{ inputs.clean-branch && needs.update-packagejson.outputs.changed == '1' }}
+    needs: [update-packagejson, merge-and-push, validate-outputs, release-notes, create-release]
+    if: ${{ inputs.clean-branch }}
     uses: ./.github/workflows/reusable-clean-branch.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}

@@ -36,7 +36,7 @@ jobs:
     outputs:
       notes: ${{ steps.release-notes.outputs.notes }}
     env:
-      FILTER_CONDITION: 'fix|feat|docs|style|refactor|perf'
+      FILTER_CONDITION: 'feat|fix|docs|style|refactor|perf'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,7 +45,7 @@ jobs:
 
       - name: Fetch all tags
         run: git fetch --tags
-        
+
       - name: Verify existence of from-tag (${{ inputs.from-tag || 'Empty' }})
         if: ${{ inputs.from-tag != '' }}
         run: |
@@ -129,24 +129,45 @@ jobs:
           echo "Fetching commit range:"
           echo "Start: ${{ steps.determine-range.outputs.from_commit }}"
           echo "End: ${{ steps.determine-range.outputs.to_commit }}"
+          echo "Format: ${{ inputs.commit-message-format }}"
           echo "Filter conditions: $FILTER_CONDITION"
 
-          notes=$(
-            git log ${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }} \
-            --pretty=format:"${{ inputs.commit-message-format }}" \
-            | grep -iE "$FILTER_CONDITION" \
-            | grep -v "github-actions" \
-            || echo "No matching commits found."
-          )
-          length=$(echo "$notes" | wc -l)
-          echo "::notice::Release Note: $length items"
-          
+          IFS='|' read -r -a filter_conditions <<< "$FILTER_CONDITION"
+          echo "Conditions: ${filter_conditions[@]}"
+
+          sorted_notes=""
+
+          for condition in "${filter_conditions[@]}"; do
+
+            filtered_notes=$(
+              git log ${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }} \
+              --pretty=format:"${{ inputs.commit-message-format }}####UNIQUE####%cn" \
+              | grep -vi "github-actions\[bot\]" \
+              | sed 's/####UNIQUE####.*$//' \
+              | grep -iE "\b($condition)\s*:" \
+              || echo ""
+            )
+
+            if [ ! -z "$filtered_notes" ]; then
+              echo "Found commits for condition: $condition"
+              echo "$filtered_notes"
+              sorted_notes="$sorted_notes"$'\n'"$filtered_notes"
+            else
+              echo "No commits found for condition: $condition"
+            fi
+          done
+
+          sorted_notes=$(echo "$sorted_notes" | sed '/^$/d')
+
+          length=$(echo "$sorted_notes" | wc -l)
+          echo "::notice::Release Notes: $length items"
+
           echo "::group::Notebook Contents"
-          echo "$notes"
+          echo "$sorted_notes"
           echo "::endgroup::"
-          
+
           {
             echo "notes<<EOF"
-            echo "$notes"
+            echo "$sorted_notes"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
