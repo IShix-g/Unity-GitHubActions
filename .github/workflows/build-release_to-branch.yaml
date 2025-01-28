@@ -20,13 +20,17 @@ on:
         type: boolean
         required: false
         default: false
+      include-default-branch:
+        description: 'Include default branch in the action behavior. Set to true to include it.'
+        type: boolean
+        default: false
 
 jobs:
   validate-branch:
     runs-on: ubuntu-22.04
     steps:
       - name: Check if ref is default branch
-        if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+        if: ${{ !inputs.include-default-branch && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
         run: |
           target_branch="${{ github.ref }}"
           default_branch="${{ github.event.repository.default_branch }}"

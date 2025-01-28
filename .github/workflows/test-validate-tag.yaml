@@ -18,7 +18,7 @@ on:
 
 jobs:
   set-tag:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     outputs:
       tag: ${{ steps.set-tag.outputs.tag }}
     steps:

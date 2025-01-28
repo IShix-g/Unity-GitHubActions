@@ -20,7 +20,7 @@ on:
 
 jobs:
   set-branch:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     outputs:
       branch: ${{ steps.set-branch.outputs.branch }}
     steps:
@@ -36,7 +36,7 @@ jobs:
 
   create-branch:
     needs: [set-branch]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,7 +96,7 @@ jobs:
   check-branch-existence:
     needs: [set-branch, create-branch, clean-branch]
     if: ${{ needs.clean-packagejson-branch.outputs.branch-deleted == '1' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

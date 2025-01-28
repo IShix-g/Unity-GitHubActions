@@ -72,7 +72,7 @@ jobs:
 
       - name: Validate tag is not reverting
         id: validate-tag
-        if: ${{ inputs.validate-semantic-versioning == false || steps.validate-format.outputs.validated == 'true' }}
+        if: ${{ !inputs.validate-semantic-versioning || steps.validate-format.outputs.validated == 'true' }}
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
