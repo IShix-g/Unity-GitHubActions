@@ -34,6 +34,15 @@ Enable the **Read and write permissions** setting under `Settings > Actions > Ge
 
 ## Manual Release
 
+```mermaid
+graph LR
+    validate-branch --> update-packagejson
+    update-packagejson --> merge-and-push
+    merge-and-push --> release-notes
+    release-notes --> create-release
+    create-release --> clean-branch
+```
+
 Navigate to the Actions tab and trigger the manual release by selecting `Run workflow`.
 
 ![](Docs/release_manually.jpg)
@@ -65,6 +74,13 @@ Navigate to the Actions tab and trigger the manual release by selecting `Run wor
 ---
 
 ## Release via Pull Request
+
+```mermaid
+graph LR
+    extract-tag --> update-packagejson
+    update-packagejson --> release-notes
+    release-notes --> create-release
+```
 
 Create a pull request from a prepared branch to the default branch with the **release title as the tag name**. Once the pull request is merged, the release will be created automatically.
 
