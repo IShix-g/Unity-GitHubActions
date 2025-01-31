@@ -38,7 +38,7 @@ on:
         value: ${{ jobs.merge-and-push.outputs.sha }}
       merged:
         description: 'Whether the branches were merged successfully'
-        value: ${{ jobs.merge-and-push.outputs.merged }}
+        value: ${{ jobs.push-to-branch.outputs.merged }}
 
 jobs:
   merge-and-push:
@@ -46,6 +46,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       sha: ${{ steps.set-sha.outputs.sha }}
+      merged: ${{ steps.set-sha.outputs.sha }}
     steps:
       - name: Check secrets availability
         id: check-secrets
@@ -199,6 +200,7 @@ jobs:
           git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
 
       - name: Push to Branch (${{ steps.set-push-branch.outputs.push-branch }})
+        id: push-to-branch
         if: ${{ steps.check-update.outputs.changed == '1' && steps.branches-match.outputs.identical != '1' && !inputs.dry-run }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
