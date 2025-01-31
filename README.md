@@ -1,5 +1,10 @@
+[![Test Create Release](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml)  
+[![Test Update package.json](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml)  
+[![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
+[![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)
+
 # Unity-GitHubActions
-GitHub Actions for Unity
+GitHub Actions for Unity.
 
 ## What does this action do?
 
@@ -18,7 +23,7 @@ By starting commit messages with keywords like `feat` or `fix`, they will be aut
 
 ### When branch or tag protection is enabled
 
-If branch or tag protection is enabled, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
+**If branch or tag protection is enabled**, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
 
 - Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
 - Install the app and configure it for the target repository
@@ -132,3 +137,7 @@ A release will be triggered when the following conditions are met:
 ## Recommendation
 
 Even when using the pull request release method, it is advisable to configure the manual release option as a fallback mechanism. Otherwise, creating new pull requests will be the only way to create releases.
+
+## 参考にしたリポジトリ
+
+https://github.com/Cysharp/Actions
