@@ -38,7 +38,7 @@ on:
         value: ${{ jobs.merge-and-push.outputs.sha }}
       merged:
         description: 'Whether the branches were merged successfully'
-        value: ${{ jobs.push-to-branch.outputs.merged }}
+        value: ${{ jobs.merge-and-push.outputs.merged }}
 
 jobs:
   merge-and-push:
@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       sha: ${{ steps.set-sha.outputs.sha }}
-      merged: ${{ steps.set-sha.outputs.sha }}
+      merged: ${{ steps.push-to-branch.outputs.merged }}
     steps:
       - name: Check secrets availability
         id: check-secrets
