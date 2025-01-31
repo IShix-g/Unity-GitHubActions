@@ -19,6 +19,17 @@ Automate Unity Package Releases Using GitHub Actions
 
 By starting commit messages with keywords like `feat` or `fix`, they will be automatically included in the release notes.
 
+#### List of Available Types
+
+| Type       | Description                                          |
+|------------|------------------------------------------------------|
+| feat:      | Addition of a new feature                           |
+| fix:       | Bug fixes                                           |
+| docs:      | Documentation updates or corrections                |
+| style:     | Code style adjustments (e.g., removing whitespaces) |
+| refactor:  | Code changes that neither fix a bug nor add a feature |
+| perf:      | Changes made to improve performance                 |
+
 ![](Docs/release-note.jpg)
 
 ### When branch or tag protection is enabled
