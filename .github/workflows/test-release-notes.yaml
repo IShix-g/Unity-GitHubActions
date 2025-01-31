@@ -1,8 +1,5 @@
 name: (Test) Release Notes Generator
 
-env:
-  COMMIT_MESSAGE_FORMAT: '- %s by %cn (%h)'
-
 on:
   workflow_dispatch:
     inputs:
@@ -17,7 +14,7 @@ on:
       commit-message-format:
         description: 'Commit message format (see https://git-scm.com/docs/pretty-formats)'
         type: string
-        default: ${{ env.COMMIT_MESSAGE_FORMAT }}
+        default: '- %s by %cn (%h)'
       derive-from-tag:
         description: 'true = Auto-determine from-tag using previous tags; false = Set manually.'
         type: boolean
