@@ -299,8 +299,6 @@ For branch or tag protection:
 | BOT_APP_ID      | Specify the application ID |
 | BOT_PRIVATE_KEY | Set the private key for the app |
 
----
-
 ## Related Repository
 
 https://github.com/Cysharp/Actions
