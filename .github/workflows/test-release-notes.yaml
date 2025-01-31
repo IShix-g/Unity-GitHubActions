@@ -29,17 +29,3 @@ jobs:
       commit-message-format: ${{ inputs.commit-message-format }}
       commit-id: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
       derive-from-tag: ${{ inputs.derive-from-tag }}
-
-  print:
-    needs: [release-notes]
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Echo release notes
-        run: |
-          notes="${{ needs.release-notes.outputs.notes }}"
-          length=$(echo "$notes" | wc -l)
-          echo "::notice::Release Note: $length items"
-          IFS=$'\n'
-          for line in $notes; do
-          echo $line
-          done
