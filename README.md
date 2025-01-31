@@ -1,5 +1,10 @@
+[![Test Create Release](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml)  
+[![Test Update package.json](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml)  
+[![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
+[![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)
+
 # Unity-GitHubActions
-GitHub Actions for Unity
+GitHub Actions for Unity.
 
 ## What does this action do?
 
@@ -18,7 +23,7 @@ By starting commit messages with keywords like `feat` or `fix`, they will be aut
 
 ### When branch or tag protection is enabled
 
-If branch or tag protection is enabled, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
+**If branch or tag protection is enabled**, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
 
 - Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
 - Install the app and configure it for the target repository
@@ -132,3 +137,159 @@ A release will be triggered when the following conditions are met:
 ## Recommendation
 
 Even when using the pull request release method, it is advisable to configure the manual release option as a fallback mechanism. Otherwise, creating new pull requests will be the only way to create releases.
+
+## Job Descriptions
+
+Main Job Descriptions.
+
+### Validate Tag
+
+[.github/workflows/reusable-validate-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-validate-tag.yaml)
+
+This action checks if the tag format is valid and returns `outputs.normalized-tag`, a normalized version of the tag with only numeric values.
+
+#### Inputs
+
+| id                        | description                                                                                                             | default |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------|---------|
+| require-validation        | `true` to disallow old or invalid tags. `false` to proceed even if validation fails.                                    | true    |
+| validate-semantic-versioning | Specifies whether to validate the tag format using Semantic Versioning.                                              | true    |
+| tag                       | The tag to validate (e.g., `1.0.0`).                                                                                   |         |
+
+#### Outputs
+
+| id               | description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| normalized-tag   | Normalized tag (e.g., tag without the `v` prefix).                         |
+| tag              | Same as the input tag.                                                     |
+| validated        | Indicates whether the tag passed validation.                               |
+
+---
+
+### Update package.json
+
+[.github/workflows/reusable-update-packagejson.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-packagejson.yaml)
+
+This action updates the version in `package.json` and commits the changes.
+
+#### Inputs
+
+| id                        | description                                                                                            | default              |
+|---------------------------|--------------------------------------------------------------------------------------------------------|----------------------|
+| file-path                 | Path to the `package.json` file to update. You can provide multiline paths. Only `package.json` files are supported. |                      |
+| tag                       | The Git tag to assign (e.g., `1.0.0`).                                                                |                      |
+| dry-run                   | `true` to simulate the update and commit without actual changes being pushed.                         |                      |
+| require-validation        | `true` requires tag validation to pass, `false` allows proceeding even if it fails.                   | true                 |
+| ref                       | The branch or tag to check out before updating.                                                       |                      |
+| commit-message-format     | Template for the commit message when updating `package.json`. Example: `Update package.json to {v}`. | `Update package.json to {v}` |
+
+#### Secrets
+
+For branch or tag protection:
+
+| id            | description                |
+|---------------|----------------------------|
+| BOT_APP_ID    | Specify the application ID |
+| BOT_PRIVATE_KEY | Set the private key for the app |
+
+#### Outputs
+
+| id               | description                                      |
+|------------------|--------------------------------------------------|
+| normalized-tag   | Normalized tag (tag without the `v` prefix).     |
+| sha              | Git commit SHA after the `package.json` update. |
+| changed          | Indicates if the Git branch was modified or created. |
+
+---
+
+### Merge and Push
+
+[.github/workflows/reusable-merge-and-push.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-merge-and-push.yaml)
+
+This action merges branches and pushes the changes.
+
+#### Inputs
+
+| id             | description                                     | default |
+|----------------|-------------------------------------------------|---------|
+| target-branch  | The target branch from the repository to merge. |         |
+| push-branch    | The branch to push the changes into.            |         |
+| commit-id      | Commit ID for creating a release and tag.       |         |
+| dry-run        | Enables dry-run mode (simulate without committing). | false   |
+| fast-forward   | Allows a fast-forward merge.                   | false   |
+
+#### Secrets
+
+For branch or tag protection:
+
+| id              | description                |
+|-----------------|----------------------------|
+| BOT_APP_ID      | Specify the application ID |
+| BOT_PRIVATE_KEY | Set the private key for the app |
+
+#### Outputs
+
+| id               | description                                   |
+|------------------|-----------------------------------------------|
+| sha              | Git commit SHA after the merge.              |
+| merged           | Indicates if the branches were successfully merged. |
+
+---
+
+### Release Notes Generator
+
+[.github/workflows/reusable-release-notes.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-release-notes.yaml)
+
+This action generates release notes based on commit messages. Messages beginning with `fix:` or `feat:` will be included in the release notes.
+
+#### Inputs
+
+| id                     | description                                                                              | default                  |
+|------------------------|------------------------------------------------------------------------------------------|--------------------------|
+| from-tag               | The starting tag (default: first commit if unset).                                       |                          |
+| to-tag                 | The ending tag (default: latest commit if unset).                                        |                          |
+| commit-message-format  | Format for commit messages (see https://git-scm.com/docs/pretty-formats for details).    | `- %s (%h)`              |
+| commit-id              | Commit ID for release and tag.                                                          |                          |
+| derive-from-tag        | `true` to auto-determine `from-tag` using previous tags; `false` to configure manually. | true                     |
+
+#### Outputs
+
+| id      | description                           |
+|---------|---------------------------------------|
+| notes   | The generated release notes.         |
+
+---
+
+### Create Release
+
+[.github/workflows/reusable-create-release.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-create-release.yaml)
+
+This action creates a release and optionally adds a tag.
+
+#### Inputs
+
+| id                     | description                                                                                       | default        |
+|------------------------|---------------------------------------------------------------------------------------------------|----------------|
+| commit-id              | Commit ID for creating the release and tag.                                                      |                |
+| dry-run                | `true` to perform a dry run (does not create the release).                                        |                |
+| require-validation     | `true` enforces validation; `false` skips validation and proceeds.                                | true           |
+| wait-before-delete     | The wait time (in seconds) before deleting temporary branches.                                    | 25             |
+| tag                    | The Git tag to create (e.g., `1.0.0`).                                                           |                |
+| release-format         | Template for the release title. E.g., `Ver.{0}` will title the release as `Ver.1.0.0`. `{0}` omits prefixes. | Ver.{0}        |
+| release-note           | Custom release notes to include.                                                                 |                |
+| draft-release          | `true` for a draft release; `false` for a final release.                                         | false          |
+
+#### Secrets
+
+For branch or tag protection:
+
+| id              | description                |
+|-----------------|----------------------------|
+| BOT_APP_ID      | Specify the application ID |
+| BOT_PRIVATE_KEY | Set the private key for the app |
+
+---
+
+## Related Repository
+
+https://github.com/Cysharp/Actions
