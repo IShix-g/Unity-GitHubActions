@@ -21,10 +21,30 @@ By starting commit messages with keywords like `feat` or `fix`, they will be aut
 If branch or tag protection is enabled, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
 
 - Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
+- Install the app and configure it for the target repository
 - Set `BOT_APP_ID` and `BOT_PRIVATE_KEY` in the repository's Secrets
 - Update the protection rules to allow the GitHub App to bypass them
 
+#### GitHub App Permissions
+
+Please configure the following permissions:
+
+| Permissions  |  Read and write |
+|---|---|
+| Administration  |  Read and write |
+| Contents  | Read and write  |
+| Metadata  | Read-only  |
+| Pull requests  |  Read-only |
+
+#### Set Secrets
+
+`Repository > Settings > Secrets and variables > Actions`
 ![](Docs/bot-setting.jpg)
+
+#### Bypass the App
+
+`Repository > Settings > Rules > Rulesets`
+![](Docs/rules.jpg)
 
 ## Required Configuration
 
@@ -71,8 +91,6 @@ Navigate to the Actions tab and trigger the manual release by selecting `Run wor
 3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
 
----
-
 ## Release via Pull Request
 
 ```mermaid
@@ -110,8 +128,6 @@ A release will be triggered when the following conditions are met:
 2. Update the `file-path` in `update-packagejson` to match your project’s file structure.
 3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
-
----
 
 ## Recommendation
 
