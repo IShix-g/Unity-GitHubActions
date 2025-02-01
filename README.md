@@ -3,6 +3,8 @@
 [![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
 [![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)
 
+[README - 日本語版](Docs/README_jp.md)
+
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
@@ -41,26 +43,7 @@ By starting commit messages with keywords like `feat` or `fix`, they will be aut
 - Set `BOT_APP_ID` and `BOT_PRIVATE_KEY` in the repository's Secrets
 - Update the protection rules to allow the GitHub App to bypass them
 
-#### GitHub App Permissions
-
-Please configure the following permissions:
-
-| Permissions  |  Read and write |
-|---|---|
-| Administration  |  Read and write |
-| Contents  | Read and write  |
-| Metadata  | Read-only  |
-| Pull requests  |  Read-only |
-
-#### Set Secrets
-
-`Repository > Settings > Secrets and variables > Actions`
-![](Docs/bot-setting.jpg)
-
-#### Bypass the App
-
-`Repository > Settings > Rules > Rulesets`
-![](Docs/rules.jpg)
+For detailed configuration instructions, please refer to [GitHubApp.md](Docs/GitHubApp.md).
 
 ## Required Configuration
 
