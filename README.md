@@ -85,7 +85,7 @@ Navigate to the Actions tab and trigger the manual release by selecting `Run wor
 
 ### Setup Guide
 
-1. Copy the code from [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) and create a YAML file in your project’s Actions folder.
+1. Copy the code from [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) and create a YAML file in your project’s .github/workflows folder.
 2. Update the `file-path` in `update-packagejson` to fit your project structure.
 3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
@@ -123,7 +123,7 @@ A release will be triggered when the following conditions are met:
 
 ### Setup Guide
 
-1. Copy the code from [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) and create a YAML file in your project’s Actions folder.
+1. Copy the code from [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) and create a YAML file in your project’s .github/workflows folder.
 2. Update the `file-path` in `update-packagejson` to match your project’s file structure.
 3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
