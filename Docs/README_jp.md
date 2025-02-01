@@ -45,7 +45,7 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 
 ## 必須の設定
 
-`Settings > Actions > General > Workflow permissions`で**読み取り/書き込み権限** を設定してください。
+`Settings > Actions > General > Workflow permissions`で **Read and write permissions** を設定してください。
 
 ![](settings_action.jpg)
 
@@ -83,7 +83,7 @@ Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`
 
 ### セットアップガイド
 
-1. [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) からコードをコピーし、プロジェクトの Actions フォルダに YAML ファイルを作成します。
+1. [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) からコードをコピーし、プロジェクトの `.github/workflows` フォルダに YAML ファイルを作成します。
 2. プロジェクト構造に合うように、`update-packagejson` 内の `file-path` を更新します。
 3. ブランチ保護ルールを使用していない場合、`secrets.BOT_APP_ID` および `secrets.BOT_PRIVATE_KEY` に関する記述を削除してください。
 4. 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
@@ -121,7 +121,7 @@ graph LR
 
 ### セットアップガイド
 
-1. [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) からコードをコピーし、プロジェクトの Actions フォルダに YAML ファイルを作成します。
+1. [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) からコードをコピーし、プロジェクトの `.github/workflows` フォルダに YAML ファイルを作成します。
 2. `update-packagejson` 内の `file-path` を、プロジェクトのファイル構造に合わせて更新します。
 3. ブランチの保護ルールを使用していない場合、`secrets.BOT_APP_ID` および `secrets.BOT_PRIVATE_KEY` に関する記述は削除してください。
 4. 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
