@@ -8,7 +8,7 @@ GitHub Actions for Unity.
 
 ## 実現すること
 
-GitHub アクションを使った Unity パッケージのリリースの自動化  
+GitHubアクションを使った、Unityパッケージのリリース自動化  
 
 **このアクションは以下のタスクを自動化します。**
 - [パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
@@ -34,7 +34,7 @@ GitHub アクションを使った Unity パッケージのリリースの自動
 
 ### ブランチ保護またはタグ保護が有効な場合
 
-**ブランチやタグの保護が有効な場合**、デフォルトではパーミッションエラーが発生します。これを回避するには、GitHub Apps でこれらの保護ルールを回避できるように設定します。
+デフォルトではパーミッションエラーが発生します。これを回避するには、GitHub Apps でこれらの保護ルールを回避できるように設定します。
 
 - [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)を作成する
 - アプリをインストールし、対象のリポジトリ用に設定する
