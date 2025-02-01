@@ -11,7 +11,7 @@ GitHub Actions for Unity.
 GitHub アクションを使った Unity パッケージのリリースの自動化  
 
 **このアクションは以下のタスクを自動化します。**
-- パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
+- [パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
 - リリースを生成する
 - タグを作成する
 
