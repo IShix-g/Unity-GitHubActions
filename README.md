@@ -8,6 +8,11 @@
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
+## Table of Contents
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ## What does this action do?
 
 Automate Unity Package Releases Using GitHub Actions

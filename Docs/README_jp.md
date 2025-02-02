@@ -6,6 +6,11 @@
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
+## 目次
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ## 実現すること
 
 GitHubアクションを使った、Unityパッケージのリリース自動化  
