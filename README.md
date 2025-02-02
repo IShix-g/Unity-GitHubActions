@@ -10,8 +10,46 @@ GitHub Actions for Unity.
 
 ## Table of Contents
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<details>
+<summary>Details</summary>
+
+- [What does this action do?](#what-does-this-action-do)
+  - [Release Notes](#release-notes)
+    - [List of Available Types](#list-of-available-types)
+  - [When branch or tag protection is enabled](#when-branch-or-tag-protection-is-enabled)
+- [Required Configuration](#required-configuration)
+- [Manual Release](#manual-release)
+  - [Steps to Release Manually](#steps-to-release-manually)
+  - [Setup Guide](#setup-guide)
+- [Release via Pull Request](#release-via-pull-request)
+  - [Conditions for Release Creation](#conditions-for-release-creation)
+  - [Steps to Release via Pull Request](#steps-to-release-via-pull-request)
+  - [Setup Guide](#setup-guide-1)
+- [Recommendation](#recommendation)
+- [Job Descriptions](#job-descriptions)
+  - [Validate Tag](#validate-tag)
+    - [Inputs](#inputs)
+    - [Outputs](#outputs)
+  - [Update package.json](#update-packagejson)
+    - [Inputs](#inputs-1)
+    - [Secrets](#secrets)
+    - [Outputs](#outputs-1)
+  - [Merge and Push](#merge-and-push)
+    - [Inputs](#inputs-2)
+    - [Secrets](#secrets-1)
+    - [Outputs](#outputs-2)
+  - [Release Notes Generator](#release-notes-generator)
+    - [Inputs](#inputs-3)
+    - [Outputs](#outputs-3)
+  - [Create Release](#create-release)
+    - [Inputs](#inputs-4)
+    - [Secrets](#secrets-2)
+- [Referenced Repository](#referenced-repository)
+
+</details>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## What does this action do?
 
