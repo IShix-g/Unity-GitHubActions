@@ -6,6 +6,49 @@
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
+## 目次
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<details>
+<summary>Details</summary>
+
+- [実現すること](#%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B%E3%81%93%E3%81%A8)
+  - [リリースノート](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88)
+    - [List of Available Types](#list-of-available-types)
+  - [ブランチ保護またはタグ保護が有効な場合](#%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E4%BF%9D%E8%AD%B7%E3%81%BE%E3%81%9F%E3%81%AF%E3%82%BF%E3%82%B0%E4%BF%9D%E8%AD%B7%E3%81%8C%E6%9C%89%E5%8A%B9%E3%81%AA%E5%A0%B4%E5%90%88)
+- [必須の設定](#%E5%BF%85%E9%A0%88%E3%81%AE%E8%A8%AD%E5%AE%9A)
+- [手動でのリリース](#%E6%89%8B%E5%8B%95%E3%81%A7%E3%81%AE%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9)
+  - [手動でリリースする手順](#%E6%89%8B%E5%8B%95%E3%81%A7%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%81%99%E3%82%8B%E6%89%8B%E9%A0%86)
+  - [セットアップガイド](#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%82%AC%E3%82%A4%E3%83%89)
+- [Release via Pull Request](#release-via-pull-request)
+  - [リリース作成の条件](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E4%BD%9C%E6%88%90%E3%81%AE%E6%9D%A1%E4%BB%B6)
+  - [プルリクエストを介したリリース手順](#%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%82%92%E4%BB%8B%E3%81%97%E3%81%9F%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E6%89%8B%E9%A0%86)
+  - [セットアップガイド](#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%82%AC%E3%82%A4%E3%83%89-1)
+- [推奨事項](#%E6%8E%A8%E5%A5%A8%E4%BA%8B%E9%A0%85)
+- [Jobの説明](#job%E3%81%AE%E8%AA%AC%E6%98%8E)
+  - [タグの検証 (Validate Tag)](#%E3%82%BF%E3%82%B0%E3%81%AE%E6%A4%9C%E8%A8%BC-validate-tag)
+    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs)
+    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs)
+  - [package.json の更新 (Update package.json)](#packagejson-%E3%81%AE%E6%9B%B4%E6%96%B0-update-packagejson)
+    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-1)
+    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1)
+    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-1)
+  - [マージとプッシュ (Merge and Push)](#%E3%83%9E%E3%83%BC%E3%82%B8%E3%81%A8%E3%83%97%E3%83%83%E3%82%B7%E3%83%A5-merge-and-push)
+    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-2)
+    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1-1)
+    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-2)
+  - [リリースノート生成 (Release Notes Generator)](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88%E7%94%9F%E6%88%90-release-notes-generator)
+    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-3)
+    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-3)
+  - [リリース作成 (Create Release)](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E4%BD%9C%E6%88%90-create-release)
+    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-4)
+    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1-2)
+- [参考リポジトリ](#%E5%8F%82%E8%80%83%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA)
+
+</details>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 実現すること
 
 GitHubアクションを使った、Unityパッケージのリリース自動化  
