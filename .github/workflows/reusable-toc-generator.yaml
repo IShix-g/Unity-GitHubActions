@@ -1,0 +1,52 @@
+name: TOC Generator
+
+on:
+  workflow_call:
+    inputs:
+      toc-title:
+        description: 'TOC Title'
+        required: false
+        type: string
+        default: 'Details'
+      target-paths:
+        description: 'Target file path. (Comma separated, Detail)'
+        required: false
+        type: string
+        default: 'README*.md'
+      folding:
+        description: 'Whether to make TOC foldable'
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+
+jobs:
+  generate-toc:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: technote-space/toc-generator@v4
+        with:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token || secrets.ACCESS_TOKEN }}
+          TOC_TITLE: ${{ inputs.toc-title }}
+          TARGET_PATHS: ${{ inputs.target-paths }}
+          FOLDING: ${{ inputs.folding }}
