@@ -48,10 +48,10 @@ jobs:
           commit_message="${{ github.event.head_commit.message }}"
           
           if [[ "$commit_message" != *"Update package.json"* ]]; then
-            echo "::notice::Commit message does not match: Update package.json"
+            echo "::notice::Commit message does not match"
             echo "passed=1" >> $GITHUB_OUTPUT
           else
-            echo "::notice::Commit message matches: Update package.json"
+            echo "::notice::Commit message matches"
           fi
 
   toc-generator:
