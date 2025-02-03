@@ -15,7 +15,7 @@ permissions:
 jobs:
   check-last-commit-tag:
     runs-on: ubuntu-22.04
-    env:
+    outputs:
       tagged: ${{ steps.check_tag.outputs.tagged }}
     steps:
       - name: Checkout code
