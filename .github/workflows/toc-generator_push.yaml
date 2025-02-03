@@ -1,6 +1,10 @@
 name: TOC Generator via push
 
-on: push
+on:
+  push:
+    tags-ignore:
+      - '**'
+  pull_request:
 
 permissions:
   contents: write
@@ -9,7 +13,7 @@ jobs:
   validate-branch:
     runs-on: ubuntu-22.04
     steps:
-      - name: Check if ref is default branch
+      - name: Check if ref is not default branch
         run: |
           target_branch="${{ github.ref }}"
           default_branch="${{ github.event.repository.default_branch }}"
@@ -26,15 +30,15 @@ jobs:
   validate-commit-message:
     runs-on: ubuntu-22.04
     steps:
-      - name: Check if ref is default branch
+      - name: Verify commit message contains...
         run: |
           commit_message="${{ github.event.head_commit.message }}"
           
           if [[ "$commit_message" != *"Update package.json"* ]]; then
-            echo "Commit message does not match: Update package.json"
+            echo "::notice::Commit message does not match: Update package.json"
             echo "passed=1" >> $GITHUB_OUTPUT
           else
-            echo "Commit message matches: Update package.json"
+            echo "::notice::Commit message matches: Update package.json"
           fi
 
   toc-generator:
