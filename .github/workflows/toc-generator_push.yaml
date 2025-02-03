@@ -10,36 +10,9 @@ permissions:
   contents: write
 
 jobs:
-  validate-branch:
-    runs-on: ubuntu-22.04
-    if: ${{ github.event.pull_request.merged }}
-    outputs:
-      passed: ${{ steps.check-branch.outputs.passed }}
-    steps:
-      - name: Check if ref is not default branch
-        id: check-branch
-        run: |
-          event_name="${{ github.event_name }}"
-          if [ "$event_name" == "pull_request" ] || [ "$event_name" == "workflow_dispatch" ]; then
-            target_branch="${{ github.event.pull_request.base.ref }}"
-          else
-            target_branch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          fi
-
-          default_branch="${{ github.event.repository.default_branch }}"
-
-          if [[ "$target_branch" == "$default_branch" ]]; then
-            echo "::notice::Branch check passed."
-            echo "passed=1" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::This is not the default branch. ($default_branch)"
-            echo "Target branch: $target_branch"
-            echo "Default branch: $default_branch"
-          fi
-
   validate-commit-message:
     runs-on: ubuntu-22.04
-    if: ${{ github.event.pull_request.merged }}
+    if: ${{ github.event.pull_request.merged || github.event_name == 'workflow_dispatch' }}
     outputs:
       passed: ${{ steps.validate-message.outputs.passed }}
     steps:
@@ -56,7 +29,7 @@ jobs:
           fi
 
   toc-generator:
-    needs: [validate-branch, validate-commit-message]
+    needs: [validate-commit-message]
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-toc-generator.yaml@main
     if: ${{ needs.validate-branch.outputs.passed == '1' && needs.validate-commit-message.outputs.passed == '1' }}
     secrets:
@@ -64,3 +37,4 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       target-paths: 'README*.md,Docs/README*.md'
+      check-only-default-branch: true
