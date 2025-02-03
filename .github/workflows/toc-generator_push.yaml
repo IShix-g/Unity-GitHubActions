@@ -6,6 +6,8 @@ on:
     tags-ignore:
       - '**'
   pull_request:
+    types:
+      - closed
 
 permissions:
   contents: write
@@ -13,6 +15,7 @@ permissions:
 jobs:
   validate-branch:
     runs-on: ubuntu-22.04
+    if: ${{ github.event.pull_request.merged }}
     outputs:
       passed: ${{ steps.check-branch.outputs.passed }}
     steps:
@@ -38,6 +41,7 @@ jobs:
 
   validate-commit-message:
     runs-on: ubuntu-22.04
+    if: ${{ github.event.pull_request.merged }}
     outputs:
       passed: ${{ steps.validate-message.outputs.passed }}
     steps:
