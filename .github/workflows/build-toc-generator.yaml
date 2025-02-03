@@ -1,4 +1,4 @@
-name: TOC Generation via Push and PR
+name: TOC Generation Workflow Completed
 
 on:
   workflow_dispatch:
@@ -6,6 +6,8 @@ on:
     workflows:
       - "Manual Release (Merge to Default)"
       - "Release via PR (Default Branch)"
+    types:
+      - completed
 
 permissions:
   contents: write
