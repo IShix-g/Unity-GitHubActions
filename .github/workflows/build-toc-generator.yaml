@@ -29,8 +29,6 @@ jobs:
           fi
 
   check-last-commit-tag:
-    needs: [check-trigger]
-    if: ${{ needs.check-trigger.outputs.checked != '1' }}
     runs-on: ubuntu-22.04
     outputs:
       tagged: ${{ steps.check_tag.outputs.tagged }}
