@@ -2,9 +2,6 @@ name: TOC Generation via Push and PR
 
 on:
   workflow_dispatch:
-  push:
-    tags-ignore:
-      - '**'
   pull_request:
     types:
       - closed
