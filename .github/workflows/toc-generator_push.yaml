@@ -22,14 +22,14 @@ jobs:
           fi
 
           default_branch="${{ github.event.repository.default_branch }}"
-          
-          if [[ "$target_branch" != "$default_branch" ]]; then
+
+          if [[ "$target_branch" == "$default_branch" ]]; then
+            echo "::notice::Branch check passed."
+            echo "passed=1" >> "$GITHUB_OUTPUT"
+          else
             echo "::notice::This is not the default branch. ($default_branch)"
             echo "Target branch: $target_branch"
             echo "Default branch: $default_branch"
-            echo "passed=1" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::Branch check passed."
           fi
 
   validate-commit-message:
