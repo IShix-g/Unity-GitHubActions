@@ -30,6 +30,7 @@ jobs:
           fi
 
   toc-generator:
+    needs: [validate-commit-message]
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-toc-generator.yaml@main
     if: ${{ needs.validate-commit-message.outputs.passed == '1' }}
     secrets:
