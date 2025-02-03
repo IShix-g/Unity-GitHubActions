@@ -12,8 +12,11 @@ permissions:
 jobs:
   validate-branch:
     runs-on: ubuntu-22.04
+    outputs:
+      passed: ${{ steps.check-branch.outputs.passed }}
     steps:
       - name: Check if ref is not default branch
+        id: check-branch
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             target_branch="${{ github.event.pull_request.base.ref }}"
@@ -34,8 +37,11 @@ jobs:
 
   validate-commit-message:
     runs-on: ubuntu-22.04
+    outputs:
+      passed: ${{ steps.validate-message.outputs.passed }}
     steps:
       - name: Verify commit message contains...
+        id: validate-message
         run: |
           commit_message="${{ github.event.head_commit.message }}"
           
