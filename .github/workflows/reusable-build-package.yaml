@@ -21,7 +21,7 @@ on:
         description: 'Specify the path to your Unity project or package to be tested. The path should be relative to the root of your project.'
         required: false
         type: string
-        default: '/'
+        default: ''
       builds-path:
         description: 'Path where the builds should be stored.'
         required: false
@@ -87,4 +87,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Build-StandaloneLinux64
-          path: ${{ inputs.builds-path }}/StandaloneLinux64
+          path: /github/workspace/${{ inputs.builds-path }}/StandaloneLinux64
