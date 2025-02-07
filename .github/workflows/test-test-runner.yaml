@@ -12,6 +12,20 @@ on:
           - '2021.3.45f1'
           - '2022.3.57f1'
           - '6000.0.37f1'
+  workflow_call:
+    inputs:
+      unity-version:
+        required: false
+        type: string
+        default: '2022.3.57f1'
+    secrets:
+      UNITY_LICENSE:
+        required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
+
 jobs:
   test-runner:
     uses: ./.github/workflows/reusable-test-runner.yaml
