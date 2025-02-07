@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: ''
+      coverage-options:
+        description: 'Options for configuring code coverage. https://game.ci/docs/github/test-runner#coverageoptions'
+        required: false
+        type: string
+        default: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
     secrets:
       UNITY_LICENSE:
         required: true
@@ -82,6 +87,7 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
+          coverageOptions: ${{ inputs.coverage-options }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
