@@ -81,7 +81,7 @@ jobs:
           customParameters: -tag ${{ inputs.tag }} ${{ inputs.custom-parameters }}
           unityVersion: ${{ inputs.unity-version }}
           projectPath: ${{ inputs.project-path }}
-          buildsPath: ${{ inputs.builds-path }}
+          customBuildPath: ${{ inputs.builds-path }}
           buildMethod: ${{ inputs.build-method }}
 
       - uses: actions/upload-artifact@v4
