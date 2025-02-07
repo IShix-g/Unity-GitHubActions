@@ -57,8 +57,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unity-version: ${{ inputs.unity-version }}
-        projectPath: ${{ inputs.project-path }}
         testMode: ${{ fromJson(needs.prepare-test-modes.outputs.array) }}
 
     steps:
@@ -78,7 +76,8 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ inputs.unity-version }}
+          projectPath: ${{ inputs.projectPath }}
           testMode: ${{ matrix.testMode }}
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
