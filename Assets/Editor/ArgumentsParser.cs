@@ -16,11 +16,6 @@ namespace UnityBuilderAction.Input
         {
             Dictionary<string, string> validatedOptions;
             ParseCommandLineArguments(out validatedOptions);
-
-            if (!validatedOptions.TryGetValue("buildsPath", out var buildsPath))
-            {
-                PrintErrorLog("Please pass a buildsPath to with. buildsPath: build");
-            }
             
             if (!validatedOptions.TryGetValue("tag", out var tag))
             {
