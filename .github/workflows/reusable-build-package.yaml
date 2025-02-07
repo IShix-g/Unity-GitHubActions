@@ -81,10 +81,10 @@ jobs:
           customParameters: -tag ${{ inputs.tag }} ${{ inputs.custom-parameters }}
           unityVersion: ${{ inputs.unity-version }}
           projectPath: ${{ inputs.project-path }}
-          customBuildPath: ${{ inputs.builds-path }}
+          buildsPath: ${{ inputs.builds-path }}
           buildMethod: ${{ inputs.build-method }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: Build-StandaloneLinux64
-          path: ${{ inputs.builds-path }}/StandaloneLinux64
+          path: ${{ inputs.builds-path }}
