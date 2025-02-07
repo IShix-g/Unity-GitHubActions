@@ -17,12 +17,12 @@ namespace UnityBuilderAction.Input
             Dictionary<string, string> validatedOptions;
             ParseCommandLineArguments(out validatedOptions);
 
-            if (!validatedOptions.TryGetValue("buildsPath", out var buildsPath) || string.IsNullOrEmpty(buildsPath))
+            if (!validatedOptions.TryGetValue("buildsPath", out var buildsPath))
             {
                 PrintErrorLog("Please pass a buildsPath to with. buildsPath: build");
             }
             
-            if (!validatedOptions.TryGetValue("tag", out var tag) || string.IsNullOrEmpty(tag))
+            if (!validatedOptions.TryGetValue("tag", out var tag))
             {
                 PrintErrorLog("Please pass a tag to customParameters. customParameters: -tag 1.0.0");
             }
