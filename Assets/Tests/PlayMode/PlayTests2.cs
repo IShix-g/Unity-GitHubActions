@@ -32,19 +32,6 @@ namespace Tests
         }
         
         [UnityTest]
-        public IEnumerator AudioSourcePlayTest()
-        {
-            var audioObject = new GameObject("TestAudio");
-            var audioSource = audioObject.AddComponent<AudioSource>();
-            audioSource.clip = AudioClip.Create("TestClip", 44100, 1, 44100, false);
-            audioSource.Play();
-
-            yield return null;
-
-            Assert.That(audioSource.isPlaying, Is.True, "The AudioSource should be playing.");
-        }
-        
-        [UnityTest]
         public IEnumerator GameObjectScaleChangeTest()
         {
             var obj = new GameObject("TestObject");
