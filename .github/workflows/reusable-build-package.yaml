@@ -21,7 +21,7 @@ on:
         description: 'Specify the path to your Unity project or package to be tested. The path should be relative to the root of your project.'
         required: false
         type: string
-        default: ''
+        default: '/'
       builds-path:
         description: 'Path where the builds should be stored.'
         required: false
