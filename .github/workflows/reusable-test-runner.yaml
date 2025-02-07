@@ -41,10 +41,13 @@ jobs:
         id: set-array
         run: |
           if [[ "${{ inputs.test-modes }}" == *","* ]]; then
-            echo '::set-output name=array::["'$(echo "${{ inputs.test-modes }}" | sed 's/,/","/g')'"]'
+            array='["'$(echo "${{ inputs.test-modes }}" | sed 's/,/","/g')'"]'
+            echo "array=$array" >> $GITHUB_OUTPUT
           else
-            echo '::set-output name=array::["${{ inputs.test-modes }}"]'
+            array='["${{ inputs.test-modes }}"]'
+            echo "array=$array" >> $GITHUB_OUTPUT
           fi
+          echo "::notice title=Test Modes Array::Generated test modes array: $array"
 
   test-all:
     needs: [prepare-test-modes]
