@@ -1,0 +1,23 @@
+name: (Test) Test Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      unity-version:
+        description: 'Select the Unity version to use'
+        required: true
+        default: '2021.3.45f1'
+        type: choice
+        options:
+          - '2021.3.45f1'
+          - '2022.3.57f1'
+          - '6000.0.37f1'
+jobs:
+  test-runner:
+    uses: ./.github/workflows/reusable-test-runner.yaml
+    secrets:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    inputs:
+      unity-version: ${{ inputs.unity-version }}
