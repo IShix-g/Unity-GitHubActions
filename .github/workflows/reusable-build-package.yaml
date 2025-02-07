@@ -1,0 +1,90 @@
+name: (Reusable) Build Package
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Git tag you want to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      commit-id:
+        description: 'Commit ID for release and tag.'
+        required: false
+        type: string
+        default: ''
+      unity-version:
+        description: 'Version of Unity to use for testing the project. Use "auto" to get from your ProjectSettings/ProjectVersion.txt. ⚠️ If testing a Unity Package, this field is required and cannot be set to "auto". https://game.ci/docs/docker/versions/'
+        required: false
+        type: string
+        default: 'auto'
+      project-path:
+        description: 'Specify the path to your Unity project or package to be tested. The path should be relative to the root of your project.'
+        required: false
+        type: string
+        default: ''
+      builds-path:
+        description: 'Path where the builds should be stored.'
+        required: false
+        type: string
+        default: 'build'
+      build-method:
+        description: 'Path where the builds should be stored.'
+        required: false
+        type: string
+        default: 'PackageExporter.Export'
+      custom-parameters:
+        description: 'Custom parameters to configure the build. https://game.ci/docs/github/builder#customparameters'
+        required: false
+        type: string
+        default: ''
+    secrets:
+      UNITY_LICENSE:
+        required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
+
+jobs:
+  print-unity-version:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Print
+        run: |
+          unity_version=${{ inputs.unity-version }}
+          echo "::notice title=Unity Version::$unity_version"
+
+  build-package:
+    name: Build for StandaloneLinux64
+    timeout-minutes: 20
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit-id }}
+          fetch-depth: 0
+          lfs: true
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-StandaloneLinux64
+          restore-keys: Library-
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneLinux64
+          customParameters: -tag ${{ inputs.tag }} ${{ inputs.custom-parameters }}
+          unityVersion: ${{ inputs.unity-version }}
+          projectPath: ${{ inputs.project-path }}
+          buildsPath: ${{ inputs.builds-path }}
+          buildMethod: ${{ inputs.build-method }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Build-StandaloneLinux64
+          path: ${{ inputs.builds-path }}/StandaloneLinux64

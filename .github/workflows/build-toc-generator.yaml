@@ -1,4 +1,4 @@
-name: TOC Generation Workflow
+name: TOC Generation
 
 on:
   workflow_dispatch:
