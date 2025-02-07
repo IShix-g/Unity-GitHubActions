@@ -47,6 +47,7 @@ jobs:
           fi
 
   test-all:
+    needs: [prepare-test-modes]
     name: Test in ${{ matrix.testMode }}
     runs-on: ubuntu-22.04
     timeout-minutes: 20
