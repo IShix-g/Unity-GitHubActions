@@ -80,7 +80,6 @@ jobs:
           targetPlatform: StandaloneLinux64
           customParameters: -tag ${{ inputs.tag }} ${{ inputs.custom-parameters }}
           unityVersion: ${{ inputs.unity-version }}
-          projectPath: ${{ inputs.project-path }}
           buildsPath: ${{ inputs.builds-path }}
           buildMethod: ${{ inputs.build-method }}
 
