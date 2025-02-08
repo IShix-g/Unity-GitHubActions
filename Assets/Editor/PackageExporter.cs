@@ -29,12 +29,21 @@ public sealed class PackageExporter
         
         PrintLog("Export below files" + Environment.NewLine + string.Join(Environment.NewLine, assets));
 
+        var exportFullPath = Path.GetFullPath(exportPath);
+
         AssetDatabase.ExportPackage(
             assets,
-            exportPath,
+            exportFullPath,
             ExportPackageOptions.Default);
 
-        PrintLog("Export complete: " + Path.GetFullPath(exportPath));
+        if (File.Exists(exportFullPath))
+        {
+            PrintLog("Export complete: " + Path.GetFullPath(exportFullPath));
+        }
+        else
+        {
+            PrintErrorLog("Export failed: " + Path.GetFullPath(exportFullPath));
+        }
     }
     
     static string ToExportPath(string exportPath, string tag) => exportPath.Replace("{version}", tag);
@@ -45,5 +54,13 @@ public sealed class PackageExporter
         else Debug.Log(msg);
     }
     
-
+    public static void PrintErrorLog(string msg)
+    {
+        if (Application.isBatchMode)
+        {
+            Console.WriteLine($"::error:: {msg}");
+            EditorApplication.Exit(1);
+        }
+        else Debug.LogError(msg);
+    }
 }
