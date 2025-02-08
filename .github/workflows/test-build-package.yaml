@@ -34,5 +34,6 @@ jobs:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
     with:
+      package-name: 'Test'
       tag: '1.0.0'
       unity-version: ${{ inputs.unity-version }}
