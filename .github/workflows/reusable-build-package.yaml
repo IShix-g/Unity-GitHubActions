@@ -103,7 +103,7 @@ jobs:
 
           echo "normalized-package-name=$package_name" >> "$GITHUB_OUTPUT"
           echo "export-path=$export_path" >> "$GITHUB_OUTPUT"
-          echo "normalized-project-path=$project_path" >> "$GITHUB_OUTPUT"
+          echo "normalized-project-path=/$project_path/" >> "$GITHUB_OUTPUT"
           echo "::notice title=Export Path:: $export_path"
 
       - uses: game-ci/unity-builder@v4
