@@ -62,18 +62,6 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit-id }}
-          fetch-depth: 0
-          lfs: true
-
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-StandaloneLinux64
-          restore-keys: Library-
-
       - name: Normalize Path
         id: path-normalizer
         shell: bash
@@ -106,6 +94,18 @@ jobs:
           echo "normalized-project-path=/$project_path/" >> "$GITHUB_OUTPUT"
           echo "::notice title=Export Path:: $export_path"
 
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit-id }}
+          fetch-depth: 0
+          lfs: true
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-StandaloneLinux64
+          restore-keys: Library-
+
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -114,7 +114,6 @@ jobs:
         with:
           targetPlatform: StandaloneLinux64
           unityVersion: ${{ inputs.unity-version }}
-          projectPath: ${{ steps.path-normalizer.outputs.normalized-project-path }}
           buildsPath: ${{ inputs.builds-path }}
           buildName: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           buildMethod: ${{ inputs.build-method }}
