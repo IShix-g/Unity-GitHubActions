@@ -31,6 +31,13 @@ public sealed class PackageExporter
 
         var exportFullPath = Path.GetFullPath(exportPath);
 
+        var exportDirectory = Path.GetDirectoryName(exportFullPath);
+        exportDirectory = exportDirectory.Replace("\\", "/");
+        if (!Directory.Exists(exportDirectory))
+        {
+            Directory.CreateDirectory(exportDirectory);
+        }
+        
         AssetDatabase.ExportPackage(
             assets,
             exportFullPath,
