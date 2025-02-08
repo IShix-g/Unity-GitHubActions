@@ -82,9 +82,9 @@ jobs:
           builds_path="${builds_path%/}"
 
           if [ -z "$project_path" ]; then
-            final_path="./$builds_path/StandaloneLinux64/$package_name"
+            final_path="/$builds_path/StandaloneLinux64/$package_name"
           else
-            final_path="./$project_path/$builds_path/StandaloneLinux64/$package_name"
+            final_path="/$project_path/$builds_path/StandaloneLinux64/$package_name"
           fi
 
           export_path=$(echo "$final_path" | sed 's://*:/:g')
@@ -119,6 +119,17 @@ jobs:
           buildName: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           buildMethod: ${{ inputs.build-method }}
           customParameters: ${{ inputs.custom-parameters }}
+
+      - name: 'Debug: Verify Exported File Exists'
+        run: |
+          echo "Checking exported file:"
+          ls -la /github/workspace/build/StandaloneLinux64
+          if [ -f "/github/workspace/build/StandaloneLinux64/Test_1.0.0.unitypackage" ]; then
+            echo "File exists: /github/workspace/build/StandaloneLinux64/Test_1.0.0.unitypackage"
+          else
+            echo "File not found!"
+            exit 1
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
