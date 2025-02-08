@@ -59,7 +59,6 @@ jobs:
           echo "::notice title=Unity Version::$unity_version"
 
   build-package:
-    name: Build for StandaloneLinux64
     timeout-minutes: 20
     runs-on: ubuntu-22.04
     steps:
@@ -75,6 +74,34 @@ jobs:
           key: Library-StandaloneLinux64
           restore-keys: Library-
 
+      - name: Normalize Path
+        id: path-normalizer
+        shell: bash
+        run: |
+          project_path="${{ inputs.project-path || GITHUB_WORKSPACE }}"
+          builds_path="${{ inputs.builds-path }}"
+          package_name="${{ inputs.package-name }}_${{ inputs.tag }}.unitypackage"
+
+          builds_path="${builds_path#/}"
+          builds_path="${builds_path%/}"
+          project_path="${project_path#/}"
+          project_path="${project_path%/}"
+          builds_path="${builds_path#/}"
+          builds_path="${builds_path%/}"
+
+          if [ -z "$project_path" ]; then
+            final_path="./$builds_path/StandaloneLinux64/$package_name"
+          else
+            final_path="./$project_path/$builds_path/StandaloneLinux64/$package_name"
+          fi
+
+          export_path=$(echo "$final_path" | sed 's://*:/:g')
+
+          echo "normalized-package-name=$package_name" >> "$GITHUB_OUTPUT"
+          echo "export-path=$export_path" >> "$GITHUB_OUTPUT"
+          echo "normalized-project-path=$project_path" >> "$GITHUB_OUTPUT"
+          echo "::notice title=Export Path:: $export_path"
+
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -82,38 +109,14 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneLinux64
-          buildName: ${{ inputs.package-name }}_${{ inputs.tag }}.unitypackage
           unityVersion: ${{ inputs.unity-version }}
-          projectPath: ${{ inputs.project-path }}
+          projectPath: ${{ steps.path-normalizer.outputs.normalized-project-path }}
           buildsPath: ${{ inputs.builds-path }}
+          buildName: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           buildMethod: ${{ inputs.build-method }}
-          customParameters: -tag ${{ inputs.tag }} ${{ inputs.custom-parameters }}
-
-      - name: Normalize Path
-        id: path-normalizer
-        run: |
-          project_path="${{ inputs.project-path }}"
-          builds_path="${{ inputs.builds-path }}"
-          package_name="${{ inputs.package-name }}"
-          tag="${{ inputs.tag }}"
-
-          builds_path="${builds_path%/}"
-          project_path="${project_path%/}"
-          builds_path="${builds_path%/}"
-
-          if [ -z "$project_path" ]; then
-            final_path="./$builds_path/StandaloneLinux64/${package_name}_${tag}.unitypackage"
-          else
-            final_path="./$project_path/$builds_path/StandaloneLinux64/${package_name}_${tag}.unitypackage"
-          fi
-
-          normalized_path=$(echo "$final_path" | sed 's://*:/:g')
-
-          echo "path=$normalized_path" >> "$GITHUB_OUTPUT"
-          echo "::notice title=Export Path:: $normalized_path"
-        shell: bash
+          customParameters: ${{ inputs.custom-parameters }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: Build-StandaloneLinux64
-          path: ${{ steps.path-normalizer.outputs.path }}
+          path: ${{ steps.path-normalizer.outputs.export-path }}

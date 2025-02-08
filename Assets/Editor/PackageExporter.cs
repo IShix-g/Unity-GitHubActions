@@ -17,10 +17,8 @@ public sealed class PackageExporter
     public static void Export()
     {
         var options = ArgumentsParser.GetValidatedOptions();
-        var buildPath = options.GetValueOrDefault("customBuildPath")?.TrimEnd('/');
-        var buildName = options.GetValueOrDefault("buildName");
-        var exportPath = (!string.IsNullOrEmpty(buildPath) ? buildPath + "/" : "") + buildName;
-        Export(_folderPath, exportPath);
+        var buildPath = options.GetValueOrDefault("customBuildPath");
+        Export(_folderPath, buildPath);
     }
 
     public static void Export(string folderPath, string exportPath)

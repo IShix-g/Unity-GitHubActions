@@ -16,12 +16,6 @@ namespace UnityBuilderAction.Input
         {
             Dictionary<string, string> validatedOptions;
             ParseCommandLineArguments(out validatedOptions);
-            
-            if (!validatedOptions.TryGetValue("tag", out var tag))
-            {
-                PrintErrorLog("Please pass a tag to customParameters. customParameters: -tag 1.0.0");
-            }
-            
             return validatedOptions;
         }
 
