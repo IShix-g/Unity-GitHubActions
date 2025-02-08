@@ -78,9 +78,13 @@ jobs:
         id: path-normalizer
         shell: bash
         run: |
-          project_path="${{ inputs.project-path || GITHUB_WORKSPACE }}"
+          project_path="${{ inputs.project-path }}"
           builds_path="${{ inputs.builds-path }}"
           package_name="${{ inputs.package-name }}_${{ inputs.tag }}.unitypackage"
+
+          if [ -z "$project_path" ]; then
+            project_path="$GITHUB_WORKSPACE"
+          fi
 
           builds_path="${builds_path#/}"
           builds_path="${builds_path%/}"
