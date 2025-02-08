@@ -82,9 +82,9 @@ jobs:
           builds_path="${builds_path%/}"
 
           if [ -z "$project_path" ]; then
-            final_path="/$builds_path/StandaloneLinux64/$package_name"
+            final_path="./$builds_path/StandaloneLinux64/$package_name"
           else
-            final_path="/$project_path/$builds_path/StandaloneLinux64/$package_name"
+            final_path="./$project_path/$builds_path/StandaloneLinux64/$package_name"
           fi
 
           export_path=$(echo "$final_path" | sed 's://*:/:g')
@@ -114,6 +114,7 @@ jobs:
         with:
           targetPlatform: StandaloneLinux64
           unityVersion: ${{ inputs.unity-version }}
+          projectPath: ${{ inputs.project-path }}
           buildsPath: ${{ inputs.builds-path }}
           buildName: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           buildMethod: ${{ inputs.build-method }}

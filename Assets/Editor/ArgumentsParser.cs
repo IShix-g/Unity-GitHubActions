@@ -50,15 +50,5 @@ namespace UnityBuilderAction.Input
                 providedArguments.Add(flag, value);
             }
         }
-        
-        public static void PrintErrorLog(string msg)
-        {
-            if (Application.isBatchMode)
-            {
-                Console.WriteLine($"::error:: {msg}");
-                EditorApplication.Exit(1);
-            }
-            else Debug.LogError(msg);
-        }
     }
 }
