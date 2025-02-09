@@ -70,10 +70,6 @@ jobs:
           builds_path="${{ inputs.builds-path }}"
           package_name="${{ inputs.package-name }}_${{ inputs.tag }}.unitypackage"
 
-          if [ -z "$project_path" ]; then
-            project_path=${GITHUB_WORKSPACE/\/home\/runner\/work\/*\/*/\/github\/workspace}
-          fi
-
           builds_path="${builds_path#/}"
           builds_path="${builds_path%/}"
           project_path="${project_path#/}"
