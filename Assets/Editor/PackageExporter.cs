@@ -18,6 +18,7 @@ public sealed class PackageExporter
     {
         var options = ArgumentsParser.GetValidatedOptions();
         var buildPath = options.GetValueOrDefault("customBuildPath");
+        buildPath = buildPath?.Replace("/github/workspace/", "");
         Export(_folderPath, buildPath);
     }
 
