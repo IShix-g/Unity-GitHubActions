@@ -18,13 +18,13 @@ public sealed class PackageExporter
     {
         var options = ArgumentsParser.GetValidatedOptions();
         var buildPath = options.GetValueOrDefault("customBuildPath");
-        buildPath = buildPath?.Replace("/github/workspace/", "");
+        buildPath = buildPath?.Replace("/github/workspace/", "./");
         Export(_folderPath, buildPath);
     }
 
-    public static void Export(string folderPath, string exportPath)
+    public static void Export(string assetsFolderPath, string exportPath)
     {
-        var assets = AssetDatabase.FindAssets("", new[] { folderPath })
+        var assets = AssetDatabase.FindAssets("", new[] { assetsFolderPath })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .ToArray();
         
