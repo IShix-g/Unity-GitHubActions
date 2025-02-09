@@ -81,11 +81,7 @@ jobs:
           builds_path="${builds_path#/}"
           builds_path="${builds_path%/}"
 
-          if [ -z "$project_path" ]; then
-            final_path="/$builds_path/StandaloneLinux64/$package_name"
-          else
-            final_path="/$project_path/$builds_path/StandaloneLinux64/$package_name"
-          fi
+          final_path="/$builds_path/StandaloneLinux64/$package_name"
 
           export_path=$(echo "$final_path" | sed 's://*:/:g')
 

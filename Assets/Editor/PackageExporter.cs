@@ -28,32 +28,21 @@ public sealed class PackageExporter
                 .ToArray();
         
         PrintLog("Export below files" + Environment.NewLine + string.Join(Environment.NewLine, assets));
-
-        var exportFullPath = Path.GetFullPath(exportPath);
-
-        var exportDirectory = Path.GetDirectoryName(exportFullPath);
-        exportDirectory = exportDirectory.Replace("\\", "/");
-        if (!Directory.Exists(exportDirectory))
-        {
-            Directory.CreateDirectory(exportDirectory);
-        }
         
         AssetDatabase.ExportPackage(
             assets,
-            exportFullPath,
+            exportPath,
             ExportPackageOptions.Default);
 
-        if (File.Exists(exportFullPath))
+        if (File.Exists(exportPath))
         {
-            PrintLog("Export complete: " + Path.GetFullPath(exportFullPath));
+            PrintLog("Export complete: " + Path.GetFullPath(exportPath));
         }
         else
         {
-            PrintErrorLog("Export failed: " + Path.GetFullPath(exportFullPath));
+            PrintErrorLog("Export failed: " + Path.GetFullPath(exportPath));
         }
     }
-    
-    static string ToExportPath(string exportPath, string tag) => exportPath.Replace("{version}", tag);
     
     static void PrintLog(string msg)
     {
