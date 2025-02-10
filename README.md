@@ -2,6 +2,7 @@
 [![Test Update package.json](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml)  
 [![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
 [![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)  
+[![Test Build Package](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml)  
 [![Test Test Runner](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-test-runner.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-test-runner.yaml)
 
 [README - 日本語版](Docs/README_jp.md)
