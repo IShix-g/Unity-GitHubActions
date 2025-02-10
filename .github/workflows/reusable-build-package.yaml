@@ -112,7 +112,7 @@ jobs:
           elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
             echo "name=UNITY_SERIAL" >> "$GITHUB_OUTPUT"
           else
-            echo "::error::No license or serial found."
+            echo "::error::No secrets.UNITY_LICENSE or secrets.UNITY_SERIAL found."
             exit 1
           fi
           echo "::notice title=License::$name"
