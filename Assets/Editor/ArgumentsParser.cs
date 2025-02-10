@@ -9,13 +9,49 @@ namespace UnityBuilderAction.Input
 {
     public class ArgumentsParser
     {
-        static string EOL = Environment.NewLine;
+        static string Eol = Environment.NewLine;
         static readonly string[] Secrets = { "androidKeystorePass", "androidKeyaliasName", "androidKeyaliasPass" };
-
+        const string DefaultCustomBuildName = "TestBuild";
+        
         public static Dictionary<string, string> GetValidatedOptions()
         {
-            Dictionary<string, string> validatedOptions;
-            ParseCommandLineArguments(out validatedOptions);
+            ParseCommandLineArguments(out var validatedOptions);
+            
+            if (!validatedOptions.TryGetValue("projectPath", out string _))
+            {
+                Console.WriteLine("Missing argument -projectPath");
+                EditorApplication.Exit(110);
+            }
+
+            if (!validatedOptions.TryGetValue("buildTarget", out string buildTarget))
+            {
+                Console.WriteLine("Missing argument -buildTarget");
+                EditorApplication.Exit(120);
+            }
+
+            if (!Enum.IsDefined(typeof(BuildTarget), buildTarget ?? string.Empty))
+            {
+                Console.WriteLine($"{buildTarget} is not a defined {nameof(BuildTarget)}");
+                EditorApplication.Exit(121);
+            }
+
+            if (!validatedOptions.TryGetValue("customBuildPath", out string _))
+            {
+                Console.WriteLine("Missing argument -customBuildPath");
+                EditorApplication.Exit(130);
+            }
+            
+            if (!validatedOptions.TryGetValue("customBuildName", out string customBuildName))
+            {
+                Console.WriteLine($"Missing argument -customBuildName, defaulting to {defaultCustomBuildName}.");
+                validatedOptions.Add("customBuildName", DefaultCustomBuildName);
+            }
+            else if (customBuildName == "")
+            {
+                Console.WriteLine($"Invalid argument -customBuildName, defaulting to {defaultCustomBuildName}.");
+                validatedOptions.Add("customBuildName", DefaultCustomBuildName);
+            }
+            
             return validatedOptions;
         }
 
@@ -25,15 +61,16 @@ namespace UnityBuilderAction.Input
             string[] args = Environment.GetCommandLineArgs();
 
             Console.WriteLine(
-                EOL +
-                "###########################" + EOL +
-                "#    Parsing settings     #" + EOL +
-                "###########################" + EOL +
-                EOL
+                $"{Eol}" +
+                $"###########################{Eol}" +
+                $"#    Parsing settings     #{Eol}" +
+                $"###########################{Eol}" +
+                $"{Eol}"
             );
 
             // Extract flags with optional values
-            for (int current = 0, next = 1; current < args.Length; current++, next++) {
+            for (int current = 0, next = 1; current < args.Length; current++, next++)
+            {
                 // Parse flag
                 bool isFlag = args[current].StartsWith("-");
                 if (!isFlag) continue;
@@ -46,7 +83,7 @@ namespace UnityBuilderAction.Input
                 string displayValue = secret ? "*HIDDEN*" : "\"" + value + "\"";
 
                 // Assign
-                Console.WriteLine("Found flag \"" + flag + "\" with value " + displayValue);
+                Console.WriteLine($"Found flag \"{flag}\" with value {displayValue}.");
                 providedArguments.Add(flag, value);
             }
         }

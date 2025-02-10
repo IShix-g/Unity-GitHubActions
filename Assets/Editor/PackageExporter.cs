@@ -36,7 +36,7 @@ public sealed class PackageExporter
 
         if (File.Exists(exportPath))
         {
-            PrintLog("Export complete: " + Path.GetFullPath(exportPath));
+            PrintLog("::notice title=Export Path::Export complete: " + Path.GetFullPath(exportPath));
         }
         else
         {
@@ -54,7 +54,7 @@ public sealed class PackageExporter
     {
         if (Application.isBatchMode)
         {
-            Console.WriteLine($"::error:: {msg}");
+            Console.WriteLine($"::error::{msg}");
             EditorApplication.Exit(1);
         }
         else Debug.LogError(msg);
