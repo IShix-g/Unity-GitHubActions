@@ -30,9 +30,9 @@ jobs:
   build-package:
     uses: ./.github/workflows/reusable-build-package.yaml
     secrets:
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
     with:
       package-name: 'Test'
       tag: '1.0.0'
