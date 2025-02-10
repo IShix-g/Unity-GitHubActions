@@ -43,12 +43,12 @@ namespace UnityBuilderAction.Input
             
             if (!validatedOptions.TryGetValue("customBuildName", out string customBuildName))
             {
-                Console.WriteLine($"Missing argument -customBuildName, defaulting to {defaultCustomBuildName}.");
+                Console.WriteLine($"Missing argument -customBuildName, defaulting to {DefaultCustomBuildName}.");
                 validatedOptions.Add("customBuildName", DefaultCustomBuildName);
             }
             else if (customBuildName == "")
             {
-                Console.WriteLine($"Invalid argument -customBuildName, defaulting to {defaultCustomBuildName}.");
+                Console.WriteLine($"Invalid argument -customBuildName, defaulting to {DefaultCustomBuildName}.");
                 validatedOptions.Add("customBuildName", DefaultCustomBuildName);
             }
             

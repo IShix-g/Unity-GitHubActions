@@ -48,6 +48,10 @@ on:
         required: true
       UNITY_PASSWORD:
         required: true
+    outputs:
+      export-path:
+        description: 'Export path where the package was generated'
+        value: ${{ jobs.build-package.outputs.export-path }}
 
 jobs:
   print-unity-version:
@@ -61,6 +65,8 @@ jobs:
   build-package:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
+    outputs:
+      export-path: ${{ steps.path-normalizer.outputs.export-path }}
     steps:
       - name: Normalize Path
         id: path-normalizer
