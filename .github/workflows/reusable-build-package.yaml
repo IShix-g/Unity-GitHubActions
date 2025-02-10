@@ -105,7 +105,7 @@ jobs:
           lfs: true
 
       - name: Set Unity License Environment
-        id: unity-license
+        id: license
         run: |
           if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
             echo "name=UNITY_LICENSE" >> "$GITHUB_OUTPUT"
