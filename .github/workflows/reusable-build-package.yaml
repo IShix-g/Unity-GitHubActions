@@ -42,12 +42,14 @@ on:
         type: string
         default: ''
     secrets:
-      UNITY_LICENSE:
-        required: true
       UNITY_EMAIL:
         required: true
       UNITY_PASSWORD:
         required: true
+      UNITY_LICENSE:
+        required: false
+      UNITY_SERIAL:
+        required: false
     outputs:
       export-path:
         description: 'Export path where the package was generated'
@@ -102,6 +104,19 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Set Unity License Environment
+        id: unity-license
+        run: |
+          if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
+            echo "name=UNITY_LICENSE" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
+            echo "name=UNITY_SERIAL" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No license or serial found."
+            exit 1
+          fi
+          echo "::notice title=License::$name"
+
       - uses: actions/cache@v4
         with:
           path: Library
@@ -110,9 +125,9 @@ jobs:
 
       - uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          ${{ steps.license.outputs.name }}: ${{ secrets[steps.license.outputs.name] }}
         with:
           targetPlatform: StandaloneLinux64
           unityVersion: ${{ inputs.unity-version }}
