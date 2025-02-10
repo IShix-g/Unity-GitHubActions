@@ -18,13 +18,6 @@ public sealed class PackageExporter
     {
         var options = ArgumentsParser.GetValidatedOptions();
         var buildPath = options.GetValueOrDefault("customBuildPath");
-        
-        var workspaceDir = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-        if (!string.IsNullOrEmpty(workspaceDir))
-        {
-            buildPath = buildPath.Replace($"{workspaceDir}/", "./");
-        }
-        
         Export(_folderPath, buildPath);
     }
 
