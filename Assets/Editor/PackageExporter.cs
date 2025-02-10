@@ -36,7 +36,7 @@ public sealed class PackageExporter
 
         if (File.Exists(exportPath))
         {
-            PrintLog("::notice title=Export Path::Export complete: " + Path.GetFullPath(exportPath));
+            PrintLog("::notice title=Export Path(C#)::Export complete: " + Path.GetFullPath(exportPath));
         }
         else
         {
