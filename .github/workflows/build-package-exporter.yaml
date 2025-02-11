@@ -21,9 +21,6 @@ on:
         type: boolean
         default: false
 
-env:
-  PACKAGE_NAME: PackageExporter
-
 jobs:
   verify-branch:
     runs-on: ubuntu-22.04
@@ -76,7 +73,7 @@ jobs:
         id: check-package
         run: |
           latest_release="${{ needs.get-latest-release.outputs.release }}"
-          file_name="${{ env.PACKAGE_NAME }}_*.unitypackage"
+          file_name="PackageExporter_*.unitypackage"
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
             echo "found=1" >> "$GITHUB_OUTPUT"
@@ -87,7 +84,7 @@ jobs:
         if: ${{ steps.check-package.outputs.found == '1' }}
         run: |
           latest_release="${{ needs.get-latest-release.outputs.release }}"
-          file_name="${{ env.PACKAGE_NAME }}_*.unitypackage"
+          file_name="PackageExporter_*.unitypackage"
           current_file_name=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name")
           if [[ -n "$current_file_name" ]]; then
             gh release delete-asset "$latest_release" "$current_file_name"
@@ -123,7 +120,7 @@ jobs:
       commit-id: ${{ needs.update-package-json.outputs.sha }}
 
   merge-and-push:
-    needs: update-packagejson
+    needs: [update-packagejson, build-package]
     if: ${{ needs.update-package-json.outputs.changed == '1' }}
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
@@ -136,7 +133,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
 
   upload-package:
-    needs: [build-package, merge-and-push]
+    needs: build-package
     runs-on: ubuntu-22.04
     steps:
       - name: Upload New Package
