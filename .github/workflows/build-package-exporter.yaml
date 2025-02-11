@@ -75,8 +75,8 @@ jobs:
           file_name="${{ env.PACKAGE_NAME }}_*.unitypackage"
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
-            echo "::notice title=Found file::$asset_url"
             echo "found=1" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Found file::$asset_url"
           fi
 
       - name: Delete Existing Package File
@@ -106,18 +106,18 @@ jobs:
 
   build-package:
     needs: update-packagejson
-    uses: ./.github/workflows/reusable-build-package.yaml
-    env:
-      PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
-    secrets:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-    with:
-      package-name: ${{ env.PACKAGE_NAME }}
-      tag: ${{ needs.update-package-json.outputs.normalized-tag }}
-      unity-version: ${{ inputs.unity-version }}
-      commit-id: ${{ needs.update-package-json.outputs.sha }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: ./.github/workflows/reusable-build-package.yaml
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          package-name: ${{ env.PACKAGE_NAME }}
+          tag: ${{ needs.update-package-json.outputs.normalized-tag }}
+          unity-version: ${{ inputs.unity-version }}
+          commit-id: ${{ needs.update-package-json.outputs.sha }}
 
   merge-and-push:
     needs: update-packagejson
