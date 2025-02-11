@@ -115,13 +115,12 @@ jobs:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
     with:
       package-name: PackageExporter
-      tag: ${{ needs.update-package-json.outputs.normalized-tag }}
+      tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
       unity-version: ${{ inputs.unity-version }}
-      commit-id: ${{ needs.update-package-json.outputs.sha }}
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   merge-and-push:
-    needs: [update-packagejson, build-package]
-    if: ${{ needs.update-package-json.outputs.changed == '1' }}
+    needs: build-package
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -129,11 +128,11 @@ jobs:
     with:
       target-branch: ${{ github.ref }}
       push-branch: ${{ github.event.repository.default_branch }}
-      commit-id: ${{ needs.update-package-json.outputs.sha }}
+      commit-id: ${{ needs.update-packagejson.outputs.sha }}
       dry-run: ${{ inputs.dry-run }}
 
   upload-package:
-    needs: build-package
+    needs: merge-and-push
     runs-on: ubuntu-22.04
     steps:
       - name: Upload New Package
