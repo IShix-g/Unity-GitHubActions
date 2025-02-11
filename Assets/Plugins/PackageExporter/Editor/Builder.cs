@@ -43,7 +43,7 @@ namespace PackageExporter.Editor
                 var message = "Export complete: " + Path.GetFullPath(buildPath);
                 if (Application.isBatchMode)
                 {
-                    message = "::notice title=Export Path(C#)::" + message;
+                    message = "::notice title=Unity Editor::" + message;
                 }
                 PrintLog(message);
             }
