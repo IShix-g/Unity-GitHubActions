@@ -25,18 +25,22 @@ env:
   PACKAGE_NAME: PackageExporter
 
 jobs:
-  extract-tag:
-    if: ${{ github.ref == github.event.repository.default_branch }}
+  verify-branch:
     runs-on: ubuntu-22.04
     steps:
-      - name: Extract tag from Pull Request title
-        id: extract-tag
+      - name: Check branch
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          echo "::error::Please specify a branch other than the default branch."
-          exit 1
+          CURRENT_REF=${REF#refs/heads/}
+          if [ "$CURRENT_REF" = "$DEFAULT_BRANCH" ]; then
+            echo "::error::Please specify a branch other than the default branch."
+            exit 1
+          fi
 
   get-latest-release:
-    needs: extract-tag
+    needs: verify-branch
     runs-on: ubuntu-22.04
     outputs:
       release: ${{ steps.latest-release.outputs.release }}
