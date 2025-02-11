@@ -40,7 +40,7 @@ jobs:
     needs: verify-branch
     runs-on: ubuntu-22.04
     outputs:
-      release: ${{ steps.latest-release.outputs.release }}
+      tag: ${{ steps.latest-release.outputs.tag }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -62,17 +62,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release=$(gh release view --json tagName -q ".tagName")
-          echo "release=$latest_release" >> "$GITHUB_OUTPUT"
+          echo "tag=$latest_release" >> "$GITHUB_OUTPUT"
           echo "::notice title=Latest release::$latest_release"
 
   check-existing-package:
-    needs: get-latest-release
+    needs: [verify-branch, get-latest-release]
     runs-on: ubuntu-22.04
     steps:
       - name: Check for Existing Package
         id: check-package
         run: |
-          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          latest_release="${{ needs.get-latest-release.outputs.tag }}"
           file_name="PackageExporter_*.unitypackage"
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
@@ -83,7 +83,7 @@ jobs:
       - name: Delete Existing Package File
         if: ${{ steps.check-package.outputs.found == '1' }}
         run: |
-          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          latest_release="${{ needs.get-latest-release.outputs.tag }}"
           file_name="PackageExporter_*.unitypackage"
           current_file_name=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name")
           if [[ -n "$current_file_name" ]]; then
@@ -94,7 +94,7 @@ jobs:
           fi
 
   update-packagejson:
-    needs: check-existing-package
+    needs: [verify-branch, get-latest-release, check-existing-package]
     uses: ./.github/workflows/reusable-update-packagejson.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -107,7 +107,7 @@ jobs:
       require-validation: false
 
   build-package:
-    needs: update-packagejson
+    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson]
     uses: ./.github/workflows/reusable-build-package.yaml
     secrets:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -120,7 +120,7 @@ jobs:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
   merge-and-push:
-    needs: build-package
+    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package]
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -132,7 +132,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
 
   upload-package:
-    needs: [get-latest-release, build-package, merge-and-push]
+    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package, merge-and-push]
     runs-on: ubuntu-22.04
     steps:
       - name: Upload New Package
@@ -140,6 +140,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           new_file="${{ needs.build-package.outputs.export-path }}"
-          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          latest_release="${{ needs.get-latest-release.outputs.tag }}"
           gh release upload "$latest_release" "$new_file"
           echo "::notice title=Uploaded new asset::$new_file"
