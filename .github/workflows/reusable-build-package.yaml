@@ -41,6 +41,14 @@ on:
         required: false
         type: string
         default: ''
+      retention-days:
+        description: >
+          Duration after which artifact will expire in days. 0 means using default retention.
+          Minimum 1 day.
+          Maximum 90 days unless changed from the repository settings page.
+        required: false
+        type: string
+        default: '1'
     secrets:
       UNITY_EMAIL:
         required: true
@@ -138,3 +146,4 @@ jobs:
         with:
           name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           path: ${{ steps.path-normalizer.outputs.export-path }}
+          retention-days: ${{ inputs.retention-days }}
