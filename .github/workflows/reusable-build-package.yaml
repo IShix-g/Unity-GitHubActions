@@ -51,9 +51,15 @@ on:
       UNITY_SERIAL:
         required: false
     outputs:
+      package-name:
+        description: 'Unity package name'
+        value: ${{ jobs.build-package.outputs.package-name }}
       export-path:
         description: 'Export path where the package was generated'
         value: ${{ jobs.build-package.outputs.export-path }}
+
+env:
+  TARGET_PLATFORM: StandaloneLinux64
 
 jobs:
   print-unity-version:
@@ -68,6 +74,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     outputs:
+      package-name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
       export-path: ${{ steps.path-normalizer.outputs.export-path }}
     steps:
       - name: Normalize Path
@@ -76,27 +83,30 @@ jobs:
         run: |
           project_path="${{ inputs.project-path }}"
           builds_path="${{ inputs.builds-path }}"
+          platform="${{ env.TARGET_PLATFORM }}"
           package_name="${{ inputs.package-name }}_${{ inputs.tag }}.unitypackage"
 
-          builds_path="${builds_path#/}"
-          builds_path="${builds_path%/}"
-          project_path="${project_path#/}"
-          project_path="${project_path%/}"
-          builds_path="${builds_path#/}"
-          builds_path="${builds_path%/}"
-
-          if [ -z "$project_path" ]; then
-            final_path="$builds_path/StandaloneLinux64/$package_name"
-          else
-            final_path="$project_path/$builds_path/StandaloneLinux64/$package_name"
-          fi
-
-          export_path=$(echo "$final_path" | sed 's://*:/:g')
+          export_path="$project_path/$builds_path/$platform/$package_name"
+          export_path=$(echo "$export_path" | sed -e 's://*:/:g' -e 's:^/::')
 
           echo "normalized-package-name=$package_name" >> "$GITHUB_OUTPUT"
           echo "export-path=$export_path" >> "$GITHUB_OUTPUT"
-          echo "normalized-project-path=/$project_path/" >> "$GITHUB_OUTPUT"
           echo "::notice title=Export Path::$export_path"
+
+      - name: Set Unity License Name
+        id: license
+        run: |
+          if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
+            license_name="UNITY_LICENSE"
+          elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
+            license_name="UNITY_SERIAL"
+          else
+          echo "::error::No secrets.UNITY_LICENSE or secrets.UNITY_SERIAL found."
+          exit 1
+          fi
+
+          echo "name=$license_name" >> "$GITHUB_OUTPUT"
+          echo "::notice title=License::$license_name"
 
       - uses: actions/checkout@v4
         with:
@@ -104,23 +114,10 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Set Unity License Environment
-        id: license
-        run: |
-          if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
-            echo "name=UNITY_LICENSE" >> "$GITHUB_OUTPUT"
-          elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
-            echo "name=UNITY_SERIAL" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::No secrets.UNITY_LICENSE or secrets.UNITY_SERIAL found."
-            exit 1
-          fi
-          echo "::notice title=License::$name"
-
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-StandaloneLinux64
+          key: Library-${{ env.TARGET_PLATFORM }}
           restore-keys: Library-
 
       - uses: game-ci/unity-builder@v4
@@ -129,7 +126,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           ${{ steps.license.outputs.name }}: ${{ secrets[steps.license.outputs.name] }}
         with:
-          targetPlatform: StandaloneLinux64
+          targetPlatform: ${{ env.TARGET_PLATFORM }}
           unityVersion: ${{ inputs.unity-version }}
           projectPath: ${{ inputs.project-path }}
           buildsPath: ${{ inputs.builds-path }}
