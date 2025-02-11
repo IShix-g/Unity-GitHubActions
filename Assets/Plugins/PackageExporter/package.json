@@ -2,7 +2,7 @@
   "name": "com.ishix.packageexporter",
   "displayName": "Package Exporter",
   "description": "Export unity package",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "unity": "2021.3",
   "relatedPackages": {},
   "documentationUrl": "https://github.com/IShix-g/Unity-GitHubActions",
