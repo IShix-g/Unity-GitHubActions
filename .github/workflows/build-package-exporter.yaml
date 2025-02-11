@@ -132,7 +132,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
 
   upload-package:
-    needs: merge-and-push
+    needs: [get-latest-release, build-package, merge-and-push]
     runs-on: ubuntu-22.04
     steps:
       - name: Upload New Package
