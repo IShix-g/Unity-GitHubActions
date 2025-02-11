@@ -113,6 +113,9 @@ jobs:
     needs: update-packagejson
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - uses: ./.github/workflows/reusable-build-package.yaml
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
