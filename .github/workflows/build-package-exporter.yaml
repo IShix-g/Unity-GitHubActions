@@ -1,0 +1,142 @@
+name: Build Package Exporter
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag you want to create (e.g., 1.0.0).'
+        required: true
+        type: string
+      unity-version:
+        description: 'Select the Unity version to use'
+        required: true
+        default: '2021.3.45f1'
+        type: choice
+        options:
+          - '2021.3.45f1'
+          - '2022.3.57f1'
+          - '6000.0.37f1'
+      dry-run:
+        description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
+        type: boolean
+        default: false
+
+env:
+  PACKAGE_NAME: PackageExporter
+
+jobs:
+  extract-tag:
+    if: ${{ github.ref == github.event.repository.default_branch }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Extract tag from Pull Request title
+        id: extract-tag
+        run: |
+          echo "::error::Please specify a branch other than the default branch."
+          exit 1
+
+  get-latest-release:
+    needs: extract-tag
+    runs-on: ubuntu-22.04
+    outputs:
+      release: ${{ steps.latest-release.outputs.release }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Verify GitHub CLI Installation
+        run: gh --version
+
+      - name: Get Latest Release
+        id: latest-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_release=$(gh release view --json tagName -q ".tagName")
+          echo "release=$latest_release" >> "$GITHUB_OUTPUT"
+          echo "::notice title=Latest release::$latest_release"
+
+  check-existing-package:
+    needs: get-latest-release
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check for Existing Package
+        id: check-package
+        run: |
+          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          file_name="${{ env.PACKAGE_NAME }}_*.unitypackage"
+          asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
+          if [[ -n "$asset_url" ]]; then
+            echo "::notice title=Found file::$asset_url"
+            echo "found=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Delete Existing Package File
+        if: ${{ steps.check-package.outputs.found == '1' }}
+        run: |
+          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          file_name="${{ env.PACKAGE_NAME }}_*.unitypackage"
+          current_file_name=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name")
+          if [[ -n "$current_file_name" ]]; then
+            gh release delete-asset "$latest_release" "$current_file_name"
+            echo "::notice title=Removed asset::$current_file_name"
+          else
+            echo "::notice title=Not removed asset::No matching asset found to remove."
+          fi
+
+  update-packagejson:
+    needs: check-existing-package
+    uses: .github/workflows/reusable-update-packagejson.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      ref: ${{ github.ref }}
+      file-path: ./Assets/Plugins/PackageExporter/package.json
+      tag: ${{ inputs.tag }}
+      dry-run: ${{ inputs.dry-run }}
+
+  build-package:
+    needs: update-packagejson
+    uses: .github/workflows/reusable-build-package.yaml
+    secrets:
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+    with:
+      package-name: ${{ env.PACKAGE_NAME }}
+      tag: ${{ needs.update-package-json.outputs.normalized-tag }}
+      unity-version: ${{ inputs.unity-version }}
+      commit-id: ${{ needs.update-package-json.outputs.sha }}
+
+  merge-and-push:
+    needs: update-packagejson
+    if: ${{ needs.update-package-json.outputs.changed == '1' }}
+    uses: .github/workflows/reusable-merge-and-push.yaml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      target-branch: ${{ github.ref }}
+      push-branch: ${{ github.event.repository.default_branch }}
+      commit-id: ${{ needs.update-package-json.outputs.sha }}
+      dry-run: ${{ inputs.dry-run }}
+
+  upload-package:
+    needs: [build-package, merge-and-push]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Upload New Package
+        run: |
+          new_file="${{ needs.build-package.outputs.export-path }}"
+          latest_release="${{ needs.get-latest-release.outputs.release }}"
+          gh release upload "$latest_release" "$new_file"
+          echo "::notice title=Uploaded new asset::$new_file"

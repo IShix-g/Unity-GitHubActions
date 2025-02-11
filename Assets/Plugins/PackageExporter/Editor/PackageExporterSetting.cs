@@ -18,15 +18,12 @@ namespace PackageExporter.Editor
             {
                 if (s_instance == default)
                 {
-                    s_instance = Load();
+                    s_instance = AssetDatabaseSupport.CreateOrLoad<PackageExporterSetting>(AssetPath);
                 }
                 return s_instance;
             }
         }
         static PackageExporterSetting s_instance;
-
-        public static PackageExporterSetting Load()
-            => AssetDatabaseSupport.CreateOrLoad<PackageExporterSetting>(AssetPath);
 
         public void SetFolderPath(string path)
         {
