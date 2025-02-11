@@ -107,6 +107,7 @@ jobs:
       file-path: ./Assets/Plugins/PackageExporter/package.json
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
+      require-validation: false
 
   build-package:
     needs: update-packagejson
