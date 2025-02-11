@@ -139,7 +139,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          new_file="./${{ needs.build-package.outputs.export-path }}"
+          new_file="/github/workspace/${{ needs.build-package.outputs.export-path }}"
           latest_release="${{ needs.get-latest-release.outputs.tag }}"
           gh release upload "$latest_release" "$new_file"
           echo "::notice title=Uploaded new asset::$new_file"
