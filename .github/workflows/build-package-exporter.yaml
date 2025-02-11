@@ -119,21 +119,8 @@ jobs:
       unity-version: ${{ inputs.unity-version }}
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
 
-  upload-package:
-    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package]
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Upload New Package
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          new_file="${{ needs.build-package.outputs.export-path }}"
-          latest_release="${{ needs.get-latest-release.outputs.tag }}"
-          gh release upload "$latest_release" "$new_file"
-          echo "::notice title=Uploaded new asset::$new_file"
-
   merge-and-push:
-    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package, upload-package]
+    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package]
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -143,3 +130,16 @@ jobs:
       push-branch: ${{ github.event.repository.default_branch }}
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
       dry-run: ${{ inputs.dry-run }}
+
+  upload-package:
+    needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson, build-package, merge-and-push]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Upload New Package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          new_file="${{ needs.build-package.outputs.artifact-url }}"
+          latest_release="${{ needs.get-latest-release.outputs.tag }}"
+          gh release upload "$latest_release" "$new_file"
+          echo "::notice title=Uploaded new asset::$new_file"

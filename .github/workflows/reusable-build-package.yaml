@@ -65,6 +65,9 @@ on:
       export-path:
         description: 'Export path where the package was generated'
         value: ${{ jobs.build-package.outputs.export-path }}
+      artifact-url:
+        description: 'URL to download an Artifact.'
+        value: ${{ jobs.build-package.outputs.artifact-url }}
 
 env:
   TARGET_PLATFORM: StandaloneLinux64
@@ -84,6 +87,7 @@ jobs:
     outputs:
       package-name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
       export-path: ${{ steps.path-normalizer.outputs.export-path }}
+      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
     steps:
       - name: Normalize Path
         id: path-normalizer
@@ -143,6 +147,7 @@ jobs:
           customParameters: ${{ inputs.custom-parameters }}
 
       - uses: actions/upload-artifact@v4
+        id: upload-artifact
         with:
           name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           path: ${{ steps.path-normalizer.outputs.export-path }}
