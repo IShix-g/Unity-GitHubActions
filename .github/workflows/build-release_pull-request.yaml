@@ -63,6 +63,6 @@ jobs:
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
       dry-run: false
-      tag: ${{ needs.extract-tag.outputs.tag }}
+      tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
       release-note: ${{ needs.release-notes.outputs.notes }}
       draft-release: false
