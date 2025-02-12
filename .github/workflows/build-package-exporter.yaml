@@ -105,6 +105,7 @@ jobs:
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
       require-validation: false
+      commit-message-format: 'Update the Package Exporter package.json to {v}'
 
   build-package:
     needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson]
