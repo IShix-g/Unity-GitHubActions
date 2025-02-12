@@ -1,0 +1,41 @@
+name: (Reusable) Upload package to release
+
+on:
+  workflow_call:
+    inputs:
+      release-tag:
+        description: 'Specify the release tag (e.g., 1.0.0).'
+        required: true
+        type: string
+      artifact-package-name:
+        description: 'The name of the package uploaded as an artifact.'
+        required: true
+        type: string
+      dry-run:
+        description: 'true = dry-run'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  upload-package:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-package-name }}
+
+      - name: Upload Package
+        if: ${{ !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          file="${{ inputs.artifact-package-name }}"
+          file_path="./$file"
+          tag="${{ inputs.release-tag }}"
+          gh release upload "$tag" "$file_path"
+          echo "::notice title=Uploaded asset::$file"

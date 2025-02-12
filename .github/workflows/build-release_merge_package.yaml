@@ -27,11 +27,6 @@ on:
         description: 'true = Draft release; false = Non-draft release.'
         type: boolean
         default: false
-      require-validation:
-        description: 'true requires validation to pass; false allows continuing even if validation fails.'
-        required: false
-        type: boolean
-        default: true
 
 permissions:
   actions: read
@@ -121,25 +116,11 @@ jobs:
 
   upload-package:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes, create-release]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.build-package.outputs.package-name }}
-
-      - name: Upload Package
-        if: ${{ !inputs.dry-run }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          file="./${{ needs.build-package.outputs.package-name }}"
-          tag="${{ needs.update-packagejson.outputs.normalized-tag }}"
-          gh release upload "$tag" "$file"
-          echo "::notice title=Uploaded new asset::$file"
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-package-upload.yaml@main
+    with:
+      release-tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
+      artifact-package-name: ${{ needs.build-package.outputs.package-name }}
+      dry-run: ${{ inputs.dry-run }}
 
   clean-branch:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes, create-release, upload-package]
