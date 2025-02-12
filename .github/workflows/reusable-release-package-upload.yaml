@@ -28,6 +28,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-package-name }}
+          path: ./artifacts
 
       - name: Upload Package
         if: ${{ !inputs.dry-run }}
@@ -35,7 +36,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           file="${{ inputs.artifact-package-name }}"
-          file_path="./$file"
+          file_path="./artifacts/$file"
           tag="${{ inputs.release-tag }}"
           gh release upload "$tag" "$file_path"
           echo "::notice title=Uploaded asset::$file"
@@ -46,6 +47,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           file="${{ inputs.artifact-package-name }}"
-          file_path="./$file"
+          file_path="./artifacts/$file"
           tag="${{ inputs.release-tag }}"
           echo "::notice title=Dry Run::Simulating upload of '$file_path' to release tag '$tag'."
