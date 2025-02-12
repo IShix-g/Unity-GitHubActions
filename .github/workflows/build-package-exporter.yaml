@@ -136,7 +136,6 @@ jobs:
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
             echo "found=1" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Found file::$asset_url"
           fi
 
       - name: Delete Existing Package File
