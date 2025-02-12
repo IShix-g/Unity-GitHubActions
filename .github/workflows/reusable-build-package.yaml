@@ -146,13 +146,13 @@ jobs:
           buildMethod: ${{ inputs.build-method }}
           customParameters: ${{ inputs.custom-parameters }}
 
+      - uses: ./.github/actions/check-metas
+        with:
+          directory: ${{ inputs.project-path }}
+
       - uses: actions/upload-artifact@v4
         id: upload-artifact
         with:
           name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           path: ${{ steps.path-normalizer.outputs.export-path }}
           retention-days: ${{ inputs.retention-days }}
-
-      - uses: .github/actions/check-metas
-        with:
-          directory: ${{ inputs.project-path }}

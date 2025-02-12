@@ -98,7 +98,7 @@ jobs:
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: ${{ inputs.coverage-options }}
 
-      - uses: .github/actions/check-metas
+      - uses: ./.github/actions/check-metas
         with:
           directory: ${{ inputs.project-path }}
 
