@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       dry-run:
-        description: 'true = dry-run'
+        description: 'true = dry-run: The upload will not actually be performed.'
         required: false
         type: boolean
         default: false
@@ -48,20 +48,4 @@ jobs:
           file="${{ inputs.artifact-package-name }}"
           file_path="./$file"
           tag="${{ inputs.release-tag }}"
-
-          if ! gh release view "$tag" &>/dev/null; then
-            echo "::error title=Release Tag Not Found::The release tag '$tag' does not exist."
-            exit 1
-          fi
-
-          if [ ! -f "$file_path" ]; then
-            echo "::error title=File Not Found::The file '$file_path' does not exist."
-            exit 1
-          fi
-
-          if [ "${{ inputs.dry-run }}" = "true" ]; then
-            echo "::notice title=Dry Run::Simulating upload of '$file_path' to release tag '$tag'."
-          else
-            gh release upload "$tag" "$file_path"
-            echo "::notice title=Uploaded Asset::$file_path has been successfully uploaded to release tag '$tag'."
-          fi
+          echo "::notice title=Dry Run::Simulating upload of '$file_path' to release tag '$tag'."
