@@ -152,3 +152,7 @@ jobs:
           name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           path: ${{ steps.path-normalizer.outputs.export-path }}
           retention-days: ${{ inputs.retention-days }}
+
+      - uses: .github/actions/check-metas
+        with:
+          directory: ${{ inputs.project-path }}
