@@ -71,6 +71,8 @@ jobs:
     steps:
       - name: Check for Existing Package
         id: check-package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release="${{ needs.get-latest-release.outputs.tag }}"
           file_name="PackageExporter_*.unitypackage"
@@ -82,6 +84,8 @@ jobs:
 
       - name: Delete Existing Package File
         if: ${{ steps.check-package.outputs.found == '1' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release="${{ needs.get-latest-release.outputs.tag }}"
           file_name="PackageExporter_*.unitypackage"
