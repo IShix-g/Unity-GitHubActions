@@ -27,6 +27,11 @@ on:
         description: 'true = Draft release; false = Non-draft release.'
         type: boolean
         default: false
+      require-validation:
+        description: 'true requires validation to pass; false allows continuing even if validation fails.'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   actions: read
@@ -132,8 +137,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           file="./${{ needs.build-package.outputs.package-name }}"
-          latest_release="${{ needs.update-packagejson.outputs.normalized-tag }}"
-          gh release upload "$latest_release" "$file"
+          tag="${{ needs.update-packagejson.outputs.normalized-tag }}"
+          gh release upload "$tag" "$file"
           echo "::notice title=Uploaded new asset::$file"
 
   clean-branch:
