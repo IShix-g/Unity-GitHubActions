@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb346ada09d4f62892e782d664fc210, type: 3}
   m_Name: PackageExporterSetting
   m_EditorClassIdentifier: 
-  _folderPath: Assets/Plugins/PackageExporter/
+  _folderPath: Assets/PackageExporter/
+  _isCompletedTest: 1

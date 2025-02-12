@@ -101,10 +101,11 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       ref: ${{ github.ref }}
-      file-path: ./Assets/Plugins/PackageExporter/package.json
+      file-path: ./Assets/PackageExporter/package.json
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
       require-validation: false
+      commit-message-format: 'Update the Package Exporter package.json to {v}'
 
   build-package:
     needs: [verify-branch, get-latest-release, check-existing-package, update-packagejson]
