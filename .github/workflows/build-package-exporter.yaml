@@ -101,7 +101,7 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       ref: ${{ github.ref }}
-      file-path: ./Assets/Plugins/PackageExporter/package.json
+      file-path: ./Assets/PackageExporter/package.json
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
       require-validation: false

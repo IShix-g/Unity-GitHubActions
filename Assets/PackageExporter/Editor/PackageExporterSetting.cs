@@ -9,8 +9,29 @@ namespace PackageExporter.Editor
         public const string AssetPath = "Assets/Editor/PackageExporterSetting.asset";
         
         [SerializeField] string _folderPath;
-        
-        public string FolderPath => _folderPath;
+        [SerializeField] bool _isCompletedTest;
+
+        public string FolderPath
+        {
+            get => _folderPath;
+            set
+            {
+                _folderPath = value;
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssetIfDirty(this);
+            }
+        }
+
+        public bool IsCompletedTest
+        {
+            get => _isCompletedTest;
+            set
+            {
+                _isCompletedTest = value;
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssetIfDirty(this);
+            }
+        }
         
         public static PackageExporterSetting Instance
         {
@@ -24,12 +45,5 @@ namespace PackageExporter.Editor
             }
         }
         static PackageExporterSetting s_instance;
-
-        public void SetFolderPath(string path)
-        {
-            _folderPath = path;
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssetIfDirty(this);
-        }
     }
 }

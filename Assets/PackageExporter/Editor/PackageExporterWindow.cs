@@ -8,6 +8,8 @@ namespace PackageExporter.Editor
 {
     internal class PackageExporterWindow : EditorWindow
     {
+        const string _buildPath = "PackageExportTest.unitypackage";
+        
         [MenuItem("Window/Test Export Package")]
         public static void ShowWindow()
         {
@@ -48,9 +50,13 @@ namespace PackageExporter.Editor
 
             if (buttonClicked)
             {
+                _assetsFolderPath = AssetDatabase.IsValidFolder(_assetsFolderPath)
+                    ? _assetsFolderPath
+                    : string.Empty;
+                
                 var selectedPath = EditorUtility.OpenFolderPanel(
                     "Select assets folder",
-                    string.IsNullOrEmpty(_assetsFolderPath)
+                    string.IsNullOrWhiteSpace(_assetsFolderPath)
                         ? "Assets/"
                         : _assetsFolderPath,
                     "Select assets folder");
@@ -77,7 +83,7 @@ namespace PackageExporter.Editor
                         Debug.LogError("Please select the directory path under Assets.");
                     }
                     
-                    PackageExporterSetting.Instance.SetFolderPath(_assetsFolderPath);
+                    PackageExporterSetting.Instance.FolderPath = _assetsFolderPath;
                     EditorUtility.SetDirty(this);
                 }
             }
@@ -87,7 +93,8 @@ namespace PackageExporter.Editor
             if (GUILayout.Button("Export Package", GUILayout.Height(35))
                 && ValidDirectory(_assetsFolderPath))
             {
-                Builder.Build(_assetsFolderPath, "Test.unitypackage");
+                Builder.Build(_assetsFolderPath, _buildPath);
+                PackageExporterSetting.Instance.IsCompletedTest = File.Exists(_buildPath);
             }
         }
         

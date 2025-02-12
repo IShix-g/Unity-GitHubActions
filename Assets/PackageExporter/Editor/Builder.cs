@@ -13,7 +13,8 @@ namespace PackageExporter.Editor
         public static void Build()
         {
             var assetsFolderPath = PackageExporterSetting.Instance.FolderPath;
-            if (!string.IsNullOrWhiteSpace(assetsFolderPath))
+            var isCompletedTest = PackageExporterSetting.Instance.IsCompletedTest;
+            if (!string.IsNullOrWhiteSpace(assetsFolderPath) && isCompletedTest)
             {
                 var options = ArgumentsParser.GetValidatedOptions();
                 var buildPath = options.GetValueOrDefault("customBuildPath");
