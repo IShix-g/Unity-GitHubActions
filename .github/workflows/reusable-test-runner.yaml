@@ -78,8 +78,8 @@ jobs:
           lfs: true
       - uses: actions/cache@v4
         with:
-          path: ${{ matrix.projectPath }}/Library
-          key: Library-${{ matrix.projectPath }}
+          path: ${{ matrix.project-path }}/Library
+          key: Library-${{ matrix.project-path }}
           restore-keys: |
             Library-
 
@@ -91,12 +91,16 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: ${{ inputs.unity-version }}
-          projectPath: ${{ inputs.projectPath }}
+          projectPath: ${{ inputs.project-path }}
           testMode: ${{ matrix.testMode }}
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: ${{ inputs.coverage-options }}
+
+      - uses: ./.github/actions/check-metas
+        with:
+          directory: ${{ inputs.project-path }}
 
       - uses: actions/upload-artifact@v4
         if: always()

@@ -146,6 +146,10 @@ jobs:
           buildMethod: ${{ inputs.build-method }}
           customParameters: ${{ inputs.custom-parameters }}
 
+      - uses: ./.github/actions/check-metas
+        with:
+          directory: ${{ inputs.project-path }}
+
       - uses: actions/upload-artifact@v4
         id: upload-artifact
         with:

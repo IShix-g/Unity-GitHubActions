@@ -1,0 +1,42 @@
+name: Check all .meta files are committed
+
+description: Ensure all Unity .meta files are committed to the repository.
+
+inputs:
+  directory:
+    description: 'The working directory to check for changes.'
+    required: true
+    type: string
+  exit-on-error:
+    description: 'Whether or not to exit on error.'
+    required: false
+    type: boolean
+    default: true
+outputs:
+  meta-exists:
+    description: 'Indicates whether any uncommitted .meta files exist.'
+    value: ${{ steps.check-meta.outputs.meta-exists }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check for uncommitted .meta files
+      id: check-meta
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        # Check for untracked or modified `.meta` files
+        if git ls-files --others --exclude-standard -t | grep --regexp='[.]meta$'; then
+          echo "Detected uncommitted .meta file. Did you forget to commit a .meta file?"
+          # Output meta-exists as true
+          echo "meta-exists=true" | tee -a "$GITHUB_OUTPUT"
+          # Exit with error if 'exit-on-error' is set to true
+          if [[ "${{ inputs.exit-on-error }}" == "true" ]]; then
+            exit 1
+          fi
+        else
+          # If no .meta files are detected, display success message
+          echo "::notice title=Check all .meta files::All .meta files are properly committed."
+          # Output meta-exists as false
+          echo "meta-exists=false" | tee -a "$GITHUB_OUTPUT"
+        fi
