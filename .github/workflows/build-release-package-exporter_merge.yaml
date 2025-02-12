@@ -126,11 +126,15 @@ jobs:
         with:
           name: ${{ needs.build-package.outputs.package-name }}
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-package
-          path: ./${{ needs.build-package.outputs.package-name }}
+      - name: Upload Package
+        if: ${{ !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          file="./${{ needs.build-package.outputs.package-name }}"
+          latest_release="${{ needs.update-packagejson.outputs.normalized-tag }}"
+          gh release upload "$latest_release" "$file"
+          echo "::notice title=Uploaded new asset::$file"
 
   clean-branch:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes, create-release, upload-package]
