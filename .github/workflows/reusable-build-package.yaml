@@ -118,7 +118,7 @@ jobs:
           fi
 
           echo "name=$license_name" >> "$GITHUB_OUTPUT"
-          echo "::notice title=License::$license_name"
+          echo "::notice title=Unity License::$license_name"
 
       - uses: actions/checkout@v4
         with:
