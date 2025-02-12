@@ -79,7 +79,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release="${{ needs.get-latest-release.outputs.tag }}"
-          file_name="PackageExporter_*.unitypackage"
+          file_name="PackageExporter_.*\\.unitypackage"
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
             echo "found=1" >> "$GITHUB_OUTPUT"
@@ -92,7 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release="${{ needs.get-latest-release.outputs.tag }}"
-          file_name="PackageExporter_*.unitypackage"
+          file_name="PackageExporter_.*\\.unitypackage"
           current_file_name=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name")
           if [[ -n "$current_file_name" ]]; then
             gh release delete-asset "$latest_release" "$current_file_name"
