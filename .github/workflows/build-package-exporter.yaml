@@ -16,6 +16,10 @@ on:
           - '2021.3.45f1'
           - '2022.3.57f1'
           - '6000.0.37f1'
+      include-default-branch:
+        description: 'Include default branch in the action behavior. Set to true to include it.'
+        type: boolean
+        default: false
       dry-run:
         description: 'Dry Run: Set to true to simulate the merge without committing or pushing changes.'
         type: boolean
@@ -25,14 +29,24 @@ jobs:
   verify-branch:
     runs-on: ubuntu-22.04
     steps:
-      - name: Check branch
+      - name: Check if ref is default branch
         env:
           REF: ${{ github.ref }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          CURRENT_REF=${REF#refs/heads/}
-          if [ "$CURRENT_REF" = "$DEFAULT_BRANCH" ]; then
-            echo "::error::Please specify a branch other than the default branch."
+          include=${{ inputs.include-default-branch }}
+
+          if [ "$include" = 'true' ]; then
+            exit 0
+          fi
+
+          ref=${REF#refs/heads/}
+
+          if [ "$ref" = "$DEFAULT_BRANCH" ]; then
+            echo "::error::Cannot proceed on default branch. ($DEFAULT_BRANCH)"
+            echo "::error::If you want to target the default branch ($DEFAULT_BRANCH), please turn on 'Include default branch'."
+            echo "Target branch: $ref"
+            echo "Default branch: $DEFAULT_BRANCH"
             exit 1
           fi
 

@@ -37,15 +37,25 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check if ref is default branch
-        if: ${{ !inputs.include-default-branch && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+        env:
+          REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          target_branch="${{ github.ref }}"
-          default_branch="${{ github.event.repository.default_branch }}"
-          echo "::error::Cannot proceed on default branch. ($default_branch)"
-          echo "::error::If you want to target the default branch ($default_branch), please turn on 'Include default branch'."
-          echo "Target branch: $target_branch"
-          echo "Default branch: $default_branch"
-          exit 1
+          include=${{ inputs.include-default-branch }}
+
+          if [ "$include" = 'true' ]; then
+            exit 0
+          fi
+
+          ref=${REF#refs/heads/}
+
+          if [ "$ref" = "$DEFAULT_BRANCH" ]; then
+            echo "::error::Cannot proceed on default branch. ($DEFAULT_BRANCH)"
+            echo "::error::If you want to target the default branch ($DEFAULT_BRANCH), please turn on 'Include default branch'."
+            echo "Target branch: $ref"
+            echo "Default branch: $DEFAULT_BRANCH"
+            exit 1
+          fi
 
   update-packagejson:
     needs: [validate-branch]
