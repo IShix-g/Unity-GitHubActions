@@ -19,11 +19,11 @@ on:
         type: string
         default: '2022.3.57f1'
     secrets:
-      UNITY_LICENSE:
-        required: true
       UNITY_EMAIL:
         required: true
       UNITY_PASSWORD:
+        required: true
+      UNITY_LICENSE:
         required: true
 
 jobs:

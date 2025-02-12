@@ -82,7 +82,7 @@ jobs:
           fi
 
           echo "name=$license_name" >> "$GITHUB_OUTPUT"
-          echo "::notice title=License::$license_name"
+          echo "::notice title=Unity License::$license_name"
 
   test-all:
     needs: [prepare-test-modes, unity-license]
