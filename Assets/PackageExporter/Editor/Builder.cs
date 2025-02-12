@@ -10,29 +10,22 @@ namespace PackageExporter.Editor
 {
     internal sealed class Builder
     {
-        public static void Build()
+        static readonly string s_eol = Environment.NewLine;
+        
+        public static void BuildWithAssetsFolder(string assetsFolderPath)
         {
-            var assetsFolderPath = PackageExporterSetting.Instance.FolderPath;
-            var isCompletedTest = PackageExporterSetting.Instance.IsCompletedTest;
-            if (!string.IsNullOrWhiteSpace(assetsFolderPath) && isCompletedTest)
-            {
-                var options = ArgumentsParser.GetValidatedOptions();
-                var buildPath = options.GetValueOrDefault("customBuildPath");
-                Build(assetsFolderPath, buildPath);
-            }
-            else
-            {
-                PrintErrorLog("Please perform a package export test in Unity first. Go to Window > Test Export Package.");
-            }
+            var options = GetValidatedOptions();
+            var buildPath = options.GetValueOrDefault("customBuildPath");
+            Build(assetsFolderPath, buildPath);
         }
-
+        
         public static void Build(string assetsFolderPath, string buildPath)
         {
             var assets = AssetDatabase.FindAssets("", new[] {assetsFolderPath})
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .ToArray();
 
-            PrintLog("Export below files" + Environment.NewLine + string.Join(Environment.NewLine, assets));
+            Logger.Log("Export below files" + s_eol + string.Join(s_eol, assets));
 
             AssetDatabase.ExportPackage(
                 assets,
@@ -46,28 +39,75 @@ namespace PackageExporter.Editor
                 {
                     message = "::notice title=Unity Editor::" + message;
                 }
-                PrintLog(message);
+                Logger.Log(message);
             }
             else
             {
-                PrintErrorLog("Export failed: " + Path.GetFullPath(buildPath));
+                Logger.Error("Export failed: " + Path.GetFullPath(buildPath));
             }
         }
-
-        static void PrintLog(string msg)
+        
+        // https://github.com/game-ci/documentation/blob/main/example/BuildScript.cs
+        
+        public static Dictionary<string, string> GetValidatedOptions()
         {
-            if (Application.isBatchMode) Console.WriteLine(msg);
-            else Debug.Log(msg);
-        }
-
-        public static void PrintErrorLog(string msg)
-        {
-            if (Application.isBatchMode)
+            ParseCommandLineArguments(out var validatedOptions);
+            
+            if (!validatedOptions.TryGetValue("projectPath", out string _))
             {
-                Console.WriteLine($"::error::{msg}");
-                EditorApplication.Exit(1);
+                Console.WriteLine("Missing argument -projectPath");
+                EditorApplication.Exit(110);
             }
-            else Debug.LogError(msg);
+            if (!validatedOptions.TryGetValue("buildTarget", out string buildTarget))
+            {
+                Console.WriteLine("Missing argument -buildTarget");
+                EditorApplication.Exit(120);
+            }
+            if (!Enum.IsDefined(typeof(BuildTarget), buildTarget ?? string.Empty))
+            {
+                Console.WriteLine($"{buildTarget} is not a defined {nameof(BuildTarget)}");
+                EditorApplication.Exit(121);
+            }
+            if (!validatedOptions.TryGetValue("customBuildPath", out string _))
+            {
+                Console.WriteLine("Missing argument -customBuildPath");
+                EditorApplication.Exit(130);
+            }
+            if (!validatedOptions.TryGetValue("customBuildName", out string _))
+            {
+                Console.WriteLine("Missing argument -customBuildName");
+                EditorApplication.Exit(131);
+            }
+            return validatedOptions;
+        }
+
+        static void ParseCommandLineArguments(out Dictionary<string, string> providedArguments)
+        {
+            providedArguments = new Dictionary<string, string>();
+            var args = Environment.GetCommandLineArgs();
+
+            Console.WriteLine(
+                $"{s_eol}" +
+                $"###########################{s_eol}" +
+                $"#    Parsing settings     #{s_eol}" +
+                $"###########################{s_eol}" +
+                $"{s_eol}"
+            );
+            
+            for (int current = 0, next = 1; current < args.Length; current++, next++)
+            {
+                var isFlag = args[current].StartsWith("-");
+                if (!isFlag)
+                {
+                    continue;
+                }
+                var flag = args[current].TrimStart('-');
+                var flagHasValue = next < args.Length && !args[next].StartsWith("-");
+                var value = flagHasValue ? args[next].TrimStart('-') : "";
+                var displayValue = "\"" + value + "\"";
+                Console.WriteLine($"Found flag \"{flag}\" with value {displayValue}.");
+                providedArguments.Add(flag, value);
+            }
         }
     }
 }

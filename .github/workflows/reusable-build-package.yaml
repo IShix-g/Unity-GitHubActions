@@ -35,7 +35,7 @@ on:
         description: 'Path where the builds should be stored.'
         required: false
         type: string
-        default: 'PackageExporter.Editor.Builder.Build'
+        default: 'PackageExporter.Editor.CLIBuilder.Build'
       custom-parameters:
         description: 'Custom parameters to configure the build. https://game.ci/docs/github/builder#customparameters'
         required: false
