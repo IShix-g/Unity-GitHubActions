@@ -29,12 +29,14 @@ on:
         type: string
         default: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
     secrets:
-      UNITY_LICENSE:
-        required: true
       UNITY_EMAIL:
         required: true
       UNITY_PASSWORD:
         required: true
+      UNITY_LICENSE:
+        required: false
+      UNITY_SERIAL:
+        required: false
 
 jobs:
   print-unity-version:
@@ -62,8 +64,28 @@ jobs:
           fi
           echo "::notice title=Test Modes::$array"
 
+  unity-license:
+    runs-on: ubuntu-22.04
+    outputs:
+      name: ${{ steps.license.outputs.name }}
+    steps:
+      - name: Set Unity License Name
+        id: license
+        run: |
+          if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
+            license_name="UNITY_LICENSE"
+          elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
+            license_name="UNITY_SERIAL"
+          else
+            echo "::error::No secrets.UNITY_LICENSE or secrets.UNITY_SERIAL found."
+            exit 1
+          fi
+
+          echo "name=$license_name" >> "$GITHUB_OUTPUT"
+          echo "::notice title=License::$license_name"
+
   test-all:
-    needs: [prepare-test-modes]
+    needs: [prepare-test-modes, unity-license]
     name: Test in ${{ matrix.testMode }}
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -86,9 +108,9 @@ jobs:
       - uses: game-ci/unity-test-runner@v4
         id: tests
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          ${{ needs.unity-license.outputs.name }}: ${{ secrets[needs.unity-license.outputs.name] }}
         with:
           unityVersion: ${{ inputs.unity-version }}
           projectPath: ${{ inputs.project-path }}
