@@ -94,6 +94,7 @@ jobs:
       tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
       unity-version: ${{ inputs.unity-version }}
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
+      retention-days: 1
 
   release-notes:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package]

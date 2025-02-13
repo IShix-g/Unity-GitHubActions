@@ -48,7 +48,7 @@ on:
           Maximum 90 days unless changed from the repository settings page.
         required: false
         type: string
-        default: '1'
+        default: '0'
     secrets:
       UNITY_EMAIL:
         required: true
