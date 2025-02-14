@@ -71,12 +71,13 @@ jobs:
           # Check if the latest release contains the unitypackage
           release_info=$(gh release view "$latest_release" --json assets)
           file_present=$(echo "$release_info" | jq '.assets[].name | select(test("PackageExporter_.*\\.unitypackage"))')
+          
           if [ -n "$file_present" ]; then
             echo "Unitypackage file found in the latest release."
             echo "file-present=1" >> "$GITHUB_OUTPUT"
           else
             echo "No Unitypackage found in the latest release."
-            echo "file-present=0" >> "$GITHUB_OUTPUT"
+          fi
 
   upload-package:
     needs: check-package
