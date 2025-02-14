@@ -71,6 +71,9 @@ on:
       artifact-digest:
         description: 'SHA-256 digest of an Artifact'
         value: ${{ jobs.build-package.outputs.artifact-digest }}
+      package-hash:
+        description: 'Calculate Package Hash'
+        value: ${{ jobs.build-package.outputs.package-hash }}
 
 env:
   TARGET_PLATFORM: StandaloneLinux64
@@ -92,6 +95,7 @@ jobs:
       export-path: ${{ steps.path-normalizer.outputs.export-path }}
       artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
       artifact-digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
+      package-hash: ${{ steps.package-hash.outputs.hash }}
     steps:
       - name: Normalize Path
         id: path-normalizer
@@ -160,3 +164,10 @@ jobs:
           name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
           path: ${{ steps.path-normalizer.outputs.export-path }}
           retention-days: ${{ inputs.retention-days }}
+
+      - name: Calculate Package Hash
+        id: package-hash
+        run: |
+          artifact_file="${{ steps.path-normalizer.outputs.export-path }}"
+          calculated_hash=$(sha256sum "$artifact_file" | awk '{ print $1 }')
+          echo "hash=$calculated_hash" >> "$GITHUB_OUTPUT"
