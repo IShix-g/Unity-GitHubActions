@@ -11,8 +11,8 @@ on:
         description: 'The name of the package uploaded as an artifact.'
         required: true
         type: string
-      artifact-digest:
-        description: 'SHA-256 digest of an Artifact. https://github.com/actions/upload-artifact?tab=readme-ov-file#outputs'
+      package-hash:
+        description: 'The SHA-256 hash of the package file'
         required: true
         type: string
       dry-run:
@@ -53,13 +53,13 @@ jobs:
         run: |
           artifact_file="${{ steps.artifact-path.outputs.path }}"
           calculated_hash=$(sha256sum "$artifact_file" | awk '{ print $1 }')
-          uploaded_hash="${{ inputs.artifact-digest }}"
+          uploaded_hash="${{ inputs.package-hash }}"
 
           echo "Uploaded hash: $uploaded_hash"
           echo "Calculated hash: $calculated_hash"
 
           if [ "$calculated_hash" != "$uploaded_hash" ]; then
-            echo "::error::Artifact integrity check failed! The calculated hash does not match the uploaded artifact-digest."
+            echo "::error::Artifact integrity check failed! The calculated hash does not match the package-hash."
             exit 1
           fi
             echo "Artifact Verified: Integrity check passed. Hashes match!"

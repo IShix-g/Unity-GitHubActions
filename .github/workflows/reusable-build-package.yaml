@@ -68,11 +68,8 @@ on:
       artifact-url:
         description: 'URL to download an Artifact'
         value: ${{ jobs.build-package.outputs.artifact-url }}
-      artifact-digest:
-        description: 'SHA-256 digest of an Artifact'
-        value: ${{ jobs.build-package.outputs.artifact-digest }}
       package-hash:
-        description: 'Calculate Package Hash'
+        description: 'The SHA-256 hash of the package file'
         value: ${{ jobs.build-package.outputs.package-hash }}
 
 env:
@@ -94,7 +91,6 @@ jobs:
       package-name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
       export-path: ${{ steps.path-normalizer.outputs.export-path }}
       artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
-      artifact-digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
       package-hash: ${{ steps.package-hash.outputs.hash }}
     steps:
       - name: Normalize Path

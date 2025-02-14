@@ -1,0 +1,83 @@
+name: Check and Upload Unitypackage
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Manual Release (Merge to Default)"
+      - "Manual Release and Build Package (Merge to Default)"
+      - "Release via PR (Default Branch)"
+    types:
+      - completed
+
+jobs:
+  check-package:
+    runs-on: ubuntu-22.04
+    outputs:
+      file-present: ${{ steps.check-file.outputs.file-present }}
+      closest-release: ${{ steps.find-release.outputs.closest-release }}
+      latest-release: ${{ steps.get-latest-release.outputs.latest-release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get all releases and search for PackageExporter
+        id: find-release
+        run: |
+          # Get all releases info
+          all_releases=$(gh release list --json tagName,assets --limit 50)
+
+          # Find the latest release
+          latest_release=$(echo "$all_releases" | jq -r '.[0].tagName')
+          echo "latest-release=$latest_release" >> "$GITHUB_OUTPUT"
+
+          # Find the most recent release with a matching unitypackage
+          closest_release=$(echo "$all_releases" | jq -r \
+                            '.[] | select(.assets[].name | test("PackageExporter_.*\\.unitypackage")) | .tagName' | head -n 1)
+
+          if [ -n "$closest_release" ]; then
+            echo "Closest release found: $closest_release"
+            echo "closest-release=$closest_release" >> "$GITHUB_OUTPUT"
+          else
+            echo "No matching unitypackage found."
+            echo "closest-release=" >> "$GITHUB_OUTPUT"
+
+      - name: Check if PackageExporter exists in the latest release
+        id: check-file
+        env:
+          latest_release: ${{ steps.find-release.outputs.latest-release }}
+        run: |
+          # Check if the latest release contains the unitypackage
+          release_info=$(gh release view "$latest_release" --json assets)
+          file_present=$(echo "$release_info" | jq '.assets[].name | select(test("PackageExporter_.*\\.unitypackage"))')
+          if [ -n "$file_present" ]; then
+            echo "Unitypackage file found in the latest release."
+            echo "file-present=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "No Unitypackage found in the latest release."
+            echo "file-present=0" >> "$GITHUB_OUTPUT"
+
+  upload-package:
+    needs: check-package
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Handle PackageExporter Upload
+        if: ${{ needs.check-package.outputs.file-present != '1' }}
+        run: |
+          closest_release=${{ needs.check-package.outputs.closest-release }}
+          latest_release=${{ needs.check-package.outputs.latest-release }}
+          
+          if [ -n "$closest_release" ]; then
+            echo "Uploading from closest release ($closest_release) to the latest release ($latest_release)..."
+          
+            gh release download "$closest_release" --pattern "PackageExporter_*.unitypackage" -D ./temp-unitypackage
+          
+            gh release upload "$latest_release" ./temp-unitypackage/PackageExporter_*.unitypackage
+            echo "Successfully uploaded the file to the latest release: $latest_release"
+          else
+            echo "No closest release found with a PackageExporter. Nothing to upload."
+            exit 1
+          fi

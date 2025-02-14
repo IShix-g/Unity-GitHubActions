@@ -121,7 +121,7 @@ jobs:
     with:
       release-tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
       artifact-package-name: ${{ needs.build-package.outputs.package-name }}
-      artifact-digest: ${{ needs.build-package.outputs.package-hash }}
+      package-hash: ${{ needs.build-package.outputs.package-hash }}
       dry-run: ${{ inputs.dry-run }}
 
   clean-branch:
