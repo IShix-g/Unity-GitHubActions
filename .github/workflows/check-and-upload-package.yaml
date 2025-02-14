@@ -8,12 +8,11 @@ on:
       - "Manual Release and Build Package (Merge to Default)"
       - "Release via PR (Default Branch)"
     types:
-      - closed
+      - completed
 
 jobs:
   check-package:
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
     outputs:
       file-present: ${{ steps.check-file.outputs.file-present }}
       closest-release: ${{ steps.find-release.outputs.closest-release }}
