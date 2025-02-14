@@ -27,7 +27,7 @@ on:
         required: true
 
 jobs:
-  test-runner:
+  unity-test:
     uses: ./.github/workflows/reusable-unity-test.yaml
     secrets:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
