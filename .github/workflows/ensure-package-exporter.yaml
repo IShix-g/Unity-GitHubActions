@@ -26,34 +26,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get the list of all release tags up to 50
           all_releases=$(gh release list --json tagName --limit 50)
           release_tags=$(echo "$all_releases" | jq -r '.[].tagName')
-          
-          # Initialize variables
+
           latest_release=""
           closest_release=""
           
-          # Iterate over the releases
           for tag in $release_tags; do
-          # Get detailed release info for each tag
           release_info=$(gh release view "$tag" --json tagName,assets)
-        
-          # Check if this is the latest release
+
           if [ -z "$latest_release" ]; then
             latest_release="$tag"
             echo "latest-release=$latest_release" >> "$GITHUB_OUTPUT"
           fi
-        
-          # Check for matching .unitypackage in the assets
+
           match=$(echo "$release_info" | jq -r '.assets[].name | select(test("PackageExporter_.*\\.unitypackage"))')
           if [ -n "$match" ] && [ -z "$closest_release" ]; then
             closest_release="$tag"
             echo "Closest release found: $closest_release"
           fi
           done
-          
-          # Output the results
+
           if [ -n "$closest_release" ]; then
             echo "closest-release=$closest_release" >> "$GITHUB_OUTPUT"
           else
@@ -67,7 +60,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           latest_release: ${{ steps.find-release.outputs.latest-release }}
         run: |
-          # Check if the latest release contains the unitypackage
           release_info=$(gh release view "$latest_release" --json assets)
           file_present=$(echo "$release_info" | jq '.assets[].name | select(test("PackageExporter_.*\\.unitypackage"))')
           
@@ -95,9 +87,7 @@ jobs:
           
           if [ -n "$closest_release" ]; then
             echo "Uploading from closest release ($closest_release) to the latest release ($latest_release)..."
-          
             gh release download "$closest_release" --pattern "PackageExporter_*.unitypackage" -D ./temp-unitypackage
-          
             gh release upload "$latest_release" ./temp-unitypackage/PackageExporter_*.unitypackage
             echo "Successfully uploaded the file to the latest release: $latest_release"
           else
