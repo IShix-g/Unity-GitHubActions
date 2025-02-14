@@ -114,15 +114,17 @@ jobs:
         run: |
           if [ -n "${{ secrets.UNITY_LICENSE }}" ]; then
             license_name="UNITY_LICENSE"
+            license_type="Personal"
           elif [ -n "${{ secrets.UNITY_SERIAL }}" ]; then
             license_name="UNITY_SERIAL"
+            license_type="Pro"
           else
             echo "::error::No secrets.UNITY_LICENSE or secrets.UNITY_SERIAL found."
             exit 1
           fi
 
           echo "name=$license_name" >> "$GITHUB_OUTPUT"
-          echo "::notice title=Unity License::$license_name"
+          echo "::notice title=Unity License::$license_type"
 
       - uses: actions/checkout@v4
         with:
