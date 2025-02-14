@@ -100,10 +100,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
       - uses: actions/cache@v4
         with:
-          path: ${{ matrix.project-path }}/Library
-          key: Library-${{ matrix.project-path }}
+          path: ${{ inputs.project-path || '.' }}/Library
+          key: Library-${{ inputs.project-path || 'default'}}
           restore-keys: |
             Library-
 
