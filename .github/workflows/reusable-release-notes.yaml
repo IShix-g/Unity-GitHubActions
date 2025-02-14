@@ -141,6 +141,7 @@ jobs:
 
             filtered_notes=$(
               git log ${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }} \
+              --reverse \
               --pretty=format:"${{ inputs.commit-message-format }}####UNIQUE####%cn" \
               | grep -vi "github-actions\[bot\]" \
               | sed 's/####UNIQUE####.*$//' \
