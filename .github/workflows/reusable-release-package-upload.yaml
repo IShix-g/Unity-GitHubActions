@@ -53,7 +53,7 @@ jobs:
         run: |
           artifact_file="${{ steps.artifact-path.outputs.path }}"
           calculated_hash=$(sha256sum "$artifact_file" | awk '{ print $1 }')
-          uploaded_hash="${{ inputs.artifact_digest }}"
+          uploaded_hash="${{ inputs.artifact-digest }}"
 
           echo "Uploaded hash: $uploaded_hash"
           echo "Calculated hash: $calculated_hash"
