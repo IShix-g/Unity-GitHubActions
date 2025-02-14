@@ -11,7 +11,45 @@ on:
       - completed
 
 jobs:
+  check-trigger:
+    runs-on: ubuntu-22.04
+    outputs:
+      checked: ${{ steps.check_trigger.outputs.checked }}
+    steps:
+      - name: Check if trigger is workflow_dispatch
+        id: check_trigger
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "::notice::Trigger is workflow_dispatch"
+            echo "checked=1" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::Trigger is not workflow_dispatch"
+          fi
+
+  check-last-commit-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      tagged: ${{ steps.check_tag.outputs.tagged }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if last commit has a tag
+        id: check_tag
+        run: |
+          TAGS=$(git tag --points-at HEAD)
+          if [ -z "$TAGS" ]; then
+            echo "::notice::No tags found on the last commit."
+          else
+            echo "::notice::Tags found on the last commit: $TAGS"
+            echo "tagged=1" >> $GITHUB_OUTPUT
+          fi
+
   check-package:
+    needs: [check-trigger, check-last-commit-tag]
+    if: ${{ needs.check-trigger.outputs.checked == '1' || needs.check-last-commit-tag.outputs.tagged == '1' }}
     runs-on: ubuntu-22.04
     outputs:
       file-present: ${{ steps.check-file.outputs.file-present }}
@@ -71,7 +109,7 @@ jobs:
           fi
 
   upload-package:
-    needs: check-package
+    needs: [check-trigger, check-last-commit-tag, check-package]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
