@@ -19,7 +19,7 @@ on:
         type: string
         default: 'playmode,editmode'
       custom-parameters:
-        description: 'Custom parameters to configure the test runner.  https://game.ci/docs/github/test-runner/#customparameters'
+        description: 'Custom parameters to configure the test framework.  https://game.ci/docs/github/test-runner/#customparameters'
         required: false
         type: string
         default: ''
