@@ -1,4 +1,4 @@
-name: Check and Upload Package Exporter
+name: Ensure PackageExporter in Release
 
 on:
   workflow_dispatch:
