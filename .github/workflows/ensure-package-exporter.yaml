@@ -6,7 +6,7 @@ on:
     workflows:
       - "Manual Release (Merge to Default)"
       - "Manual Release and Build Package (Merge to Default)"
-      - "Manual Release and Test Runner (Merge to Default)"
+      - "Manual Release and Test Framework (Merge to Default)"
       - "Release via PR (Default Branch)"
     types:
       - completed
