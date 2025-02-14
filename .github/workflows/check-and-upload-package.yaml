@@ -82,6 +82,9 @@ jobs:
     needs: check-package
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Handle PackageExporter Upload
         if: ${{ needs.check-package.outputs.file-present != '1' }}
         env:
