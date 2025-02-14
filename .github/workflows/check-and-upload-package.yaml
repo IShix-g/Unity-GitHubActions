@@ -8,7 +8,7 @@ on:
       - "Manual Release and Build Package (Merge to Default)"
       - "Release via PR (Default Branch)"
     types:
-      - completed
+      - closed
 
 jobs:
   check-package:
