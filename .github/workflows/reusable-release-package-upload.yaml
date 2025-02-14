@@ -59,10 +59,10 @@ jobs:
           echo "Calculated hash: $calculated_hash"
 
           if [ "$calculated_hash" != "$uploaded_hash" ]; then
-            echo "::error::Artifact integrity check failed! Hash mismatch."
+            echo "::error::Artifact integrity check failed! The calculated hash does not match the uploaded artifact-digest."
             exit 1
           fi
-            echo "Artifact Verified: Integrity check passed. Hash matches."
+            echo "Artifact Verified: Integrity check passed. Hashes match!"
 
       - name: Upload Package
         if: ${{ !inputs.dry-run }}
