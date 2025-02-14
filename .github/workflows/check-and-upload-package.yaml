@@ -1,4 +1,4 @@
-name: Check and Upload Unitypackage
+name: Check and Upload Package Exporter
 
 on:
   workflow_dispatch:
@@ -23,6 +23,8 @@ jobs:
 
       - name: Get all releases and search for PackageExporter
         id: find-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Get all releases info
           all_releases=$(gh release list --json tagName,assets --limit 50)
@@ -45,6 +47,7 @@ jobs:
       - name: Check if PackageExporter exists in the latest release
         id: check-file
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           latest_release: ${{ steps.find-release.outputs.latest-release }}
         run: |
           # Check if the latest release contains the unitypackage
@@ -66,6 +69,8 @@ jobs:
 
       - name: Handle PackageExporter Upload
         if: ${{ needs.check-package.outputs.file-present != '1' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           closest_release=${{ needs.check-package.outputs.closest-release }}
           latest_release=${{ needs.check-package.outputs.latest-release }}
