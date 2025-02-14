@@ -104,9 +104,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ inputs.project-path || '.' }}/Library
-          key: Library-${{ inputs.project-path || 'default'}}
+          key: Library-${{ inputs.project-path || 'default' }}-${{ matrix.testMode }}
           restore-keys: |
-            Library-
+            Library-${{ inputs.project-path || 'default' }}-
 
       - uses: game-ci/unity-test-runner@v4
         id: tests
