@@ -48,7 +48,7 @@ on:
           Maximum 90 days unless changed from the repository settings page.
         required: false
         type: string
-        default: '1'
+        default: '0'
     secrets:
       UNITY_EMAIL:
         required: true
@@ -66,8 +66,11 @@ on:
         description: 'Export path where the package was generated'
         value: ${{ jobs.build-package.outputs.export-path }}
       artifact-url:
-        description: 'URL to download an Artifact.'
+        description: 'URL to download an Artifact'
         value: ${{ jobs.build-package.outputs.artifact-url }}
+      artifact-digest:
+        description: 'SHA-256 digest of an Artifact'
+        value: ${{ jobs.build-package.outputs.artifact-digest }}
 
 env:
   TARGET_PLATFORM: StandaloneLinux64
@@ -88,6 +91,7 @@ jobs:
       package-name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
       export-path: ${{ steps.path-normalizer.outputs.export-path }}
       artifact-url: ${{ steps.upload-artifact.outputs.artifact-url }}
+      artifact-digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
     steps:
       - name: Normalize Path
         id: path-normalizer

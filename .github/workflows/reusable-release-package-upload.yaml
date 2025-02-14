@@ -11,6 +11,10 @@ on:
         description: 'The name of the package uploaded as an artifact.'
         required: true
         type: string
+      artifact-digest:
+        description: 'SHA-256 digest of an Artifact. https://github.com/actions/upload-artifact?tab=readme-ov-file#outputs'
+        required: true
+        type: string
       dry-run:
         description: 'true = dry-run: The upload will not actually be performed.'
         required: false
@@ -30,23 +34,51 @@ jobs:
           name: ${{ inputs.artifact-package-name }}
           path: ./artifacts
 
+      - name: Define Path for Artifact File
+        id: artifact-path
+        run: |
+          file="${{ inputs.artifact-package-name }}"
+          echo "path=./artifacts/$file" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Artifact Exists
+        run: |
+          artifact_file="${{ steps.artifact-path.outputs.path }}"
+          if [ ! -f "$artifact_file" ]; then
+            echo "::error file=$artifact_file::Artifact file not found!"
+            exit 1
+          fi
+            echo "Artifact exists: $artifact_file"
+
+      - name: Verify Artifact Integrity
+        run: |
+          artifact_file="${{ steps.artifact-path.outputs.path }}"
+          calculated_hash=$(sha256sum "$artifact_file" | awk '{ print $1 }')
+          uploaded_hash="${{ inputs.artifact_digest }}"
+
+          echo "Uploaded hash: $uploaded_hash"
+          echo "Calculated hash: $calculated_hash"
+
+          if [ "$calculated_hash" != "$uploaded_hash" ]; then
+            echo "::error::Artifact integrity check failed! Hash mismatch."
+            exit 1
+          fi
+            echo "Artifact Verified: Integrity check passed. Hash matches."
+
       - name: Upload Package
         if: ${{ !inputs.dry-run }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           file="${{ inputs.artifact-package-name }}"
-          file_path="./artifacts/$file"
+          file_path="${{ steps.artifact-path.outputs.path }}"
           tag="${{ inputs.release-tag }}"
           gh release upload "$tag" "$file_path"
           echo "::notice title=Uploaded asset::$file"
 
       - name: Upload Package (dry-run)
         if: ${{ inputs.dry-run }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           file="${{ inputs.artifact-package-name }}"
-          file_path="./artifacts/$file"
+          file_path="${{ steps.artifact-path.outputs.path }}"
           tag="${{ inputs.release-tag }}"
           echo "::notice title=Dry Run::Simulating upload of '$file_path' to release tag '$tag'."
