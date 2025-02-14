@@ -17,7 +17,7 @@ jobs:
     outputs:
       file-present: ${{ steps.check-file.outputs.file-present }}
       closest-release: ${{ steps.find-release.outputs.closest-release }}
-      latest-release: ${{ steps.get-latest-release.outputs.latest-release }}
+      latest-release: ${{ steps.find-release.outputs.latest-release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
