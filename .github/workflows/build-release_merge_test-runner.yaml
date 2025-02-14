@@ -29,8 +29,9 @@ on:
         default: false
 
 permissions:
-  actions: read
   contents: write
+  actions: read
+  checks: write
 
 jobs:
   validate-branch:
