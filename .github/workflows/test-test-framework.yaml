@@ -1,4 +1,4 @@
-name: (Test) Test Runner
+name: (Test) Unity Test Framework
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ on:
 
 jobs:
   test-runner:
-    uses: ./.github/workflows/reusable-test-runner.yaml
+    uses: ./.github/workflows/reusable-unity-test.yaml
     secrets:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}

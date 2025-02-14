@@ -1,4 +1,4 @@
-name: (Reusable) Test Runner
+name: (Reusable) Unity Test Framework
 
 on:
   workflow_call:
