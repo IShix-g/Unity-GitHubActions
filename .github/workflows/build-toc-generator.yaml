@@ -5,6 +5,7 @@ on:
   workflow_run:
     workflows:
       - "Manual Release (Merge to Default)"
+      - "Manual Release and Build Package (Merge to Default)"
       - "Release via PR (Default Branch)"
     types:
       - completed
