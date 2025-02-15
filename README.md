@@ -352,6 +352,10 @@ Download the package from the `Assets` section of the [release page](https://git
 
 Install the exported package in a test project to verify its functionality.
 
+## About GitHub Actions Usage Fees
+
+When using GitHub Actions in a private repository, usage fees apply. For public repositories, it remains free.  
+While fees are incurred, there is a free usage allowance available. You can check the details via [Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary).
 
 ## Job Descriptions
 

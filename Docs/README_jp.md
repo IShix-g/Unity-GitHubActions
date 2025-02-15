@@ -345,6 +345,11 @@ URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExpo
 
 出力したパッケージを適当なプロジェクトにインストールして問題が無いか確認ください。
 
+## GitHub Actionsの使用料について
+
+GitHub Actionsをprivateリポジトリで使う場合、使用料が発生します。publicリポジトリの場合は無料です。  
+使用料が発生しますが無料分が存在します。詳しくは、[Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary)から確認できます。
+
 ## Jobの説明
 
 主なJobを説明です。
