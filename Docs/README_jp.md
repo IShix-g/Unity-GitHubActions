@@ -166,14 +166,14 @@ Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`
 
 ![](release_manually.jpg)
 
-| Option                | Description            | Default            | Example  |
-|-----------------------|------------------------|--------------------|----------|
-| tag| 作成したいGitタグ |                    | 1.0.0                                        |
-| clean-branch | ブランチを削除しますか？デフォルトブランチ以外のすべてのブランチが削除されます | false | |
-| fast-forward | マージの早送りを許可しますか？        | false              | |
-| include-default-branch|デフォルト・ブランチをワークフローの動作に含める| false              ||
-| dry-run | 変更をコミットまたはプッシュせずにマージをシミュレートする | false              ||
-| draft-release | ドラフトリリースの場合は `true`, 非ドラフトリリースの場合は `false` | false              |
+| Option                | Description                                                                                                                                                                                                                                        | Default            | Example  |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|----------|
+| tag| 作成したいGitタグ                                                                                                                                                                                                                                         |                    | 1.0.0                                        |
+| clean-branch | ブランチを削除しますか？デフォルトブランチ以外のすべてのブランチが削除されます                                                                                                                                                                                                            | false | |
+| fast-forward | 可能であれば[fast-forward](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github#rebasing-and-merging-your-commits)マージを許可するか？ | false              | |
+| include-default-branch| デフォルト・ブランチをワークフローの動作に含める                                                                                                                                                                                                                           | false              ||
+| dry-run | 変更をコミットまたはプッシュせずにマージをシミュレートする                                                                                                                                                                                                                      | false              ||
+| draft-release | ドラフトリリースの場合は `true`, 非ドラフトリリースの場合は `false`                                                                                                                                                                                                         | false              |
 
 ### 手動でリリースまでの流れ
 

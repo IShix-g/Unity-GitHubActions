@@ -179,7 +179,7 @@ For manual releases:
 |-------------------------|--------------------------------------------------------|---------|-----------------|
 | tag                    | Git tag to create                                      | N/A     | 1.0.0           |
 | clean-branch           | Whether to delete non-default branches                 | false   |                 |
-| fast-forward           | Whether to allow fast-forward merging                  | false   |                 |
+| fast-forward           | Whether to allow [fast-forward](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github#rebasing-and-merging-your-commits) merging                  | false   |                 |
 | include-default-branch | Whether to include the default branch in the workflow  | false   |                 |
 | dry-run                | Simulate without committing or pushing changes         | false   |                 |
 | draft-release          | Set to `true` for a draft release, `false` for final   | false   |                 |
