@@ -247,7 +247,7 @@ Even if you primarily use the pull-request-based release method, it is recommend
 
 ## Adding Unity Test Framework (formerly Test Runner)
 
-Execute tests within Unity Editor. Configuration is required to use this feature. Please refer to the [Setup](#test-framework-formerly-test-runner-or-when-generating-packages) section.
+Execute tests within Unity Editor. Configuration is required to use this feature. Please refer to the [Setup](#when-running-tests-or-generating-packages) section.
 
 ### About Tests
 
@@ -289,7 +289,7 @@ You can view the list of executed tests.
 
 ## Adding Package Generation
 
-Refer to [build-release_merge_package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_package.yaml) for implementation details. Configuration is required, as explained in the [Setup](#test-framework-formerly-test-runner-or-when-generating-packages) section.  
+Refer to [build-release_merge_package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_package.yaml) for implementation details. Configuration is required, as explained in the [Setup](#when-running-tests-or-generating-packages) section.  
 This process allows you to:
 
 - Generate packages ([UPM package](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-ui-install.html))
@@ -513,7 +513,7 @@ For branch or tag protection:
 
 - Executes either Edit Tests, Play Tests, or both using Unity Editor
 - Test results can be viewed under the [Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)
-- Requires [setup](#test-framework-formerly-test-runner-or-when-generating-packages) to be completed
+- Requires [setup](#when-running-tests-or-generating-packages) to be completed
 
 ※ This workflow uses GameCI's [Test Runner](https://game.ci/docs/github/test-runner) to execute tests.
 
@@ -539,7 +539,7 @@ The following secrets are required to execute Unity Editor in batch mode:
 | UNITY_LICENSE    | Required if using a Personal license                          |
 | UNITY_SERIAL     | Required if using a Pro license                               |
 
-For more details, please refer to the [setup section](#test-framework-formerly-test-runner-or-when-generating-packages).
+For more details, please refer to the [setup section](#when-running-tests-or-generating-packages).
 
 ---
 
@@ -550,7 +550,7 @@ For more details, please refer to the [setup section](#test-framework-formerly-t
 - Executes the package build
 - Packages must be located under the `Assets` directory
 - Requires the installation of [PackageExporter](#packageexporter)
-- Requires [setup](#test-framework-formerly-test-runner-or-when-generating-packages) to be completed
+- Requires [setup](#when-running-tests-or-generating-packages) to be completed
 
 ※ This workflow uses GameCI's [Builder](https://game.ci/docs/github/builder) to generate packages.
 
@@ -591,7 +591,7 @@ The following secrets are required to execute Unity Editor in batch mode:
 | UNITY_LICENSE    | Required if using a Personal license                          |
 | UNITY_SERIAL     | Required if using a Pro license                               |
 
-For more details, please refer to the [setup section](#test-framework-formerly-test-runner-or-when-generating-packages).
+For more details, please refer to the [setup section](#when-running-tests-or-generating-packages).
 
 ---
 
