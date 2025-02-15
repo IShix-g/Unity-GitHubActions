@@ -52,6 +52,7 @@ GitHub Actions for Unity.
     - [&#91;Recommended&#93; Package Manager](#recommended-package-manager)
     - [Download the Package](#download-the-package)
   - [&#91;Required&#93; Running Export Tests](#required-running-export-tests)
+- [About GitHub Actions Usage Fees](#about-github-actions-usage-fees)
 - [Job Descriptions](#job-descriptions)
   - [Validate Tag](#validate-tag)
     - [Inputs](#inputs)
