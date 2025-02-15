@@ -105,8 +105,7 @@ jobs:
         with:
           path: ${{ inputs.project-path || '.' }}/Library
           key: Library-${{ inputs.project-path || 'default' }}-${{ matrix.testMode }}
-          restore-keys: |
-            Library-${{ inputs.project-path || 'default' }}-${{ matrix.testMode }}-
+          restore-keys: Library-${{ inputs.project-path || 'default' }}-${{ matrix.testMode }}-
 
       - uses: game-ci/unity-test-runner@v4
         id: tests
