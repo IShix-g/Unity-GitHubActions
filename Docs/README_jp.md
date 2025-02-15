@@ -1,68 +1,31 @@
-[![Test Create Release](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-create-release.yaml)  
-[![Test Update package.json](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-packagejson.yaml)  
-[![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
-[![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)
 
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
 ## 目次
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<details>
-<summary>Details</summary>
-
-- [実現すること](#%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B%E3%81%93%E3%81%A8)
-  - [リリースノート](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88)
-    - [List of Available Types](#list-of-available-types)
-  - [ブランチ保護またはタグ保護が有効な場合](#%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E4%BF%9D%E8%AD%B7%E3%81%BE%E3%81%9F%E3%81%AF%E3%82%BF%E3%82%B0%E4%BF%9D%E8%AD%B7%E3%81%8C%E6%9C%89%E5%8A%B9%E3%81%AA%E5%A0%B4%E5%90%88)
-- [必須の設定](#%E5%BF%85%E9%A0%88%E3%81%AE%E8%A8%AD%E5%AE%9A)
-- [手動でのリリース](#%E6%89%8B%E5%8B%95%E3%81%A7%E3%81%AE%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9)
-  - [手動でリリースする手順](#%E6%89%8B%E5%8B%95%E3%81%A7%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%81%99%E3%82%8B%E6%89%8B%E9%A0%86)
-  - [セットアップガイド](#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%82%AC%E3%82%A4%E3%83%89)
-- [Release via Pull Request](#release-via-pull-request)
-  - [リリース作成の条件](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E4%BD%9C%E6%88%90%E3%81%AE%E6%9D%A1%E4%BB%B6)
-  - [プルリクエストを介したリリース手順](#%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%82%92%E4%BB%8B%E3%81%97%E3%81%9F%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E6%89%8B%E9%A0%86)
-  - [セットアップガイド](#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%82%AC%E3%82%A4%E3%83%89-1)
-- [推奨事項](#%E6%8E%A8%E5%A5%A8%E4%BA%8B%E9%A0%85)
-- [Jobの説明](#job%E3%81%AE%E8%AA%AC%E6%98%8E)
-  - [タグの検証 (Validate Tag)](#%E3%82%BF%E3%82%B0%E3%81%AE%E6%A4%9C%E8%A8%BC-validate-tag)
-    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs)
-    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs)
-  - [package.json の更新 (Update package.json)](#packagejson-%E3%81%AE%E6%9B%B4%E6%96%B0-update-packagejson)
-    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-1)
-    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1)
-    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-1)
-  - [マージとプッシュ (Merge and Push)](#%E3%83%9E%E3%83%BC%E3%82%B8%E3%81%A8%E3%83%97%E3%83%83%E3%82%B7%E3%83%A5-merge-and-push)
-    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-2)
-    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1-1)
-    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-2)
-  - [リリースノート生成 (Release Notes Generator)](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88%E7%94%9F%E6%88%90-release-notes-generator)
-    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-3)
-    - [出力値 (Outputs)](#%E5%87%BA%E5%8A%9B%E5%80%A4-outputs-3)
-  - [リリース作成 (Create Release)](#%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E4%BD%9C%E6%88%90-create-release)
-    - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-4)
-    - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1-2)
-- [参考リポジトリ](#%E5%8F%82%E8%80%83%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA)
-
-</details>
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- START doctoc -->
+<!-- END doctoc -->
 
 ## 実現すること
 
 GitHubアクションを使った、Unityパッケージのリリース自動化  
 
-**このアクションは以下のタスクを自動化します。**
+**このアクションは以下のタスクを自動化します。**  
+**利用したいタスクのみ実行する事も可能です**
+
 - [パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
 - リリースを生成する
 - タグを作成する
+- [Unity Test Framework (旧 Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)でテストする
+- パッケージの生成をする
+- 生成したパッケージをリリースページにアップロードする
 
 ### リリースノート
 
 コミットメッセージを `feat` や `fix` といったキーワードで始めることで、自動的にリリースノートに含まれるようになります。
 
-#### List of Available Types
+#### 利用可能なタイプ一覧
 
 | Type       | Description                |
 |------------|----------------------------|
@@ -75,24 +38,46 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 
 ![](release-note.jpg)
 
-### ブランチ保護またはタグ保護が有効な場合
-
-デフォルトではパーミッションエラーが発生します。これを回避するには、GitHub Apps でこれらの保護ルールを回避できるように設定します。
-
-- [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)を作成する
-- アプリをインストールし、対象のリポジトリ用に設定する
-- リポジトリの Secrets に `BOT_APP_ID` と `BOT_PRIVATE_KEY` を設定する
-- GitHub App が保護ルールをバイパスできるように更新する
-
-詳しくは[GitHubApp.md](GitHubApp_jp.md)をご確認ください。
-
 ## 必須の設定
 
-`Settings > Actions > General > Workflow permissions`で **Read and write permissions** を設定してください。
+`Settings > Actions > General > Workflow permissions`で **Read and write permissions** に設定してください。
 
 ![](settings_action.jpg)
 
+## 環境別の設定
+
+### ブランチ保護またはタグ保護が有効な場合
+
+デフォルトではパーミッションエラーが発生します。これを回避するには、GitHub Appsでこれらの保護ルールを回避できるように設定します。
+
+- [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)を作成する
+- アプリをインストールし、対象のリポジトリを設定する
+- リポジトリのSecretsに `BOT_APP_ID` と `BOT_PRIVATE_KEY` を設定する
+- GitHub App が保護ルールをバイパスできるように更新する
+
+詳しくは[GitHubApp.md](GitHubApp_jp.md)をご覧ください。
+
+### Test Framework (旧 Test Runner)またはパッケージを生成したい場合
+
+Unityをバッチモードで実行する必要がありUnityのアカウント情報が必要です。  
+[Activation](https://game.ci/docs/github/activation)を参考に必要情報を取得しリポジトリに設定してください。  
+またテストの実行、パッケージの生成に[GameCI](https://game.ci/docs/github/builder)を利用しています。
+
+### 必要情報
+
+ライセンスの種類で`UNITY_LICENSE`または`UNITY_SERIAL`のいずれかが必要です。
+リポジトリのSecretsに設定してください。
+
+| Name           |  Description                   |
+|----------------|---------------------|
+| UNITY_EMAIL    | UnityにログインするE-mail  |
+| UNITY_PASSWORD | Unityにログインするパスワード   |
+| UNITY_LICENSE  | ライセンスがPersonalの場合必要 |
+| UNITY_SERIAL   | ライセンスがProの場合必要      |
+
 ## 手動でのリリース
+
+[build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml)
 
 ```mermaid
 graph LR
@@ -103,7 +88,9 @@ graph LR
     create-release --> clean-branch
 ```
 
-Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`を選択して手動でリリースをおこないます。
+Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`を選択して手動でリリースをおこないます。  
+
+[実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13129242127)
 
 ![](release_manually.jpg)
 
@@ -116,22 +103,25 @@ Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`
 | dry-run | 変更をコミットまたはプッシュせずにマージをシミュレートする | false              ||
 | draft-release | ドラフトリリースの場合は `true`, 非ドラフトリリースの場合は `false` | false              |
 
-### 手動でリリースする手順
+### 手動でリリースまでの流れ
 
 1. ブランチを作成する (例: `release`)
 2. このブランチでリリースを準備する
-3. `Run workflow` を使って手動リリースをトリガーする。
+3. `Run workflow` を使って手動リリースをトリガーする
 
 ![](release_manually2.jpg)
 
 ### セットアップガイド
 
-1. [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) からコードをコピーし、プロジェクトの `.github/workflows` フォルダに YAML ファイルを作成します。
-2. プロジェクト構造に合うように、`update-packagejson` 内の `file-path` を更新します。
+1. [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) からコードをコピーし、プロジェクトの `.github/workflows` フォルダに YAML ファイルを作成
+2. プロジェクト構造に合うように、`update-packagejson` 内の `file-path` を更新
 3. ブランチ保護ルールを使用していない場合、`secrets.BOT_APP_ID` および `secrets.BOT_PRIVATE_KEY` に関する記述を削除してください。
-4. 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
 
-## Release via Pull Request
+※ 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
+
+## プルリクエストでのリリース
+
+[build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml)
 
 ```mermaid
 graph LR
@@ -140,26 +130,28 @@ graph LR
     release-notes --> create-release
 ```
 
-任意のブランチからデフォルトブランチへのプルリクエストを作成します。**リリースタイトルにタグ名**（例: `1.0.0`）を使用する必要があります。このプルリクがマージされると、リリースが自動で作成されます。
+任意のブランチからデフォルトブランチへのプルリクエストを作成します。**リリースタイトルにタグ名**（例: `1.0.0`）を使用する必要があります。このプルリクエストがマージされると、リリースが自動で作成されます。
+
+[実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13323524820)
 
 ![](pull_request.jpg)
 
-マージ後、リリースは自動的に作成されます。
+プルリクエストをマージ後、リリースが自動的に作成されます。
 
 ![](pull_request2.jpg)
 
 ### リリース作成の条件
 
-以下の条件が満たされた場合、リリースがトリガーされます:
-- プルリクエストのタイトルにバージョン番号（例: `1.0.0`）が含まれている
+以下の条件が満たされた場合、リリースが作成されます:
+- プルリクエストのタイトルにバージョン番号が含まれている（例: `1.0.0`）
 - ベースブランチが[デフォルトブランチ](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch)である
 
-### プルリクエストを介したリリース手順
+### プルリクエストを介したリリースの流れ
 
 1. ブランチを作成します（例: `release`）
 2. このブランチでリリースを準備します
-3. このブランチをデフォルトブランチへマージするプルリクエストを作成します。プルリクエストのタイトルにはバージョン番号を使用します
-4. プルリクエストをマージします
+3. このブランチをデフォルトブランチへマージするプルリクエストを作成します。タイトルをバージョン番号にする(例: `v1.0.0`)
+4. プルリクエストのマージ
 5. リリースが自動的に生成されます
 
 ### セットアップガイド
@@ -167,19 +159,128 @@ graph LR
 1. [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) からコードをコピーし、プロジェクトの `.github/workflows` フォルダに YAML ファイルを作成します。
 2. `update-packagejson` 内の `file-path` を、プロジェクトのファイル構造に合わせて更新します。
 3. ブランチの保護ルールを使用していない場合、`secrets.BOT_APP_ID` および `secrets.BOT_PRIVATE_KEY` に関する記述は削除してください。
-4. 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
+
+※ 実行時にパーミッションエラーが発生した場合は、[permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) を構成してください。
 
 ## 推奨事項
 
-プルリクエストリリースの方法を使用している場合であっても、フォールバック手段として手動リリースオプションを構成することをお勧めします。そうしない場合、新しいプルリクエストを作成する以外にリリースを作成する手段がなくなります。
+プルリクエストでのリリースを使用する場合でも、フォールバック手段として手動リリースも合わせて構成することをお勧めします。
+
+## Unity Test Framework (旧 Test Runner)の実行を追加する
+
+UnityEditor上のテストを実行します。利用には[設定](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)が必要です。
+
+### テストについて
+
+GameCIの[Test Runner](https://game.ci/docs/github/test-runner)を利用してテストを実行します。  
+実行するテストを指定する必要はなくUnityEditor上で作成したEdit Test、Play Testのいずれかまたはすべてを実行します。
+
+### Workflowの参考
+
+[build-release_merge_test.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_test.yaml) を参考に実装ください。
+
+### 現在のWorkflowに追加する場合
+
+- `permissions`に`checks: write`を追加
+- `unity-test`Jobを追加
+- `unity-version`にUnity Editorのバージョンを指定 (例: `2021.3.45f1`)
+
+Unity Editorの対応バージョンは[こちら](https://game.ci/docs/docker/versions)から確認できます。
+
+### Modeを指定したい
+
+初期値では、Edit mode、Play Mode両方のテストを実行します。
+選択したい場合は、`test-modes`を指定してください。
+指定できるパラメータは、[Game CI - testMode](https://game.ci/docs/github/test-runner/#testmode)で確認できます。
+複数指定する場合は、`,`で区切ってください。
+
+#### コード例 (初期値)
+```yaml
+test-modes: 'playmode,editmode'
+```
+#### 実行結果のサンプル
+
+実行したテスト一覧の確認  
+[実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)
+![](artifact-editmode.jpg)
+
+[Unity - Code Coverage](https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/index.html)がArtifactsに表示されます。
+
+![](artifact-download.jpg)
+
+## パッケージの生成を追加する
+
+[build-release_merge_package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_package.yaml)を参考に実装ください。利用には[設定](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)が必要です。  
+パッケージの生成では、以下を達成できるようにします。
+
+- パッケージの生成 ([UPM package](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-ui-install.html))
+- 生成したパッケージをリリースページのAssetsに追加
+
+### パッケージの生成について
+
+GameCIの[Builder](https://game.ci/docs/github/builder)を利用してパッケージを生成しています。
+
+### [注意] パッケージが生成できない環境
+
+UnityEditor上でのパッケージのパスが、`Assets`配下で無い場合生成できないので使えません。
+
+#### パスの例
+
+- [生成できる] `Assets/MyPackage/`
+- [生成できない] `Packages/MyPackage/`
+
+### 現在のWorkflowに追加する場合
+
+- `build-package`Jobの追加
+- `package-name`に拡張子無しのパッケージ名を指定 (例: `TestPackage`)
+- `unity-version`にUnity Editorのバージョンを指定 (例: `2021.3.45f1`)
+- `release-package-upload`Jobの追加
+
+Unity Editorの対応バージョンは[こちら](https://game.ci/docs/docker/versions)から確認できます。
+
+### Unity Editorで必須の設定
+
+パッケージを生成するスクリプトが必要です。[PackageExporter](#packageexporter)を用意しているのでご利用ください。
+
+### 実行結果のサンプル
+
+リリースにビルドしたパッケージが表示されます。  
+[実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13320955403)
+
+![](release_page.jpg)
+
+## PackageExporter
+
+パッケージを生成するスクリプトです。Editorでのみ機能し、ビルドには何も追加しない軽量のプラグインです。
+
+### インストール
+いずれかの方法でインストールください。
+
+#### [おすすめ] パッケージマネージャー
+
+Unity Editorで"Window > Package Manager > Add package from git URL..."にURLを入力してインストールしてください。
+
+URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter`
+
+#### パッケージをダウンロード
+
+[リリースページ](https://github.com/IShix-g/Unity-GitHubActions/releases)のAssetsにある`PackageExporter_xxx.unitypackage`をダウンロードしてインストールしてください。
+
+### [必須] 出力テストの実行
+
+- Unity EditorのWindow > Test Export Packageを開く
+- 必要情報を入力しExportの実行
+- コンソールにエラーが出ず、パッケージの出力先パスが表示されれば成功です
+
+出力したパッケージを適当なプロジェクトにインストールして問題が無いか確認ください。
 
 ## Jobの説明
 
-主なJobを説明します。
+主なJobを説明です。
 
 ### タグの検証 (Validate Tag)
 
-[.github/workflows/reusable-validate-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-validate-tag.yaml)
+[reusable-validate-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-validate-tag.yaml)
 
 このアクションは、タグの形式が有効かどうかを検証し、数値のみで正規化されたタグ (`outputs.normalized-tag`) を返します。
 
@@ -203,7 +304,7 @@ graph LR
 
 ### package.json の更新 (Update package.json)
 
-[.github/workflows/reusable-update-packagejson.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-packagejson.yaml)
+[reusable-update-packagejson.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-packagejson.yaml)
 
 このアクションは、`package.json` 内のバージョンを更新し、変更をコミットします。
 
@@ -239,17 +340,17 @@ graph LR
 
 ### マージとプッシュ (Merge and Push)
 
-[.github/workflows/reusable-merge-and-push.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-merge-and-push.yaml)
+[reusable-merge-and-push.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-merge-and-push.yaml)
 
 このアクションは、ブランチをマージして変更をプッシュします。
 
 #### 入力値 (Inputs)
 
-| ID              | 説明                                            | デフォルト値 |
-|-----------------|------------------------------------------------|------------|
+| ID              | 説明                                           | デフォルト値 |
+|-----------------|-----------------------------------------------|------------|
 | target-branch   | リポジトリからマージする対象のブランチ              |            |
-| push-branch     | 変更をプッシュする対象ブランチ                   |            |
-| commit-id       | リリースやタグ作成用のコミット ID                |            |
+| push-branch     | 変更をプッシュする対象ブランチ                  |            |
+| commit-id       | リリースやタグ作成用のコミットID                |            |
 | dry-run         | 実際にコミットせずシミュレーションする場合は `true`    | false      |
 | fast-forward    | ファストフォワードマージを許可する場合は `true`      | false      |
 
@@ -273,7 +374,7 @@ graph LR
 
 ### リリースノート生成 (Release Notes Generator)
 
-[.github/workflows/reusable-release-notes.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-release-notes.yaml)
+[reusable-release-notes.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-release-notes.yaml)
 
 このアクションは、コミットメッセージに基づいてリリースノートを生成します。`fix:` または `feat:` で始まるメッセージがリリースノートに含まれます。
 
@@ -297,7 +398,7 @@ graph LR
 
 ### リリース作成 (Create Release)
 
-[.github/workflows/reusable-create-release.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-create-release.yaml)
+[reusable-create-release.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-create-release.yaml)
 
 このアクションは、リリースを作成し、必要に応じてタグを追加します。
 
@@ -322,6 +423,122 @@ graph LR
 |-------------------|-----------------------------------|
 | BOT_APP_ID        | アプリケーション ID を指定する    |
 | BOT_PRIVATE_KEY   | アプリ用の秘密鍵を設定する        |
+
+---
+
+### Unityテストの実行 (Unity Test Framework)
+
+[reusable-unity-test.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-unity-test.yaml)
+
+#### このWorkflowについて
+
+- Unity Editor上のEdit Test、Play Testのいずれかまたはすべてを実行します
+- [実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)でテスト結果を確認できます
+- 利用には[設定](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)が必要です
+
+※ GameCIの[Test Runner](https://game.ci/docs/github/test-runner)を利用してテストしています
+
+#### 入力値 (Inputs)
+
+| ID | 説明                                                                                | デフォルト値 |
+|---|-----------------------------------------------------------------------------------|--------|
+|unity-version | Unityのバージョンを指定、autoの場合プロジェクトのUnityバージョンを使う                                        | auto   |
+|project-path | Unityプロジェクトのパスを指定 |        |
+|test-modes | [どのテスト](https://game.ci/docs/github/test-runner/#testmode)を実行するかを指定               | playmode,editmode       |
+|coverage-options | [コード・カバレッジを設定](https://game.ci/docs/github/test-runner#coverageoptions)するためのオプション | generateAdditionalMetrics;generateHtmlReport;generateBadgeReport |
+
+UnityEditorの対応バージョンは[こちら](https://game.ci/docs/docker/versions)から確認できます。
+
+#### Secrets (機密情報)
+
+Unity Editorをバッチモードで起動する為に必要:
+
+| ID   | 説明  |
+|----|----|
+| UNITY_EMAIL    | UnityにログインするE-mail  |
+| UNITY_PASSWORD | Unityにログインするパスワード   |
+| UNITY_LICENSE  | ライセンスがPersonalの場合必要 |
+| UNITY_SERIAL   | ライセンスがProの場合必要      |
+
+詳しくは、[こちら](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)を確認
+
+---
+
+### パッケージの生成 (Build Package)
+
+[reusable-build-package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-build-package.yaml)
+
+- パッケージのビルドを実行します
+- パッケージは`Assets`配下に設置している必要があります
+- [PackageExporter](#packageexporter)のインストールが必要です
+- 利用には[設定](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)が必要です
+
+※ GameCIの[Builder](https://game.ci/docs/github/builder)を利用してパッケージを生成しています
+
+#### 入力値 (Inputs)
+
+| ID   | 説明                                         | デフォルト値                                  |
+|------|--------------------------------------------|-----------------------------------------|
+| tag  | 適用する Git タグ (例: `1.0.0`)                   |                                         |
+|package-name| パッケージ名を拡張子無しで指定 (例: `TestPackage`)         |                                         |
+|commit-id | リリースやタグ作成用のコミットID                          |                                         |
+|unity-version | Unityのバージョンを指定、autoの場合プロジェクトのUnityバージョンを使う | auto                                    |
+|project-path | Unityプロジェクトのパスを指定                          |                                         |
+|build-method | パッケージをビルドするスクリプトのメソッド名を`namespace`から指定     | PackageExporter.Editor.CLIBuilder.Build |
+|retention-days| [artifactに保存する期間](https://github.com/actions/upload-artifact?tab=readme-ov-file#usage)                        | 0                                       |
+
+UnityEditorの対応バージョンは[こちら](https://game.ci/docs/docker/versions)から確認できます。  
+生成したパッケージをリリースページにアップロードする場合は、`retention-days`は1日で良いです。
+
+#### 出力値 (Outputs)
+
+| ID           | 説明                     |
+|--------------|------------------------|
+| package-name | 指定したパッケージ名             |
+| export-path  | 生成されたパッケージの出力パス        |
+| artifact-url | 生成されたパッケージのダウンロードURL   |
+| package-hash | 生成されたパッケージのSHA-256ハッシュ |
+
+※ export-pathは確認用です。GitHub Actionsの特性上、Workflow終了後に削除されます。
+
+#### Secrets (機密情報)
+
+Unity Editorをバッチモードで起動する為に必要:
+
+| ID   | 説明  |
+|----|----|
+| UNITY_EMAIL    | UnityにログインするE-mail  |
+| UNITY_PASSWORD | Unityにログインするパスワード   |
+| UNITY_LICENSE  | ライセンスがPersonalの場合必要 |
+| UNITY_SERIAL   | ライセンスがProの場合必要      |
+
+詳しくは、[こちら](#test-framework-旧-test-runnerまたはパッケージを生成したい場合)を確認
+
+---
+
+### パッケージのアップロード (Upload package to release)
+
+[reusable-release-package-upload.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-release-package-upload.yaml)
+
+このアクションは、リリースページにパッケージをアップロードします。
+
+#### 入力値 (Inputs)
+
+| ID | 説明                                                               | デフォルト値 |
+|---|------------------------------------------------------------------|--------|
+|release-tag | アップロード対象のリリースのタグ (例: `1.0.0`)                                    |        |
+|artifact-package-name | アーティファクトにアップロードしたパッケージ名を指定 (例: `TestPackage_1.0.0.unitypackage`) |        |
+|package-hash | 対象パッケージのSHA-256ハッシュ                                              |        |
+|dry-run | テスト trueの場合、実際にはアップロードされません。                                     | false  |
+
+##### SHA-256ハッシュの生成
+
+自身で生成する場合は、下記のように生成します。  
+アーティファクトのアップロードで取得できる[artifact-digest](https://github.com/actions/upload-artifact#outputs)はSHA-256のハッシュですが流用できません。
+
+```yaml
+hash=$(sha256sum "$package_path" | awk '{ print $1 }')
+```
 
 ## 参考リポジトリ
 

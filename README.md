@@ -3,7 +3,7 @@
 [![Test Merge and Push](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-merge-and-push.yaml)  
 [![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)  
 [![Test Build Package](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml)  
-[![Test Test Runner](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-test-runner.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-test-runner.yaml)
+[![Test Unity Test](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml)
 
 [README - 日本語版](Docs/README_jp.md)
 
@@ -12,91 +12,79 @@ GitHub Actions for Unity.
 
 ## Table of Contents
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<details>
-<summary>Details</summary>
+<!-- START doctoc -->
+<!-- END doctoc -->
 
-- [What does this action do?](#what-does-this-action-do)
-  - [Release Notes](#release-notes)
-    - [List of Available Types](#list-of-available-types)
-  - [When branch or tag protection is enabled](#when-branch-or-tag-protection-is-enabled)
-- [Required Configuration](#required-configuration)
-- [Manual Release](#manual-release)
-  - [Steps to Release Manually](#steps-to-release-manually)
-  - [Setup Guide](#setup-guide)
-- [Release via Pull Request](#release-via-pull-request)
-  - [Conditions for Release Creation](#conditions-for-release-creation)
-  - [Steps to Release via Pull Request](#steps-to-release-via-pull-request)
-  - [Setup Guide](#setup-guide-1)
-- [Recommendation](#recommendation)
-- [Job Descriptions](#job-descriptions)
-  - [Validate Tag](#validate-tag)
-    - [Inputs](#inputs)
-    - [Outputs](#outputs)
-  - [Update package.json](#update-packagejson)
-    - [Inputs](#inputs-1)
-    - [Secrets](#secrets)
-    - [Outputs](#outputs-1)
-  - [Merge and Push](#merge-and-push)
-    - [Inputs](#inputs-2)
-    - [Secrets](#secrets-1)
-    - [Outputs](#outputs-2)
-  - [Release Notes Generator](#release-notes-generator)
-    - [Inputs](#inputs-3)
-    - [Outputs](#outputs-3)
-  - [Create Release](#create-release)
-    - [Inputs](#inputs-4)
-    - [Secrets](#secrets-2)
-- [Referenced Repository](#referenced-repository)
+## Overview
 
-</details>
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+This repository provides automation for Unity package releases using GitHub Actions.
 
-## What does this action do?
+**This action automates the following tasks:**  
+**You can choose to execute only specific tasks you need.**
 
-Automate Unity Package Releases Using GitHub Actions
-
-**This action automates the following tasks:**
-- Updates the version in the [Package manifest](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)
-- Generates a release
-- Creates tags
+- Update the [package manifest](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html) version
+- Generate releases
+- Create tags
+- Run tests using the [Unity Test Framework (formerly Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)
+- Build packages
+- Upload the generated packages to the release page
 
 ### Release Notes
 
-By starting commit messages with keywords like `feat` or `fix`, they will be automatically included in the release notes.
+When commit messages start with specific keywords like `feat` or `fix`, they will be automatically included in the release notes.
 
-#### List of Available Types
+#### Available Commit Message Types
 
-| Type       | Description                                          |
-|------------|------------------------------------------------------|
-| feat:      | Addition of a new feature                           |
-| fix:       | Bug fixes                                           |
-| docs:      | Documentation updates or corrections                |
-| style:     | Code style adjustments (e.g., removing whitespaces) |
-| refactor:  | Code changes that neither fix a bug nor add a feature |
-| perf:      | Changes made to improve performance                 |
+| Type       | Description                              |
+|------------|------------------------------------------|
+| feat:      | Add new features                         |
+| fix:       | Fix bugs                                 |
+| docs:      | Update or fix documentation              |
+| style:     | Code style fixes (e.g., remove whitespaces) |
+| refactor:  | Refactor without changing functionality  |
+| perf:      | Changes to improve performance           |
 
 ![](Docs/release-note.jpg)
 
-### When branch or tag protection is enabled
+## Required Settings
 
-**If branch or tag protection is enabled**, a permission error will occur by default. To bypass this, you can configure GitHub Apps to allow bypassing those protection rules.
-
-- Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
-- Install the app and configure it for the target repository
-- Set `BOT_APP_ID` and `BOT_PRIVATE_KEY` in the repository's Secrets
-- Update the protection rules to allow the GitHub App to bypass them
-
-For detailed configuration instructions, please refer to [GitHubApp.md](Docs/GitHubApp.md).
-
-## Required Configuration
-
-Enable the **Read and write permissions** setting under `Settings > Actions > General > Workflow permissions`.
+Set **Read and write permissions** for `Settings > Actions > General > Workflow permissions`.
 
 ![](Docs/settings_action.jpg)
 
+## Settings for Different Scenarios
+
+### When Branch Protection or Tag Protection is Enabled
+
+By default, permission errors will occur. You need to configure GitHub Apps to bypass these protection rules.
+
+1. Create a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
+2. Install the app and configure it for your repository.
+3. Add `BOT_APP_ID` and `BOT_PRIVATE_KEY` to the repository's secrets.
+4. Update the app permissions so it can bypass protection rules.
+
+For more details, refer to [GitHubApp.md](GitHubApp_jp.md).
+
+### When Running Tests or Generating Packages
+
+Unity needs to be executed in batch mode, which requires Unity account information.  
+Refer to [Activation](https://game.ci/docs/github/activation) for the necessary details and configure them in your repository.  
+Tests and package generation utilize [GameCI](https://game.ci/docs/github/builder).
+
+### Required Secrets
+
+Depending on your Unity license, either `UNITY_LICENSE` for Personal or `UNITY_SERIAL` for Pro is mandatory. Add these to the repository's secrets.
+
+| Name           | Description                                |
+|----------------|--------------------------------------------|
+| UNITY_EMAIL    | Email address for Unity login              |
+| UNITY_PASSWORD | Password for Unity login                   |
+| UNITY_LICENSE  | Required for Personal license              |
+| UNITY_SERIAL   | Required for Pro license                   |
+
 ## Manual Release
+
+[build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml)
 
 ```mermaid
 graph LR
@@ -107,35 +95,42 @@ graph LR
     create-release --> clean-branch
 ```
 
-Navigate to the Actions tab and trigger the manual release by selecting `Run workflow`.
+For manual releases:
+1. Navigate to the Actions tab.
+2. Select `Manual Release (Merge to Default)` > `Run workflow`.
+
+[Sample Workflow Execution](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13129242127)
 
 ![](Docs/release_manually.jpg)
 
-| Option                | Description  | Default | Example  |
-|-----------------------|--------------|---------|----------|
-| tag                  | Git tag you want to create  |         | 1.0.0    |
-| clean-branch         | Delete the branch? All branches except the default branch will be deleted.  | false   |          |
-| fast-forward         | Allow fast-forward merge   | false   |          |
-| include-default-branch | Include the default branch in the workflow behavior | false   |          |
-| dry-run              | Simulate the merge without committing or pushing changes | false   |          |
-| draft-release        | `true` for Draft release, `false` for Non-draft release | false   |          |
+| Option                  | Description                                            | Default | Example         |
+|-------------------------|--------------------------------------------------------|---------|-----------------|
+| tag                    | Git tag to create                                      | N/A     | 1.0.0           |
+| clean-branch           | Whether to delete non-default branches                 | false   |                 |
+| fast-forward           | Whether to allow fast-forward merging                  | false   |                 |
+| include-default-branch | Whether to include the default branch in the workflow  | false   |                 |
+| dry-run                | Simulate without committing or pushing changes         | false   |                 |
+| draft-release          | Set to `true` for a draft release, `false` for final   | false   |                 |
 
-### Steps to Release Manually
+### Steps for Manual Release
 
-1. Create a branch (e.g., `release`)
-2. Prepare the release in this branch
-3. Trigger the manual release via `Run workflow`
+1. Create a new branch (e.g., `release`).
+2. Prepare the release in this branch.
+3. Trigger a manual release using `Run workflow`.
 
 ![](Docs/release_manually2.jpg)
 
 ### Setup Guide
 
-1. Copy the code from [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) and create a YAML file in your project’s .github/workflows folder.
-2. Update the `file-path` in `update-packagejson` to fit your project structure.
-3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
-4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+1. Copy the code from [.github/workflows/build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml) to a new YAML file in your project's `.github/workflows` directory.
+2. Update the `file-path` in `update-packagejson` to match your project structure.
+3. If not using branch protection rules, remove references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 
-## Release via Pull Request
+**Note:** In case of permission errors during execution, configure proper [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+
+## Release Through Pull Requests
+
+[build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml)
 
 ```mermaid
 graph LR
@@ -144,38 +139,148 @@ graph LR
     release-notes --> create-release
 ```
 
-Create a pull request from a prepared branch to the default branch with the **release title as the tag name**. Once the pull request is merged, the release will be created automatically.
+Create a pull request from any branch to the default branch. **Ensure the release title matches the tag name (e.g., `1.0.0`).** The release will be created automatically after merging the pull request.
+
+[Sample Execution](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13323524820)
 
 ![](Docs/pull_request.jpg)
 
-After merging, the release will be created automatically.
+Releases are created automatically post-merge.
 
 ![](Docs/pull_request2.jpg)
 
-### Conditions for Release Creation
+### Release Creation Conditions
 
-A release will be triggered when the following conditions are met:
-- The pull request title contains a version number (e.g., `1.0.0`)
-- The base branch is the [default branch](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch)
+A release will be created if:
+- The pull request title includes a version number (e.g., `1.0.0`).
+- The base branch is the [default branch](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch).
 
-### Steps to Release via Pull Request
+### Steps for PR-Based Release
 
-1. Create a branch (e.g., `release`)
-2. Prepare the release in this branch
-3. Create a pull request to merge this branch into the default branch. Use the version number as the pull request title.
+1. Create a branch (e.g., `release`).
+2. Prepare the release in this branch.
+3. Create a pull request from this branch to the default branch with the title set to the version (e.g., `v1.0.0`).
 4. Merge the pull request.
 5. The release will be generated automatically.
 
 ### Setup Guide
 
-1. Copy the code from [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) and create a YAML file in your project’s .github/workflows folder.
-2. Update the `file-path` in `update-packagejson` to match your project’s file structure.
-3. If branch protection rules are not used, remove any references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
-4. If permission errors occur while running, configure [permissions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+1. Copy the code from [.github/workflows/build-release_pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_pull-request.yaml) to a YAML file in your `.github/workflows` directory.
+2. Update the `file-path` in `update-packagejson` to match your project structure.
+3. If not using branch protection rules, remove references to `secrets.BOT_APP_ID` and `secrets.BOT_PRIVATE_KEY`.
 
-## Recommendation
+## Recommendations
 
-Even when using the pull request release method, it is advisable to configure the manual release option as a fallback mechanism. Otherwise, creating new pull requests will be the only way to create releases.
+Even if you primarily use the pull-request-based release method, it is recommended to configure manual release as a fallback.
+
+
+## Adding Unity Test Framework (formerly Test Runner)
+
+Execute tests within Unity Editor. Configuration is required to use this feature. Please refer to the [Setup](#test-framework-formerly-test-runner-or-when-generating-packages) section.
+
+### About Tests
+
+Tests are executed using GameCI's [Test Runner](https://game.ci/docs/github/test-runner).  
+There’s no need to specify individual tests; it will automatically run Edit Tests and/or Play Tests created in UnityEditor.
+
+### Workflow Examples
+
+Please refer to [build-release_merge_test.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_test.yaml) as an example implementation.
+
+### Adding to Existing Workflow
+
+- Add `checks: write` to `permissions`
+- Add a `unity-test` job
+- Specify the Unity Editor version in `unity-version` (e.g., `2021.3.45f1`)
+
+Supported Unity Editor versions can be checked [here](https://game.ci/docs/docker/versions).
+
+### Specifying Test Mode
+
+By default, both Edit Mode and Play Mode tests are executed.  
+If you want to run only specific modes, specify the `test-modes` parameter. Valid parameters can be found in [Game CI - testMode](https://game.ci/docs/github/test-runner/#testmode).  
+To specify multiple modes, separate them with commas.
+
+#### Code Example (Default Setting)
+```yaml
+test-modes: 'playmode,editmode'
+```
+
+#### Sample Execution Result
+
+You can view the list of executed tests.  
+[Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)  
+![](Docs/artifact-editmode.jpg)
+
+[Unity - Code Coverage](https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/index.html) will be included in the artifacts.
+
+![](Docs/artifact-download.jpg)
+
+## Adding Package Generation
+
+Refer to [build-release_merge_package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge_package.yaml) for implementation details. Configuration is required, as explained in the [Setup](#test-framework-formerly-test-runner-or-when-generating-packages) section.  
+This process allows you to:
+
+- Generate packages ([UPM package](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-ui-install.html))
+- Attach the generated package to the assets section of the release page
+
+### About Package Generation
+
+The package generation uses GameCI's [Builder](https://game.ci/docs/github/builder).
+
+### [Note] Environments That Cannot Generate Packages
+
+Packages cannot be generated if the package path is outside the `Assets` folder in Unity Editor.
+
+#### Path Examples
+
+- [Works] `Assets/MyPackage/`
+- [Fails] `Packages/MyPackage/`
+
+### Adding to Existing Workflow
+
+- Add a `build-package` job
+- Specify the package name without the extension in `package-name` (e.g., `TestPackage`)
+- Specify the Unity Editor version in `unity-version` (e.g., `2021.3.45f1`)
+- Add a `release-package-upload` job
+
+Supported Unity Editor versions can be checked [here](https://game.ci/docs/docker/versions).
+
+### Required Unity Editor Settings
+
+A script for generating packages is required. Please use the provided [PackageExporter](#packageexporter).
+
+### Sample Execution Result
+
+The built package will appear in the release.  
+[Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13320955403)  
+![](Docs/release_page.jpg)
+
+## PackageExporter
+
+This script generates packages. It is lightweight and only functional in the Editor, with no additions to build outputs.
+
+### Installation
+Install it using one of the following methods:
+
+#### [Recommended] Package Manager
+
+Open Unity Editor, and go to "Window > Package Manager > Add package from git URL...". Enter the following URL to install:
+
+URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter`
+
+#### Download the Package
+
+Download the package from the `Assets` section of the [release page](https://github.com/IShix-g/Unity-GitHubActions/releases) as `PackageExporter_xxx.unitypackage`, and install it.
+
+### [Required] Running Export Tests
+
+- Open "Window > Test Export Package" in Unity Editor
+- Enter the necessary information and run the export
+- If no errors appear in the console and the path of the exported package is displayed, the process is successful
+
+Install the exported package in a test project to verify its functionality.
+
 
 ## Job Descriptions
 
@@ -326,6 +431,122 @@ For branch or tag protection:
 |-----------------|----------------------------|
 | BOT_APP_ID      | Specify the application ID |
 | BOT_PRIVATE_KEY | Set the private key for the app |
+
+---
+
+### Running Unity Tests (Unity Test Framework)
+
+[.github/workflows/reusable-unity-test.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-unity-test.yaml)
+
+#### About This Workflow
+
+- Executes either Edit Tests, Play Tests, or both using Unity Editor
+- Test results can be viewed under the [Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)
+- Requires [setup](#test-framework-formerly-test-runner-or-when-generating-packages) to be completed
+
+※ This workflow uses GameCI's [Test Runner](https://game.ci/docs/github/test-runner) to execute tests.
+
+#### Inputs
+
+| ID              | Description                                                                 | Default Value                   |
+|------------------|-----------------------------------------------------------------------------|---------------------------------|
+| unity-version    | Specifies the Unity version. If set to `auto`, the project's Unity version is used | auto                            |
+| project-path     | Specifies the path to the Unity project                                    |                                 |
+| test-modes       | Specifies [which tests](https://game.ci/docs/github/test-runner/#testmode) to run  | playmode,editmode               |
+| coverage-options | Sets options for [code coverage](https://game.ci/docs/github/test-runner#coverageoptions) | generateAdditionalMetrics;generateHtmlReport;generateBadgeReport |
+
+Check supported Unity versions [here](https://game.ci/docs/docker/versions).
+
+#### Secrets
+
+The following secrets are required to execute Unity Editor in batch mode:
+
+| ID              | Description                                                    |
+|------------------|----------------------------------------------------------------|
+| UNITY_EMAIL      | Email address to log in to Unity                              |
+| UNITY_PASSWORD   | Password to log in to Unity                                   |
+| UNITY_LICENSE    | Required if using a Personal license                          |
+| UNITY_SERIAL     | Required if using a Pro license                               |
+
+For more details, please refer to the [setup section](#test-framework-formerly-test-runner-or-when-generating-packages).
+
+---
+
+### Generating a Package (Build Package)
+
+[.github/workflows/reusable-build-package.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-build-package.yaml)
+
+- Executes the package build
+- Packages must be located under the `Assets` directory
+- Requires the installation of [PackageExporter](#packageexporter)
+- Requires [setup](#test-framework-formerly-test-runner-or-when-generating-packages) to be completed
+
+※ This workflow uses GameCI's [Builder](https://game.ci/docs/github/builder) to generate packages.
+
+#### Inputs
+
+| ID              | Description                                                    | Default Value                   |
+|------------------|----------------------------------------------------------------|---------------------------------|
+| tag             | The Git tag to apply (e.g., `1.0.0`)                           |                                 |
+| package-name    | Specifies the package name without the extension (e.g., `TestPackage`) |                                 |
+| commit-id       | Commit ID for creating releases or tags                        |                                 |
+| unity-version    | Specifies the Unity version. If set to `auto`, the project's Unity version is used | auto                            |
+| project-path     | Specifies the path to the Unity project                       |                                 |
+| build-method    | Name of the script method to build the package, including the namespace | PackageExporter.Editor.CLIBuilder.Build |
+| retention-days  | Specifies how long the [artifact is retained](https://github.com/actions/upload-artifact?tab=readme-ov-file#usage) | 0                              |
+
+Check supported Unity versions [here](https://game.ci/docs/docker/versions).  
+If uploading generated packages to the release page, setting `retention-days` to 1 day is sufficient.
+
+#### Outputs
+
+| ID              | Description                                                    |
+|------------------|----------------------------------------------------------------|
+| package-name     | The specified package name                                    |
+| export-path      | Output path of the generated package                          |
+| artifact-url     | Download URL of the generated package                         |
+| package-hash     | SHA-256 hash of the generated package                         |
+
+※ `export-path` is for verification purposes. Due to GitHub Actions' limitations, it will be deleted after the workflow is completed.
+
+#### Secrets
+
+The following secrets are required to execute Unity Editor in batch mode:
+
+| ID              | Description                                                    |
+|------------------|----------------------------------------------------------------|
+| UNITY_EMAIL      | Email address to log in to Unity                              |
+| UNITY_PASSWORD   | Password to log in to Unity                                   |
+| UNITY_LICENSE    | Required if using a Personal license                          |
+| UNITY_SERIAL     | Required if using a Pro license                               |
+
+For more details, please refer to the [setup section](#test-framework-formerly-test-runner-or-when-generating-packages).
+
+---
+
+### Uploading a Package to Release
+
+[.github/workflows/reusable-release-package-upload.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-release-package-upload.yaml)
+
+This action uploads a package to the release page.
+
+#### Inputs
+
+| ID                     | Description                                                               | Default Value |
+|-------------------------|---------------------------------------------------------------------------|---------------|
+| release-tag            | Tag of the release to upload the package to (e.g., `1.0.0`)              |               |
+| artifact-package-name  | Name of the uploaded artifact package (e.g., `TestPackage_1.0.0.unitypackage`) |               |
+| package-hash           | SHA-256 hash of the target package                                       |               |
+| dry-run                | Set to `true` if only testing; no upload will occur                      | false         |
+
+##### Generating the SHA-256 Hash
+
+If generating the SHA-256 hash yourself, follow the example below:  
+Note that the [artifact-digest](https://github.com/actions/upload-artifact#outputs) produced during artifact upload is also a SHA-256 hash but cannot be reused here.
+
+```yaml
+hash=$(sha256sum "$package_path" | awk '{ print $1 }')
+```
 
 ## Referenced Repository
 
