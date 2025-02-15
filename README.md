@@ -154,6 +154,10 @@ Depending on your Unity license, either `UNITY_LICENSE` for Personal or `UNITY_S
 | UNITY_LICENSE  | Required for Personal license              |
 | UNITY_SERIAL   | Required for Pro license                   |
 
+## Is Building Unity Packages Necessary?
+
+Since Unity 2018, it has been possible to manage packages via the [Package Manager (UPM)](https://docs.unity3d.com/2022.3/Documentation/Manual/Packages.html), and now almost all supported Unity versions are compatible with UPM. Because of this, the traditional process of generating Unity packages has become largely unnecessary. As a result, the main workflow we provide does not include the release of Unity packages.
+
 ## Manual Release
 
 [build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml)

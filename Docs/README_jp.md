@@ -147,6 +147,10 @@ Unityをバッチモードで実行する必要がありUnityのアカウント�
 | UNITY_LICENSE  | ライセンスがPersonalの場合必要 |
 | UNITY_SERIAL   | ライセンスがProの場合必要      |
 
+## Unityパッケージのビルドは必要？
+
+Unity2018以降、[Package Manager (UPM)](https://docs.unity3d.com/2022.3/Documentation/Manual/Packages.html) でパッケージ管理が可能となり、現在ではほとんどのUnityバージョンでUPMが使用できます。そのため、従来のUnityパッケージ生成はほぼ不要となり、提供するメインのWorkflowにはUnityパッケージのリリースは含まないようにしています。
+
 ## 手動でのリリース
 
 [build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml)
