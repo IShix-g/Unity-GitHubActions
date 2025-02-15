@@ -136,7 +136,7 @@ jobs:
         with:
           path: Library
           key: Library-${{ env.TARGET_PLATFORM }}
-          restore-keys: Library-
+          restore-keys: Library-${{ env.TARGET_PLATFORM }}
 
       - uses: game-ci/unity-builder@v4
         env:
