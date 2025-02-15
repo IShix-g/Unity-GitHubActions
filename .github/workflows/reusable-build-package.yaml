@@ -152,7 +152,7 @@ jobs:
           buildMethod: ${{ inputs.build-method }}
           customParameters: ${{ inputs.custom-parameters }}
 
-      - uses: ./.github/actions/check-metas
+      - uses: IShix-g/Unity-GitHubActions/.github/actions/check-metas@main
         with:
           directory: ${{ inputs.project-path }}
 

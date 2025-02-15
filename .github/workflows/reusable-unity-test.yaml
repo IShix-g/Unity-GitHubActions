@@ -123,7 +123,7 @@ jobs:
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: ${{ inputs.coverage-options }}
 
-      - uses: ./.github/actions/check-metas
+      - uses: IShix-g/Unity-GitHubActions/.github/actions/check-metas@main
         with:
           directory: ${{ inputs.project-path }}
 
