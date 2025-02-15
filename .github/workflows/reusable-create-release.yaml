@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.commit-id }}
-          persist-credentials: false
+          persist-credentials: ${{ steps.check-secrets.outputs.available == '1' }}
 
       - name: Configure Git Authentication with Custom Token
         if: ${{ steps.check-secrets.outputs.available == '1' }}
