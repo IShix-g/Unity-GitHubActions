@@ -97,7 +97,7 @@ jobs:
         with:
           ref: ${{ steps.normalize-branches.outputs.push-branch }}
           fetch-depth: 0
-          persist-credentials: ${{ steps.check-secrets.outputs.available == '1' }}
+          persist-credentials: ${{ steps.check-secrets.outputs.available != '1' }}
 
       - name: Fetch and prepare Target Branch (${{ steps.normalize-branches.outputs.target-branch }})
         if: ${{ inputs.dry-run || steps.branches-match.outputs.identical != '1' }}
