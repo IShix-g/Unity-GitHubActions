@@ -12,8 +12,79 @@ GitHub Actions for Unity.
 
 ## Table of Contents
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<details>
+<summary>Details</summary>
+
+- [Overview](#overview)
+  - [Release Notes](#release-notes)
+    - [Available Commit Message Types](#available-commit-message-types)
+- [Required Settings](#required-settings)
+- [Settings for Different Scenarios](#settings-for-different-scenarios)
+  - [When Branch Protection or Tag Protection is Enabled](#when-branch-protection-or-tag-protection-is-enabled)
+  - [When Running Tests or Generating Packages](#when-running-tests-or-generating-packages)
+  - [Required Secrets](#required-secrets)
+- [Manual Release](#manual-release)
+  - [Steps for Manual Release](#steps-for-manual-release)
+  - [Setup Guide](#setup-guide)
+- [Release Through Pull Requests](#release-through-pull-requests)
+  - [Release Creation Conditions](#release-creation-conditions)
+  - [Steps for PR-Based Release](#steps-for-pr-based-release)
+  - [Setup Guide](#setup-guide-1)
+- [Recommendations](#recommendations)
+- [Adding Unity Test Framework (formerly Test Runner)](#adding-unity-test-framework-formerly-test-runner)
+  - [About Tests](#about-tests)
+  - [Workflow Examples](#workflow-examples)
+  - [Adding to Existing Workflow](#adding-to-existing-workflow)
+  - [Specifying Test Mode](#specifying-test-mode)
+    - [Code Example (Default Setting)](#code-example-default-setting)
+    - [Sample Execution Result](#sample-execution-result)
+- [Adding Package Generation](#adding-package-generation)
+  - [About Package Generation](#about-package-generation)
+  - [&#91;Note&#93; Environments That Cannot Generate Packages](#note-environments-that-cannot-generate-packages)
+    - [Path Examples](#path-examples)
+  - [Adding to Existing Workflow](#adding-to-existing-workflow-1)
+  - [Required Unity Editor Settings](#required-unity-editor-settings)
+  - [Sample Execution Result](#sample-execution-result-1)
+- [PackageExporter](#packageexporter)
+  - [Installation](#installation)
+    - [&#91;Recommended&#93; Package Manager](#recommended-package-manager)
+    - [Download the Package](#download-the-package)
+  - [&#91;Required&#93; Running Export Tests](#required-running-export-tests)
+- [Job Descriptions](#job-descriptions)
+  - [Validate Tag](#validate-tag)
+    - [Inputs](#inputs)
+    - [Outputs](#outputs)
+  - [Update package.json](#update-packagejson)
+    - [Inputs](#inputs-1)
+    - [Secrets](#secrets)
+    - [Outputs](#outputs-1)
+  - [Merge and Push](#merge-and-push)
+    - [Inputs](#inputs-2)
+    - [Secrets](#secrets-1)
+    - [Outputs](#outputs-2)
+  - [Release Notes Generator](#release-notes-generator)
+    - [Inputs](#inputs-3)
+    - [Outputs](#outputs-3)
+  - [Create Release](#create-release)
+    - [Inputs](#inputs-4)
+    - [Secrets](#secrets-2)
+  - [Running Unity Tests (Unity Test Framework)](#running-unity-tests-unity-test-framework)
+    - [About This Workflow](#about-this-workflow)
+    - [Inputs](#inputs-5)
+    - [Secrets](#secrets-3)
+  - [Generating a Package (Build Package)](#generating-a-package-build-package)
+    - [Inputs](#inputs-6)
+    - [Outputs](#outputs-4)
+    - [Secrets](#secrets-4)
+  - [Uploading a Package to Release](#uploading-a-package-to-release)
+    - [Inputs](#inputs-7)
+      - [Generating the SHA-256 Hash](#generating-the-sha-256-hash)
+- [Referenced Repository](#referenced-repository)
+
+</details>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 
