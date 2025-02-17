@@ -14,8 +14,8 @@ namespace Tests
         public int IntProperty => _intField;
 
         int _intField;
-
         string stringField;
+        double doubleField;
 
         public void improperlyStyledMethod(){
         int x=10;
