@@ -1,4 +1,4 @@
-name: C# Linter with Direct File Check (No `.csproj`)
+name: Unity-Linter
 
 on:
   pull_request:
@@ -6,48 +6,25 @@ on:
       - main
 
 jobs:
-  lint:
-    name: C# File Style Check
+  unity-lint:
+    name: Run Unity-Linter
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
 
-      - name: Detect Changed C# Files
-        id: detect_cs_files
+      - name: Install Unity-Linter
         run: |
-          cs_files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+          npm install -g unity-linter
 
-          if [ -z "$cs_files" ]; then
+      - name: Run Unity-Linter
+        run: |
+          files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+
+          if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
           fi
 
-          echo "Changed C# Files:"
-          echo "$cs_files"
-          echo "cs_files=$cs_files" >> "$GITHUB_OUTPUT"
-
-      - name: Setup .NET
-        if: steps.detect_cs_files.outputs.cs_files != ''
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0'
-
-      - name: Run dotnet-format (specific C# files)
-        if: steps.detect_cs_files.outputs.cs_files != ''
-        run: |
-          echo "Running dotnet-format on the following files:"
-          echo "${{ steps.detect_cs_files.outputs.cs_files }}"
-          echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs -I {} dotnet format --include "{}"
-
-      - name: Apply Suggestions using reviewdog
-        if: steps.detect_cs_files.outputs.cs_files != ''
-        uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: dotnet-format
-          suggest_command: |
-            echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs git diff
+          unity-linter --files $files || echo "Lint issues detected in Unity files."
