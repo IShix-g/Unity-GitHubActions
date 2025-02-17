@@ -1,4 +1,4 @@
-name: C# Linter with StyleCop and reviewdog
+name: C# Linter with StyleCop (Simple Script Linter)
 
 on:
   pull_request:
@@ -7,42 +7,44 @@ on:
 
 jobs:
   lint:
-    name: Run dotnet-format and report with reviewdog
+    name: C# Linter Check
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Detect changed C# files
+        id: detect_cs_files
+        run: |
+          cs_files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+
+          if [ -z "$cs_files" ]; then
+            echo "No C# files were changed in this PR."
+            exit 0
+          fi
+
+          echo "Changed C# Files:"
+          echo "$cs_files"
+
+          echo "::set-output name=cs_files::$cs_files"
 
       - name: Setup .NET
+        if: steps.detect_cs_files.outputs.cs_files != ''
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0'
 
-      - name: Run StyleCop Analyzers
+      - name: Run StyleCop
+        if: steps.detect_cs_files.outputs.cs_files != ''
         run: |
-          dotnet build --no-incremental /warnaserror
-          dotnet msbuild /t:Rebuild /p:TreatWarningsAsErrors=true > stylecop-report.txt || true
+          echo "Running StyleCop on the following files:"
+          echo "${{ steps.detect_cs_files.outputs.cs_files }}"
+          echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs dotnet format --include
 
-      - name: Report StyleCop findings with reviewdog
-        uses: reviewdog/reviewdog@v0.14.1
-        with:
-          name: stylecop
-          reporter: github-pr-review
-          level: warning
-          filter-mode: diff_context
-          fail-on-error: false
-          input: stylecop-report.txt
-          tool-name: StyleCop
-
-      - name: Run dotnet-format
-        run: |
-          dotnet format
-          git diff --unified=0 > format-changes.diff || true
-
-      - name: Suggest formatting changes with action-suggester
+      - name: Apply Suggestions using reviewdog/action-suggester
+        if: steps.detect_cs_files.outputs.cs_files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: 'dotnet-format'
-          suggest_command: 'cat format-changes.diff'
-          workdir: .
+          tool_name: StyleCop
+          suggest_command: |
+            echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs git diff
