@@ -50,7 +50,7 @@ jobs:
             exit 1
           fi
 
-  get-latest-release:
+  latest-release:
     needs: verify-branch
     runs-on: ubuntu-22.04
     outputs:
@@ -69,7 +69,7 @@ jobs:
           echo "::notice title=Latest release::$latest_release"
 
   update-packagejson:
-    needs: [verify-branch, get-latest-release]
+    needs: [verify-branch, latest-release]
     uses: ./.github/workflows/reusable-update-packagejson.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -83,7 +83,7 @@ jobs:
       commit-message-format: 'Update the Package Exporter package.json to {v}'
 
   build-package:
-    needs: [verify-branch, get-latest-release, update-packagejson]
+    needs: [verify-branch, latest-release, update-packagejson]
     uses: ./.github/workflows/reusable-build-package.yaml
     secrets:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -97,7 +97,7 @@ jobs:
       retention-days: 1
 
   merge-and-push:
-    needs: [verify-branch, get-latest-release, update-packagejson, build-package]
+    needs: [verify-branch, latest-release, update-packagejson, build-package]
     uses: ./.github/workflows/reusable-merge-and-push.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -109,7 +109,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
 
   upload-package:
-    needs: [verify-branch, get-latest-release, update-packagejson, build-package, merge-and-push]
+    needs: [verify-branch, latest-release, update-packagejson, build-package, merge-and-push]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -121,7 +121,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_release="${{ needs.get-latest-release.outputs.tag }}"
+          latest_release="${{ needs.latest-release.outputs.tag }}"
           file_name="PackageExporter_.*\\.unitypackage"
           asset_url=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name" || echo "")
           if [[ -n "$asset_url" ]]; then
@@ -133,7 +133,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_release="${{ needs.get-latest-release.outputs.tag }}"
+          latest_release="${{ needs.latest-release.outputs.tag }}"
           file_name="PackageExporter_.*\\.unitypackage"
           current_file_name=$(gh release view "$latest_release" --json assets -q ".assets[].name" | grep -E "$file_name")
           if [[ -n "$current_file_name" ]]; then
@@ -153,6 +153,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           new_file="./${{ needs.build-package.outputs.package-name }}"
-          latest_release="${{ needs.get-latest-release.outputs.tag }}"
+          latest_release="${{ needs.latest-release.outputs.tag }}"
           gh release upload "$latest_release" "$new_file"
           echo "::notice title=Uploaded new asset::$new_file"
