@@ -84,8 +84,7 @@ GitHub Actions for Unity.
 
 GitHubアクションを使った、Unityパッケージのリリース自動化  
 
-**このアクションは以下のタスクを自動化します。**  
-**利用したいタスクのみ実行する事も可能です**
+**このアクションは以下のタスクを自動化します。**
 
 - [パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
 - リリースを生成する
@@ -93,6 +92,8 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 - [Unity Test Framework (旧 Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)でテストを実行する
 - [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)の生成をする
 - [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)をリリースページにアップロードする
+
+利用したいタスクのみ実行可能です。
 
 ### リリースノート
 
@@ -109,13 +110,13 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 | refactor:  | バグ修正でも機能追加でもないコード変更 |
 | perf:      | パフォーマンス向上のための変更        |
 
-![](release-note.jpg)
+<img src="release-note.jpg" width="500"/>
 
 ## 必須の設定
 
 `Settings > Actions > General > Workflow permissions`で **Read and write permissions** に設定してください。
 
-![](settings_action.jpg)
+<img src="settings_action.jpg" width="500"/>
 
 ## 環境別の設定
 
@@ -152,6 +153,8 @@ Unityをバッチモードで実行する必要がありUnityのアカウント�
 
 Unity2018以降、[Package Manager (UPM)](https://docs.unity3d.com/2022.3/Documentation/Manual/Packages.html) でパッケージ管理が可能となり、現在ではほとんどのUnityバージョンでUPMが使用できます。そのため、従来のUnityパッケージ生成はほぼ不要となり、提供するメインのWorkflowにはUnityパッケージのリリースは含まないようにしています。
 
+___
+
 ## 手動でのリリース
 
 [build-release_merge.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/build-release_merge.yaml)
@@ -169,7 +172,7 @@ Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`
 
 [実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13129242127)
 
-![](release_manually.jpg)
+<img src="release_manually.jpg" width="500"/>
 
 | Option                | Description                                                                                                                                                                                                                                        | Default            | Example  |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|----------|
@@ -186,7 +189,7 @@ Actionsタブに移動し、`Manual Release (Merge to Default)` > `Run workflow`
 2. このブランチでリリースを準備する
 3. `Run workflow` を使って手動リリースをトリガーする
 
-![](release_manually2.jpg)
+<img src="release_manually2.jpg" width="500"/>
 
 ### セットアップガイド
 
@@ -211,11 +214,11 @@ graph LR
 
 [実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13323524820)
 
-![](pull_request.jpg)
+<img src="pull_request.jpg" width="500"/>
 
 プルリクエストをマージ後、リリースが自動的に作成されます。
 
-![](pull_request2.jpg)
+<img src="pull_request2.jpg" width="500"/>
 
 ### リリース作成の条件
 
@@ -279,11 +282,12 @@ test-modes: 'playmode,editmode'
 
 実行したテスト一覧の確認  
 [実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)
-![](artifact-editmode.jpg)
+
+<img src="artifact-editmode.jpg" width="500"/>
 
 [Unity - Code Coverage](https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/index.html)がArtifactsに表示されます。
 
-![](artifact-download.jpg)
+<img src="artifact-download.jpg" width="500"/>
 
 ## パッケージの生成を追加する
 
@@ -324,7 +328,7 @@ Unity Editorの対応バージョンは[こちら](https://game.ci/docs/docker/v
 リリースにビルドしたパッケージが表示されます。  
 [実行結果のサンプル](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13320955403)
 
-![](release_page.jpg)
+<img src="release_page.jpg" width="500"/>
 
 ## PackageExporter
 

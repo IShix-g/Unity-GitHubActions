@@ -92,8 +92,7 @@ GitHub Actions for Unity.
 
 This repository provides automation for Unity package releases using GitHub Actions.
 
-**This action automates the following tasks:**  
-**You can choose to execute only specific tasks you need.**
+**This action automates the following tasks:**
 
 - Update the [package manifest](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html) version
 - Generate releases
@@ -101,6 +100,8 @@ This repository provides automation for Unity package releases using GitHub Acti
 - Run tests using the [Unity Test Framework (formerly Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)
 - Build [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)
 - Upload the [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html) to the release page
+
+You can choose to execute only specific tasks you need.
 
 ### Release Notes
 
@@ -117,13 +118,13 @@ When commit messages start with specific keywords like `feat` or `fix`, they wil
 | refactor:  | Refactor without changing functionality  |
 | perf:      | Changes to improve performance           |
 
-![](Docs/release-note.jpg)
+<img src="Docs/release-note.jpg" width="500"/>
 
 ## Required Settings
 
 Set **Read and write permissions** for `Settings > Actions > General > Workflow permissions`.
 
-![](Docs/settings_action.jpg)
+<img src="Docs/settings_action.jpg" width="500"/>
 
 ## Settings for Different Scenarios
 
@@ -178,7 +179,7 @@ For manual releases:
 
 [Sample Workflow Execution](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13129242127)
 
-![](Docs/release_manually.jpg)
+<img src="Docs/release_manually.jpg" width="500"/>
 
 | Option                  | Description                                            | Default | Example         |
 |-------------------------|--------------------------------------------------------|---------|-----------------|
@@ -195,7 +196,7 @@ For manual releases:
 2. Prepare the release in this branch.
 3. Trigger a manual release using `Run workflow`.
 
-![](Docs/release_manually2.jpg)
+<img src="Docs/release_manually2.jpg" width="500"/>
 
 ### Setup Guide
 
@@ -220,11 +221,11 @@ Create a pull request from any branch to the default branch. **Ensure the releas
 
 [Sample Execution](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13323524820)
 
-![](Docs/pull_request.jpg)
+<img src="Docs/pull_request.jpg" width="500"/>
 
 Releases are created automatically post-merge.
 
-![](Docs/pull_request2.jpg)
+<img src="Docs/pull_request2.jpg" width="500"/>
 
 ### Release Creation Conditions
 
@@ -287,11 +288,11 @@ test-modes: 'playmode,editmode'
 
 You can view the list of executed tests.  
 [Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13325816869)  
-![](Docs/artifact-editmode.jpg)
+<img src="Docs/artifact-editmode.jpg" width="500"/>
 
 [Unity - Code Coverage](https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/index.html) will be included in the artifacts.
 
-![](Docs/artifact-download.jpg)
+<img src="Docs/artifact-download.jpg" width="500"/>
 
 ## Adding Package Generation
 
@@ -331,7 +332,7 @@ A script for generating packages is required. Please use the provided [PackageEx
 
 The built package will appear in the release.  
 [Sample Execution Result](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13320955403)  
-![](Docs/release_page.jpg)
+<img src="Docs/release_page.jpg" width="500"/>
 
 ## PackageExporter
 
