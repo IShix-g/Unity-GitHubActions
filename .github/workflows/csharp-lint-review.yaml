@@ -19,26 +19,34 @@ jobs:
         with:
           dotnet-version: '6.0'
 
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
       - name: Run StyleCop Analyzers
         run: |
-          dotnet build --no-incremental /warnaserror
-          dotnet msbuild /t:Rebuild /p:TreatWarningsAsErrors=true > stylecop-report.txt || true
+          dotnet build /warnaserror
+          dotnet msbuild /t:Rebuild /p:TreatWarningsAsErrors=true > stylecop-report.txt
 
-      - name: Report StyleCop findings with reviewdog
-        uses: reviewdog/reviewdog@v0.14.1
-        with:
-          name: stylecop
-          reporter: github-pr-review
-          level: warning
-          filter-mode: diff_context
-          fail-on-error: false
-          input: stylecop-report.txt
-          tool-name: StyleCop
+      - name: Confirm StyleCop log
+        run: |
+          echo "===== StyleCop Report ====="
+          cat stylecop-report.txt || echo "No issues found!"
+
+      - name: Run reviewdog
+        run: |
+          cat stylecop-report.txt | reviewdog -efm="%f(%l,%c): %t%[a-z]%m" -name="StyleCop" -reporter=github-pr-review
 
       - name: Run dotnet-format
         run: |
           dotnet format
           git diff --unified=0 > format-changes.diff || true
+
+      - name: Confirm Format Changes
+        run: |
+          echo "===== dotnet-format Changes ====="
+          cat format-changes.diff || echo "No changes detected!"
 
       - name: Suggest formatting changes with action-suggester
         uses: reviewdog/action-suggester@v1
