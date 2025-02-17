@@ -13,6 +13,8 @@ namespace Tests
 
         public int IntProperty => _intField;
 
+        static readonly string s_staticField = "This is a static field";
+
         int _intField;
         string stringField;
         double doubleField;
