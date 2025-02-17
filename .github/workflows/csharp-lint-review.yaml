@@ -1,4 +1,4 @@
-name: Unity-Linter
+name: Unity-CSharp-Linter
 
 on:
   pull_request:
@@ -6,19 +6,20 @@ on:
       - main
 
 jobs:
-  unity-lint:
-    name: Run Unity-Linter
+  unity-csharp-linter:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Unity-Linter
+      - name: Install .NET and Roslyn analyzers
         run: |
-          npm install -g unity-linter
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
 
-      - name: Run Unity-Linter
+      - name: Detect Changed C# Files
+        id: detect_cs_files
         run: |
           files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
 
@@ -27,4 +28,14 @@ jobs:
             exit 0
           fi
 
-          unity-linter --files $files || echo "Lint issues detected in Unity files."
+          echo "Detected changed C# files."
+          echo "$files"
+          echo "files=$files" >> $GITHUB_ENV
+
+      - name: Analyze and Format C# Code
+        run: |
+          echo "Analyzing changed files..."
+          for file in ${{ env.files }}; do
+            echo "Analyzing $file"
+            dotnet format $file || echo "Formatting issues detected in $file"
+          done
