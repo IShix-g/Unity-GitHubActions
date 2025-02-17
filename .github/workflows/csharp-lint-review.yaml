@@ -1,0 +1,48 @@
+name: C# Linter with StyleCop and reviewdog
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Run dotnet-format and report with reviewdog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0'
+
+      - name: Run StyleCop Analyzers
+        run: |
+          dotnet build --no-incremental /warnaserror
+          dotnet msbuild /t:Rebuild /p:TreatWarningsAsErrors=true > stylecop-report.txt || true
+
+      - name: Report StyleCop findings with reviewdog
+        uses: reviewdog/reviewdog@v0.14.1
+        with:
+          name: stylecop
+          reporter: github-pr-review
+          level: warning
+          filter-mode: diff_context
+          fail-on-error: false
+          input: stylecop-report.txt
+          tool-name: StyleCop
+
+      - name: Run dotnet-format
+        run: |
+          dotnet format
+          git diff --unified=0 > format-changes.diff || true
+
+      - name: Suggest formatting changes with action-suggester
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: 'dotnet-format'
+          suggest_command: 'cat format-changes.diff'
+          workdir: .
