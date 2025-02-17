@@ -9,6 +9,8 @@ namespace Tests
 
         public string ProperlyStyledProperty { get; } = "This is a properly styled property";
 
+        int _intField;
+
         public void improperlyStyledMethod(){
         int x=10;
             if(x>5){
