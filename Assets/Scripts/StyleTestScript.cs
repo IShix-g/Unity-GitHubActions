@@ -9,6 +9,8 @@ namespace Tests
 
         public string ProperlyStyledProperty { get; } = "This is a properly styled property";
 
+        public int IntProperty => _intField;
+
         int _intField;
 
         public void improperlyStyledMethod(){
