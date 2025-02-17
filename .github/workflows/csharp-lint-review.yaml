@@ -1,4 +1,4 @@
-name: C# Linter with StyleCop (Simple Script Linter)
+name: C# Linter with Direct File Check (No `.csproj`)
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: C# Linter Check
+    name: C# File Style Check
     runs-on: ubuntu-latest
 
     steps:
@@ -16,8 +16,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      
-      - name: Detect changed C# files
+
+      - name: Detect Changed C# Files
         id: detect_cs_files
         run: |
           cs_files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
@@ -29,8 +29,7 @@ jobs:
 
           echo "Changed C# Files:"
           echo "$cs_files"
-
-          echo "::set-output name=cs_files::$cs_files"
+          echo "cs_files=$cs_files" >> "$GITHUB_OUTPUT"
 
       - name: Setup .NET
         if: steps.detect_cs_files.outputs.cs_files != ''
@@ -38,17 +37,17 @@ jobs:
         with:
           dotnet-version: '6.0'
 
-      - name: Run StyleCop
+      - name: Run dotnet-format (specific C# files)
         if: steps.detect_cs_files.outputs.cs_files != ''
         run: |
-          echo "Running StyleCop on the following files:"
+          echo "Running dotnet-format on the following files:"
           echo "${{ steps.detect_cs_files.outputs.cs_files }}"
-          echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs dotnet format --include
+          echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs -I {} dotnet format --include "{}"
 
-      - name: Apply Suggestions using reviewdog/action-suggester
+      - name: Apply Suggestions using reviewdog
         if: steps.detect_cs_files.outputs.cs_files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: StyleCop
+          tool_name: dotnet-format
           suggest_command: |
             echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs git diff
