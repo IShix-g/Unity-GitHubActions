@@ -89,9 +89,9 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 - [パッケージマニフェスト](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-manifestPkg.html)のバージョンを更新する
 - リリースを生成する
 - タグを作成する
-- [Unity Test Framework (旧 Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)でテストする
-- パッケージの生成をする
-- 生成したパッケージをリリースページにアップロードする
+- [Unity Test Framework (旧 Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)でテストを実行する
+- [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)の生成をする
+- [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)をリリースページにアップロードする
 
 ### リリースノート
 

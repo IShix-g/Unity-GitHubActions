@@ -98,8 +98,8 @@ This repository provides automation for Unity package releases using GitHub Acti
 - Generate releases
 - Create tags
 - Run tests using the [Unity Test Framework (formerly Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)
-- Build packages
-- Upload the generated packages to the release page
+- Build [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)
+- Upload the [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html) to the release page
 
 ### Release Notes
 
