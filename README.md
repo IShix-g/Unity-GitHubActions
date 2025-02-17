@@ -25,6 +25,7 @@ GitHub Actions for Unity.
   - [When Branch Protection or Tag Protection is Enabled](#when-branch-protection-or-tag-protection-is-enabled)
   - [When Running Tests or Generating Packages](#when-running-tests-or-generating-packages)
   - [Required Secrets](#required-secrets)
+- [Is Building Unity Packages Necessary?](#is-building-unity-packages-necessary)
 - [Manual Release](#manual-release)
   - [Steps for Manual Release](#steps-for-manual-release)
   - [Setup Guide](#setup-guide)
