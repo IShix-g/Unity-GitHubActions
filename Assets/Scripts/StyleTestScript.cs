@@ -15,6 +15,8 @@ namespace Tests
 
         int _intField;
 
+        string stringField;
+
         public void improperlyStyledMethod(){
         int x=10;
             if(x>5){
