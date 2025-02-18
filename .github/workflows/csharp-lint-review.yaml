@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Install .NET and Roslyn analyzers
         run: |
@@ -28,14 +30,20 @@ jobs:
             exit 0
           fi
 
-          echo "Detected changed C# files."
-          echo "$files"
-          echo "files=$files" >> $GITHUB_ENV
+          length=$(echo "$files" | wc -l)
+          echo "::notice title=Detected changed C# files.::$length files"
+
+          echo "::group::Detected changed C# files."
+            echo "$files"
+          echo "::endgroup::"
+          echo "files=$files" >> "$GITHUB_OUTPUT"
 
       - name: Analyze and Format C# Code
+        if: steps.detect_cs_files.outputs.cs_files != ''
         run: |
+          cs_files=${{ steps.detect_cs_files.outputs.cs_files }}
           echo "Analyzing changed files..."
-          for file in ${{ env.files }}; do
+          for file in $cs_files; do
             echo "Analyzing $file"
             dotnet format $file || echo "Formatting issues detected in $file"
           done
