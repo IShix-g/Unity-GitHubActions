@@ -38,8 +38,6 @@ namespace Tests
 
         public long GetLong() => 10;
 
-        public decimal GetDecimal() => 10;
-
         public void ExampleMethod()
         {
             // 未使用の変数で警告
