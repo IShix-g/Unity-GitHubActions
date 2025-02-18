@@ -16,7 +16,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: Install .NET and Roslyn analyzers
+      - name: Install dotnet-format
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
@@ -44,11 +44,9 @@ jobs:
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
-      - name: Analyze C# Code using Roslyn Analyzers
-        id: analyze_with_roslyn
+      - name: Create Temporary csproj for Analysis
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          echo "Creating temporary project for analysis"
-
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
           echo "  <PropertyGroup>" >> TempProject.csproj
           echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
@@ -61,25 +59,24 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-          dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
-
-          dotnet build --no-restore TempProject.csproj > roslyn-build.log 2>&1 || true
-
-      - name: Debug roslyn-build.log
+      - name: Analyze C# Code using dotnet-format
+        id: analyze_with_dotnet_format
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          echo "::group::Roslyn Build Log"
-          cat roslyn-build.log
-          echo "::endgroup::"
+          dotnet format TempProject.csproj --check --verbosity diagnostic > format-results.log 2>&1 || true
 
-      - name: Run reviewdog
+      - name: Run reviewdog for dotnet-format
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          echo "Running reviewdog with MSBuild output"
-          reviewdog -efm="%f(%l,%c): %m" \
-            -name="roslyn-analyzers" \
+          cat format-results.log | reviewdog \
+            -name="dotnet-format" \
             -reporter=github-pr-review \
             -filter-mode=file \
-            -fail-on-error=false \
-            < roslyn-build.log
+            -fail-on-error=false
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cleanup temporary files
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          rm -f TempProject.csproj format-results.log
