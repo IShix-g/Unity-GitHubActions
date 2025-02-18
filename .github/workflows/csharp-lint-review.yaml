@@ -30,11 +30,11 @@ jobs:
           echo "  </PropertyGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Install StyleCop and dotnet-format
+      - name: Install Roslyn Analyzer
         run: |
+          echo "Installing Roslyn Analyzer..."
           dotnet new tool-manifest
-          dotnet tool install dotnet-format
-          dotnet add package StyleCop.Analyzers        
+          dotnet tool install dotnet-analyze
 
       - name: Detect Changed C# Files
         id: detect_cs_files
@@ -66,27 +66,28 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Run Style Analysis with StyleCop (Ignore Build Errors)
+      - name: Run Roslyn Analyzer Analysis
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Running StyleCop Analysis (ignoring compile-time issues)..."
-          dotnet build TempProject.csproj /warnaserror:false || true
+          echo "Running Roslyn Analyzer..."
+          dotnet analyze TempProject.csproj --log-format sarif --output analyzer_output.sarif || true
 
-      - name: Debug Style Analysis Log
+      - name: Debug Roslyn Analyzer Results
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "StyleCop analysis results:"
-          cat $(find . -name "*.log") || true
+          echo "Roslyn Analyzer results (SARIF Format):"
+          cat analyzer_output.sarif || true
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: StyleCop
+          tool_name: RoslynAnalyzer
           suggest_command: |
-            dotnet build TempProject.csproj /warnaserror || true
+            echo "Applying Roslyn Analyzer suggestions..."
+            cat analyzer_output.sarif || true
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj
+          rm -f TempProject.csproj analyzer_output.sarif
