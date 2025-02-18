@@ -66,11 +66,11 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Run Style Analysis with StyleCop (Style Only)
+      - name: Run Style Analysis with StyleCop (Ignore Build Errors)
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Running StyleCop Analysis..."
-          dotnet build TempProject.csproj /warnaserror || true
+          echo "Running StyleCop Analysis (ignoring compile-time issues)..."
+          dotnet build TempProject.csproj /warnaserror:false || true
 
       - name: Debug Style Analysis Log
         if: steps.detect_cs_files.outputs.files != ''
