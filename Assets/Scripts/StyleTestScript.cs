@@ -23,7 +23,7 @@ namespace Tests
             if (x > 5)
             {
                 Debug.Log("Improper styling with inconsistent spaces and format");
-            }
+    }
         }
 
         public string GetString() => "This is a string";
