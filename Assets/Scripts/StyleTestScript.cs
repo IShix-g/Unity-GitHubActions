@@ -28,11 +28,11 @@ namespace Tests
 
         public int GetInt() => 10;
 
-        public double GetDouble() => 10;
-
         public long GetLong() => 10;
 
         public float GetFloat() => 10;
+
+        public double GetDouble() => 10;
 
         public void ExampleMethod()
         {
