@@ -44,16 +44,22 @@ jobs:
           echo "Creating temporary project for analysis"
 
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <PropertyGroup>" >> TempProject.csproj
+          echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
+          echo "  </PropertyGroup>" >> TempProject.csproj
           echo "  <ItemGroup>" >> TempProject.csproj
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
 
           dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
 
           echo "Running Roslyn Analyzers..."
           dotnet build --no-restore TempProject.csproj || {
             echo "::error ::Static analysis failed."
-            exit 1 
+            exit 1
           }
+
+          rm -f TempProject.csproj
