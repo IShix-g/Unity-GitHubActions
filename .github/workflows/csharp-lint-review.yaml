@@ -65,7 +65,7 @@ jobs:
         run: |
           dotnet format TempProject.csproj \
           --verify-no-changes \
-          --verbosity diagnostic > format-results.log
+          --verbosity diagnostic > format-results.log || true
 
       - name: Debug dotnet-format log
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
