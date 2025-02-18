@@ -30,11 +30,11 @@ jobs:
           echo "  </PropertyGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Install Roslyn Analyzer
+      - name: Install StyleCop and dotnet-format
         run: |
-          echo "Installing Roslyn Analyzer..."
           dotnet new tool-manifest
-          dotnet tool install dotnet-analyze
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
 
       - name: Detect Changed C# Files
         id: detect_cs_files
@@ -66,28 +66,24 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Run Roslyn Analyzer Analysis
+      - name: Run Style Analysis for Each File (Without Full Build)
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Running Roslyn Analyzer..."
-          dotnet analyze TempProject.csproj --log-format sarif --output analyzer_output.sarif || true
-
-      - name: Debug Roslyn Analyzer Results
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "Roslyn Analyzer results (SARIF Format):"
-          cat analyzer_output.sarif || true
+          echo "Running StyleCop Analysis on individual files..."
+          for file in ${{ steps.detect_cs_files.outputs.files }}; do
+            echo "Analyzing $file"
+            dotnet format --include $file --verify-no-changes || echo "Style violation detected in $file"
+          done
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: RoslynAnalyzer
+          tool_name: StyleCop
           suggest_command: |
-            echo "Applying Roslyn Analyzer suggestions..."
-            cat analyzer_output.sarif || true
+            echo "Reviewdog is suggesting fixes based on StyleCop results."
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj analyzer_output.sarif
+          rm -f TempProject.csproj || true
