@@ -36,6 +36,8 @@ namespace Tests
             return 10;
         }
 
+        public long GetLong() => 10;
+
         public void ExampleMethod()
         {
             // 未使用の変数で警告
