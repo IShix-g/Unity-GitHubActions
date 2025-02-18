@@ -59,32 +59,31 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Analyze C# Code using dotnet-format
+      - name: Format C# Code using dotnet-format
         id: analyze_with_dotnet_format
-        if: ${{ steps.detect_cs_files.outputs.files != '' }}
-        run: |
-          dotnet format TempProject.csproj \
-          --verify-no-changes \
-          --verbosity diagnostic > format-results.log || true
-
-      - name: Debug dotnet-format log
-        if: ${{ steps.detect_cs_files.outputs.files != '' }}
-        run: |
-          cat format-results.log
-
-      - name: Run reviewdog with dotnet-format
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          reviewdog \
-            -name="dotnet-format" \
-            -reporter=github-pr-review \
-            -filter-mode=added \
-            -fail-on-error=false \
-            -f="rdjson" < format-results.log
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "Running dotnet format..."
+          dotnet format TempProject.csproj --include ${{ steps.detect_cs_files.outputs.files }} --verbosity diagnostic || true
+          
+          echo "Generating git diff for formatted changes..."
+          git diff > format-diff.patch || true
+
+      - name: Debug git diff patch
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Generated git diff patch:"
+          cat format-diff.patch
+
+      - name: Apply Suggestions using reviewdog/action-suggester
+        if: steps.detect_cs_files.outputs.files != ''
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: dotnet-format
+          suggest_command: |
+            cat format-diff.patch
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj format-results.log
+          rm -f TempProject.csproj format-diff.patch
