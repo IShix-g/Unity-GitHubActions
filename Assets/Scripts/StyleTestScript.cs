@@ -31,10 +31,7 @@ namespace Tests
             return 10;
         }
 
-        public double GetDouble()
-        {
-            return 10;
-        }
+        public double GetDouble() => 10;
 
         public long GetLong() => 10;
 
