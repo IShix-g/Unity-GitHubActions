@@ -88,14 +88,13 @@ jobs:
         run: |
           echo "Formatting output log for reviewdog..."
           touch formatted_output.log
-          cat output.log | sed -E 's|^(.*):([0-9]+),([0-9]+): (error|warning) ([^:]+): (.*) \[.*\]$|\1:\2:\3: \4: \6|' > formatted_output.log
-          
-          # Verify formatted output and fallback to awk if sed fails
+          cat output.log | sed -E 's@^\s*(.*):([0-9]+),([0-9]+):\s*(error|warning)\s+([^:]+):\s*(.*)\s*\[.*\]@\1:\2:\3: \4: \6@' > formatted_output.log
+
           if [ ! -s formatted_output.log ]; then
             echo "Sed formatting failed, switching to awk..."
             cat output.log | awk '
             {
-              if (match($0, /(.*):([0-9]+),([0-9]+): (error|warning) ([^:]+): (.*) \[.*\]/, m)) {
+              if (match($0, /^ *([A-Za-z0-9_./-]+):([0-9]+),([0-9]+): *(error|warning) +([^:]+): +(.*) +\[.*\]/, m)) {
                 print m[1] ":" m[2] ":" m[3] ": " m[4] ": " m[6]
               }
             }' > formatted_output.log
