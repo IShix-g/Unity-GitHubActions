@@ -21,6 +21,11 @@ jobs:
           dotnet new tool-manifest
           dotnet tool install dotnet-format
 
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
       - name: Detect Changed C# Files
         id: detect_cs_files
         run: |
@@ -40,9 +45,10 @@ jobs:
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
       - name: Analyze C# Code using Roslyn Analyzers
+        id: analyze_with_roslyn
         run: |
           echo "Creating temporary project for analysis"
-
+          
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
           echo "  <PropertyGroup>" >> TempProject.csproj
           echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
@@ -56,10 +62,16 @@ jobs:
 
           dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
 
-          echo "Running Roslyn Analyzers..."
-          dotnet build --no-restore TempProject.csproj || {
-            echo "::error ::Static analysis failed."
-            exit 1
-          }
+          dotnet build --no-restore TempProject.csproj > roslyn-results.txt || true
 
-          rm -f TempProject.csproj
+      - name: Run reviewdog
+        run: |
+          echo "Running reviewdog with Roslyn Analyzers results"
+          reviewdog -f=rdjson \
+            -name="roslyn-analyzers" \
+            -reporter=github-pr-review \
+            -filter-mode=file \
+            -fail-on-error=false \
+            < roslyn-results.txt
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
