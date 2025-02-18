@@ -16,15 +16,16 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: Install dotnet-format
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0'
+
+      - name: Install StyleCop and dotnet-format
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
-
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
+          dotnet add package StyleCop.Analyzers
 
       - name: Detect Changed C# Files
         id: detect_cs_files
@@ -59,31 +60,27 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Format C# Code using dotnet-format
-        id: analyze_with_dotnet_format
+      - name: Run Style Analysis with StyleCop (Style Only)
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Running dotnet format..."
-          dotnet format TempProject.csproj --include ${{ steps.detect_cs_files.outputs.files }} --verbosity diagnostic || true
-          
-          echo "Generating git diff for formatted changes..."
-          git diff > format-diff.patch || true
+          echo "Running StyleCop Analysis..."
+          dotnet build TempProject.csproj /warnaserror || true
 
-      - name: Debug git diff patch
+      - name: Debug Style Analysis Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Generated git diff patch:"
-          cat format-diff.patch
+          echo "StyleCop analysis results:"
+          cat $(find . -name "*.log") || true
 
-      - name: Apply Suggestions using reviewdog/action-suggester
+      - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: dotnet-format
+          tool_name: StyleCop
           suggest_command: |
-            cat format-diff.patch
+            dotnet build TempProject.csproj /warnaserror || true
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj format-diff.patch
+          rm -f TempProject.csproj
