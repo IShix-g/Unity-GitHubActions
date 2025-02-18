@@ -63,7 +63,12 @@ jobs:
         id: analyze_with_dotnet_format
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          dotnet format TempProject.csproj --check --verbosity diagnostic > format-results.log 2>&1 || true
+          dotnet format TempProject.csproj --check --verbosity diagnostic || true > format-results.log
+
+      - name: Debug dotnet-format log
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          cat format-results.log
 
       - name: Run reviewdog for dotnet-format
         run: |
