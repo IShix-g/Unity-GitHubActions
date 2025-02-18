@@ -73,7 +73,7 @@ jobs:
           touch output.log
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
             echo "Analyzing $file" >> output.log
-            dotnet format --include $file --verify-no-changes >> output.log || echo "Style violation detected in $file" >> output.log
+            dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
           done
 
       - name: Debug Raw Output Log
