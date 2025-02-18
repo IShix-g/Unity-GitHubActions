@@ -23,5 +23,7 @@ namespace Tests
                 Debug.Log("Improper styling with inconsistent spaces and format");
     }
         }
+
+        public string GetString() => "This is a string";
     }
 }
