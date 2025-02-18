@@ -35,5 +35,7 @@ namespace Tests
         {
             return 10;
         }
+
+        public long GetLong() => 10;
     }
 }
