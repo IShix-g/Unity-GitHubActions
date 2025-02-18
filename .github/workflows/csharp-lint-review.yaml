@@ -66,15 +66,6 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Run Style Analysis for Each File (Without Full Build)
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "Running StyleCop Analysis on individual files..."
-          for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "Analyzing $file"
-            dotnet format --include $file --verify-no-changes || echo "Style violation detected in $file"
-          done
-
       - name: Collect Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
@@ -85,17 +76,30 @@ jobs:
             dotnet format --include $file --verify-no-changes >> output.log || echo "Style violation detected in $file" >> output.log
           done
 
+      - name: Format Style Violations Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Formatting output log for reviewdog..."
+          touch formatted_output.log
+          cat output.log | sed -E 's/Warning: (.*)\((.*),(.*)\): (warning .*): (.*) \[.*\]/\1:\2:\3: \4: \5/' > formatted_output.log
+
+      - name: Debug Formatted Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG FORMATTED LOG ==="
+          cat formatted_output.log
+          echo "=== END FORMATTED LOG ==="
+
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: stylecop
-          level: warning
           suggest_command: |
-            cat output.log
+            cat formatted_output.log
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj output.log || true
+          rm -f TempProject.csproj output.log formatted_output.log || true
