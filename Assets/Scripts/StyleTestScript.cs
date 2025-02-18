@@ -20,7 +20,7 @@ namespace Tests
         public void improperlyStyledMethod()
         {
             int x = 10;
-            if (x > 5)
+        if (x > 5)
             {
                 Debug.Log("Improper styling with inconsistent spaces and format");
             }
