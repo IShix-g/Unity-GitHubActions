@@ -39,12 +39,21 @@ jobs:
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
-      - name: Analyze and Format C# Code
-        if: steps.detect_cs_files.outputs.cs_files != ''
+      - name: Analyze C# Code using Roslyn Analyzers
         run: |
-          cs_files=${{ steps.detect_cs_files.outputs.cs_files }}
-          echo "Analyzing changed files..."
-          for file in $cs_files; do
-            echo "Analyzing $file"
-            dotnet format $file || echo "Formatting issues detected in $file"
+          echo "Creating temporary project for analysis"
+
+          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <ItemGroup>" >> TempProject.csproj
+          for file in ${{ steps.detect_cs_files.outputs.files }}; do
+            echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
+          echo "  </ItemGroup>" >> TempProject.csproj
+
+          dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
+
+          echo "Running Roslyn Analyzers..."
+          dotnet build --no-restore TempProject.csproj || {
+            echo "::error ::Static analysis failed."
+            exit 1 
+          }
