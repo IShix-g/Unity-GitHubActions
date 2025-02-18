@@ -62,18 +62,17 @@ jobs:
 
           dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
 
-          dotnet build --no-restore TempProject.csproj \
-            -nologo -consoleLoggerParameters:NoSummary \
-            > results.log || true
+          dotnet build --no-restore TempProject.csproj > roslyn-build.log 2>&1 || true
 
       - name: Run reviewdog
         run: |
-          echo "Running reviewdog with Roslyn Analyzers results"
-          reviewdog -f=rdjson \
+          echo "Running reviewdog with MSBuild output"
+          reviewdog -efm="%f(%l,%c): %m" \
             -name="roslyn-analyzers" \
             -reporter=github-pr-review \
             -filter-mode=file \
             -fail-on-error=false \
-            < roslyn-results.txt
+            < roslyn-build.log
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
