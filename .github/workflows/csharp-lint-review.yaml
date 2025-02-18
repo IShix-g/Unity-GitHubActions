@@ -75,15 +75,28 @@ jobs:
             dotnet format --include $file --verify-no-changes || echo "Style violation detected in $file"
           done
 
+      - name: Collect Style Violations Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Collecting style violations into output.log..."
+          touch output.log
+          for file in ${{ steps.detect_cs_files.outputs.files }}; do
+            echo "Analyzing $file" >> output.log
+            dotnet format --include $file --verify-no-changes >> output.log || echo "Style violation detected in $file" >> output.log
+          done
+
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
-        uses: reviewdog/action-suggester@v1
+        uses: reviewdog/action-runner@v1
         with:
-          tool_name: StyleCop
-          suggest_command: |
-            echo "Reviewdog is suggesting fixes based on StyleCop results."
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tool_name: stylecop
+          input: output.log
+          level: warning
+          reporter: github-pr-review
+          fail_on_error: true
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj || true
+          rm -f TempProject.csproj output.log || true
