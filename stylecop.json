@@ -5,8 +5,8 @@
     },
     "orderingRules": {
       "usingDirectivesPlacement": "outsideNamespace",
-        "systemUsingDirectivesFirst": true,
-        "elementOrder": [
+      "systemUsingDirectivesFirst": true,
+      "elementOrder": [
         "kind",
         "accessibility",
         "readonly"
@@ -17,7 +17,15 @@
     },
     "namingRules": {
       "includeInferredTupleElementNames": true,
-        "tupleElementNameCasing": "camelCase"
+      "tupleElementNameCasing": "camelCase",
+      "fieldNamePrefix": "_",
+      "constantFieldNameCasing": "PascalCase",
+      "readonlyFieldNamePrefix": "_",
+      "staticFieldNamePrefix": "s_",
+      "enumMemberCasing": "PascalCase",
+      "methodNameCasing": "PascalCase",
+      "propertyNameCasing": "PascalCase",
+      "interfaceNamePrefix": "I"
     },
     "analyzerSettings": {
       "general": {
