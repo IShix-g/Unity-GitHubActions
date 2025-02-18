@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   unity-csharp-linter:
     runs-on: ubuntu-latest
@@ -112,10 +116,9 @@ jobs:
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: stylecop
-          level: info
+          level: error
           efm: "%f(%l,%c): %t%*[^:]: %m"
-          suggest_command: |
-            cat output.log
+          suggest_command: output.log
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
