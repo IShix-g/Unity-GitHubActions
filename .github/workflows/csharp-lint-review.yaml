@@ -1,4 +1,4 @@
-name: C# Linter with StyleCop (Simple Script Linter)
+name: Unity-CSharp-Linter
 
 on:
   pull_request:
@@ -6,45 +6,81 @@ on:
       - main
 
 jobs:
-  lint:
-    name: C# Linter Check
+  unity-csharp-linter:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Detect changed C# files
-        id: detect_cs_files
-        run: |
-          cs_files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
 
-          if [ -z "$cs_files" ]; then
-            echo "No C# files were changed in this PR."
-            exit 0
-          fi
-
-          echo "Changed C# Files:"
-          echo "$cs_files"
-
-          echo "::set-output name=cs_files::$cs_files"
-
-      - name: Setup .NET
-        if: steps.detect_cs_files.outputs.cs_files != ''
+      - name: Install .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0'
 
-      - name: Run StyleCop
-        if: steps.detect_cs_files.outputs.cs_files != ''
+      - name: Install StyleCop and dotnet-format
         run: |
-          echo "Running StyleCop on the following files:"
-          echo "${{ steps.detect_cs_files.outputs.cs_files }}"
-          echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs dotnet format --include
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
 
-      - name: Apply Suggestions using reviewdog/action-suggester
-        if: steps.detect_cs_files.outputs.cs_files != ''
+      - name: Detect Changed C# Files
+        id: detect_cs_files
+        run: |
+          files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+
+          if [ -z "$files" ]; then
+            echo "No C# files were changed in this PR."
+            exit 0
+          fi
+
+          length=$(echo "$files" | wc -l)
+          echo "::notice title=Detected changed C# files.::$length files"
+
+          echo "::group::Detected changed C# files."
+            echo "$files"
+          echo "::endgroup::"
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+
+      - name: Create Temporary csproj for Analysis
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <PropertyGroup>" >> TempProject.csproj
+          echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
+          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
+          echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "  <ItemGroup>" >> TempProject.csproj
+          for file in ${{ steps.detect_cs_files.outputs.files }}; do
+            echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
+          done
+          echo "  </ItemGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
+
+      - name: Run Style Analysis with StyleCop (Style Only)
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Running StyleCop Analysis..."
+          dotnet build TempProject.csproj /warnaserror || true
+
+      - name: Debug Style Analysis Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "StyleCop analysis results:"
+          cat $(find . -name "*.log") || true
+
+      - name: Apply Style Suggestions with reviewdog
+        if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: StyleCop
           suggest_command: |
-            echo "${{ steps.detect_cs_files.outputs.cs_files }}" | xargs git diff
+            dotnet build TempProject.csproj /warnaserror || true
+
+      - name: Cleanup temporary files
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          rm -f TempProject.csproj

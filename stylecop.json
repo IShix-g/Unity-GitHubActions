@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "documentationRules": {
+      "xmlDocumentationRequired": false
+    },
+    "orderingRules": {
+      "usingDirectivesPlacement": "outsideNamespace",
+        "systemUsingDirectivesFirst": true,
+        "elementOrder": [
+        "kind",
+        "accessibility",
+        "readonly"
+      ]
+    },
+    "layoutRules": {
+      "newlineAtEndOfFile": "require"
+    },
+    "namingRules": {
+      "includeInferredTupleElementNames": true,
+        "tupleElementNameCasing": "camelCase"
+    },
+    "analyzerSettings": {
+      "general": {
+        "analysisMode": "styleOnly"
+      }
+    }
+  }
+}
