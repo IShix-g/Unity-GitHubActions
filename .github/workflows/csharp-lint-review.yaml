@@ -64,6 +64,12 @@ jobs:
 
           dotnet build --no-restore TempProject.csproj > roslyn-build.log 2>&1 || true
 
+      - name: Debug roslyn-build.log
+        run: |
+          echo "::group::Roslyn Build Log"
+          cat roslyn-build.log
+          echo "::endgroup::"
+
       - name: Run reviewdog
         run: |
           echo "Running reviewdog with MSBuild output"
