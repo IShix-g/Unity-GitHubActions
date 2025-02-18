@@ -90,6 +90,7 @@ jobs:
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: stylecop
+          level: warning
           suggest_command: |
             cat output.log
           github_token: ${{ secrets.GITHUB_TOKEN }}
