@@ -17,9 +17,11 @@ namespace Tests
         double doubleField;
         float floatField;
 
-        public void improperlyStyledMethod(){
-        int x=10;
-            if(x>5){
+        public void improperlyStyledMethod()
+        {
+            int x = 10;
+            if (x > 5)
+            {
                 Debug.Log("Improper styling with inconsistent spaces and format");
     }
         }
