@@ -15,7 +15,7 @@ namespace Tests
         string stringField;
         int _intField;
         double doubleField;
-        float floatField;
+      float floatField;
 
         public void improperlyStyledMethod()
         {
@@ -23,7 +23,7 @@ namespace Tests
             if (x > 5)
             {
                 Debug.Log("Improper styling with inconsistent spaces and format");
-    }
+            }
         }
 
         public string GetString() => "This is a string";
