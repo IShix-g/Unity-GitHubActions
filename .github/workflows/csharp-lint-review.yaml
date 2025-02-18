@@ -62,7 +62,9 @@ jobs:
 
           dotnet add package Microsoft.CodeAnalysis.FxCopAnalyzers --version 3.3.2
 
-          dotnet build --no-restore TempProject.csproj > roslyn-results.txt || true
+          dotnet build --no-restore TempProject.csproj \
+            -nologo -consoleLoggerParameters:NoSummary \
+            > results.log || true
 
       - name: Run reviewdog
         run: |
