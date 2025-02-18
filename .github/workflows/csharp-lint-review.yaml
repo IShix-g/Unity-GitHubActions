@@ -76,12 +76,23 @@ jobs:
             dotnet format --include $file --verify-no-changes >> output.log || echo "Style violation detected in $file" >> output.log
           done
 
+      - name: Debug Raw Output Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG RAW OUTPUT.LOG ==="
+          cat output.log
+          echo "=== END RAW OUTPUT.LOG ==="
+
       - name: Format Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Formatting output log for reviewdog..."
+          echo "Formatting output log for reviewdog (using awk)..."
           touch formatted_output.log
-          cat output.log | sed -E 's/^Warning: (.*)\((.*),(.*)\): (warning|error) ([^:]*): (.*) \[.*\]/\1:\2:\3: \4: \6/' > formatted_output.log
+          cat output.log | awk '
+          /Warning:/ {
+              match($0, /Warning: (.*)\((.*),(.*)\): (warning|error) ([^:]*): (.*) \[.*\]/, arr)
+              {print arr[1] ":" arr[2] ":" arr[3] ": " arr[4] ": " arr[6]}
+          }' > formatted_output.log
       
       - name: Debug Formatted Log
         if: steps.detect_cs_files.outputs.files != ''
