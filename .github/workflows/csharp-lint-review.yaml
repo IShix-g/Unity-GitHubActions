@@ -72,14 +72,15 @@ jobs:
         run: |
           cat format-results.log
 
-      - name: Run reviewdog for dotnet-format
+      - name: Run reviewdog with dotnet-format
+        if: steps.detect_cs_files.outputs.files != ''
         run: |
           reviewdog \
             -name="dotnet-format" \
             -reporter=github-pr-review \
-            -filter-mode=file \
+            -filter-mode=added \
             -fail-on-error=false \
-            -efm="%f(%l,%c): %m"
+            -f="rdjson" < format-results.log
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
