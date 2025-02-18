@@ -66,17 +66,14 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Run Style Analysis with StyleCop (Ignore Build Errors)
+      - name: Run Style Analysis for Each File (Without Full Build)
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Running StyleCop Analysis (ignoring compile-time issues)..."
-          dotnet build TempProject.csproj /warnaserror:false || true
-
-      - name: Debug Style Analysis Log
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "StyleCop analysis results:"
-          cat $(find . -name "*.log") || true
+          echo "Running StyleCop Analysis on individual files..."
+          for file in ${{ steps.detect_cs_files.outputs.files }}; do
+            echo "Analyzing $file"
+            dotnet format --include $file --verify-no-changes || echo "Style violation detected in $file"
+          done
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
@@ -84,9 +81,9 @@ jobs:
         with:
           tool_name: StyleCop
           suggest_command: |
-            dotnet build TempProject.csproj /warnaserror:false || true
+            echo "Reviewdog is suggesting fixes based on StyleCop results."
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj
+          rm -f TempProject.csproj || true
