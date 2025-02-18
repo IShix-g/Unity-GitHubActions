@@ -21,11 +21,20 @@ jobs:
         with:
           dotnet-version: '6.0'
 
+      - name: Create Temporary csproj for Analysis
+        run: |
+          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <PropertyGroup>" >> TempProject.csproj
+          echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
+          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
+          echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
+
       - name: Install StyleCop and dotnet-format
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
-          dotnet add package StyleCop.Analyzers
+          dotnet add package StyleCop.Analyzers        
 
       - name: Detect Changed C# Files
         id: detect_cs_files
@@ -45,14 +54,11 @@ jobs:
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
-      - name: Create Temporary csproj for Analysis
+      - name: Update Temporary csproj with Changed Files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
-          echo "  <PropertyGroup>" >> TempProject.csproj
-          echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
-          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
-          echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "Adding modified C# files to TempProject.csproj..."
+          sed -i '$d' TempProject.csproj # Remove last line
           echo "  <ItemGroup>" >> TempProject.csproj
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
