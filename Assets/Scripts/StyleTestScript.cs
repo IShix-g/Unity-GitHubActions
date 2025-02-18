@@ -25,5 +25,10 @@ namespace Tests
         }
 
         public string GetString() => "This is a string";
+
+        public int GetInt()
+        {
+            return 10;
+        }
     }
 }
