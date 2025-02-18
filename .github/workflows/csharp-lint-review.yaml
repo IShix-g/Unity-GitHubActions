@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   unity-csharp-linter:
     runs-on: ubuntu-latest
@@ -79,6 +75,7 @@ jobs:
             echo "Analyzing $file" >> output.log
             dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
           done
+          sed -i -E 's/^(Warning:|Error:) //g' output.log
 
       - name: Debug Raw Output Log
         if: steps.detect_cs_files.outputs.files != ''
@@ -87,38 +84,14 @@ jobs:
           cat output.log
           echo "=== END RAW OUTPUT.LOG ==="
 
-      - name: Format Style Violations Log
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "Formatting output log for reviewdog..."
-          touch formatted_output.log
-          cat output.log | sed -E 's@^\s*(.*):([0-9]+),([0-9]+):\s*(error|warning)\s+([^:]+):\s*(.*)\s*\[.*\]@\1:\2:\3: \4: \6@' > formatted_output.log
-
-          if [ ! -s formatted_output.log ]; then
-            echo "Sed formatting failed, switching to awk..."
-            cat output.log | awk '
-            {
-              if (match($0, /^ *([A-Za-z0-9_./-]+):([0-9]+),([0-9]+): *(error|warning) +([^:]+): +(.*) +\[.*\]/, m)) {
-                print m[1] ":" m[2] ":" m[3] ": " m[4] ": " m[6]
-              }
-            }' > formatted_output.log
-          fi
-
-      - name: Debug Formatted Log
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "=== DEBUG FORMATTED LOG ==="
-          cat formatted_output.log
-          echo "=== END FORMATTED LOG ==="
-
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: stylecop
-          level: error
+          tool_name: 'stylecop'
+          level: 'warning'
           efm: "%f(%l,%c): %t%*[^:]: %m"
-          suggest_command: output.log
+          suggest_command: 'cat output.log'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
