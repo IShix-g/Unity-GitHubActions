@@ -38,6 +38,8 @@ namespace Tests
 
         public long GetLong() => 10;
 
+        public float GetFloat() => 10;
+
         public void ExampleMethod()
         {
             // 未使用の変数で警告
