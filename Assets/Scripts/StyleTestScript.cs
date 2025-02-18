@@ -14,7 +14,7 @@ namespace Tests
 
         string stringField;
         int _intField;
-        double doubleField;
+    double doubleField;
       float floatField;
 
         public void improperlyStyledMethod()
