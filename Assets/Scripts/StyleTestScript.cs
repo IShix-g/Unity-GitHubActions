@@ -35,14 +35,5 @@ namespace Tests
         public float GetFloat() => 10;
 
         public double GetDouble() => 10;
-
-        public void ExampleMethod()
-        {
-            // 未使用の変数で警告
-            int unusedVariable;
-
-            // 意図的にコンパイルエラー
-            not_defined_variable = 10;
-        }
     }
 }
