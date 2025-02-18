@@ -87,14 +87,12 @@ jobs:
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
-        uses: reviewdog/action-runner@v1
+        uses: reviewdog/action-suggester@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: stylecop
-          input: output.log
-          level: warning
-          reporter: github-pr-review
-          fail_on_error: true
+          suggest_command: |
+            cat output.log
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
