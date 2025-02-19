@@ -19,22 +19,18 @@ jobs:
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0'
+          dotnet-version: '7.0'
 
       - name: Create Temporary csproj for Analysis
         run: |
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
           echo "  <PropertyGroup>" >> TempProject.csproj
-          echo "    <TargetFramework>net472</TargetFramework>" >> TempProject.csproj
+          echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
           
           echo "  <ItemGroup>" >> TempProject.csproj
           echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
-          echo "  </ItemGroup>" >> TempProject.csproj
-          
-          echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <PackageReference Include=\"StyleCop.Analyzers\" Version=\"1.1.118\" PrivateAssets=\"all\" />" >> TempProject.csproj
           echo "  </ItemGroup>" >> TempProject.csproj
           
           echo "</Project>" >> TempProject.csproj
