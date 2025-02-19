@@ -4,11 +4,11 @@ on:
   pull_request:
     branches:
       - main
+      - feature/csharp-lint
 
 jobs:
   unity-csharp-linter:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,15 +40,12 @@ jobs:
         id: detect_cs_files
         run: |
           files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
-
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
           fi
-
           length=$(echo "$files" | wc -l)
           echo "::notice title=Detected changed C# files.::$length files"
-
           echo "::group::Detected changed C# files."
             echo "$files"
           echo "::endgroup::"
@@ -66,31 +63,32 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Collect SARIF Style Violations Log Per File
+      - name: Collect Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Collecting style violations as SARIF reports for individual files..."
-          mkdir -p sarif_reports
-          
-          # 各ファイルごとにSARIFレポートを収集
+          echo "Collecting style violations into output.log..."
+          touch output.log
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "Analyzing $file and generating SARIF report..."
-            dotnet format style --include $file --verify-no-changes --report sarif_reports/$(basename $file).sarif --report-format sarif || true
-          done
-
-          echo "Combining SARIF reports into a single file..."
-          # SARIF統一フォーマットの初期化
-          echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
-          for report in sarif_reports/*.sarif; do
-              jq '.runs as $new | {version: "2.1.0", runs: .runs + $new}' combined_report.sarif $report > tmp.sarif
-              mv tmp.sarif combined_report.sarif
+            echo "Analyzing $file" >> output.log
+            dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
           done
 
       - name: Debug Raw Output Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
           echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat combined_report.sarif
+          cat output.log
+          echo "=== END RAW OUTPUT.LOG ==="
+
+      - name: Run StyleCop and Convert to SARIF
+        run: |
+          python3 .github/scripts/convert_to_sarif.py output.log output.sarif
+
+      - name: Debug SARIF Output Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG RAW OUTPUT.LOG ==="
+          cat output.sarif
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Apply Style Suggestions with reviewdog
@@ -98,11 +96,11 @@ jobs:
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: 'stylecop'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          filter_mode: 'file'
           level: 'warning'
+          suggest_command: 'output.sarif'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
-          rm -f TempProject.csproj output.log formatted_output.log || true
+          rm -f TempProject.csproj output.log output.sarif || true
