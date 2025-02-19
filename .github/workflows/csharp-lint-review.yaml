@@ -28,6 +28,9 @@ jobs:
           echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "  <ItemGroup>" >> TempProject.csproj
+          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
+          echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
       - name: Install StyleCop and dotnet-format
@@ -50,18 +53,6 @@ jobs:
           echo "$files"
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
-
-      - name: Update Temporary csproj with Changed Files
-        if: ${{ steps.detect_cs_files.outputs.files != '' }}
-        run: |
-          echo "Adding modified C# files to TempProject.csproj..."
-          sed -i '$d' TempProject.csproj # Remove last line
-          echo "  <ItemGroup>" >> TempProject.csproj
-          for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
-          done
-          echo "  </ItemGroup>" >> TempProject.csproj
-          echo "</Project>" >> TempProject.csproj
 
       - name: Collect Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
