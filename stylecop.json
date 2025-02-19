@@ -27,6 +27,11 @@
       "propertyNameCasing": "PascalCase",
       "interfaceNamePrefix": "I"
     },
+    "analyzerSettings": {
+      "general": {
+        "analysisMode": "styleOnly"
+      }
+    },
     "disabledByDefault": true,
     "ruleSets": {
       "enabledRules": [
@@ -35,7 +40,8 @@
         "SA1307",
         "SA1308",
         "SA1311",
-        "SA1312"
+        "SA1312",
+        "SA1500"
       ]
     }
   }
