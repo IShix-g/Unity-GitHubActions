@@ -7,11 +7,11 @@ namespace Tests
         public const string ConstProperty = "This is a const property";
         public static readonly string StaticProperty = "This is a static property";
         public string ProperlyStyledProperty { get; } = "This is a properly styled property";
-        public int IntProperty => _intField;
+ public int IntProperty => _intField;
 
         static readonly string s_staticField = "This is a static field";
 
-      string stringField;
+        string stringField;
         int _intField;
         double doubleField;
         float floatField;
