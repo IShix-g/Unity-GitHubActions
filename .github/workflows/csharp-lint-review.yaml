@@ -67,23 +67,42 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Collect SARIF Style Violations Log Per File
+      - name: Collect Style Violations as JSON Logs
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Collecting style violations as SARIF reports for individual files..."
-          mkdir -p sarif_reports
-          
-          # 各ファイルごとにSARIFレポートを収集
+          echo "Collecting style violations as JSON logs for individual files..."
+          mkdir -p json_reports
+
+          # 各ファイルごとにレポートを収集
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "Analyzing $file and generating SARIF report..."
-            dotnet format style --include $file --verify-no-changes --report sarif_reports/$(basename $file).sarif --report-format sarif || true
+            echo "Analyzing $file and generating JSON report..."
+            dotnet format style --include $file --verify-no-changes --report json_reports/$(basename $file).json || true
           done
 
-          echo "Combining SARIF reports into a single file..."
+      - name: Convert JSON Logs to SARIF Format and Combine
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Combining JSON reports into a single SARIF report..."
+          mkdir -p sarif_reports
+
+          # SARIFフォーマットのベース初期化
           echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
-          for report in sarif_reports/*.sarif; do
-              jq '.runs as $new | {version: "2.1.0", runs: .runs + $new}' combined_report.sarif $report > tmp.sarif
-              mv tmp.sarif combined_report.sarif
+
+          # 各JSONレポートをSARIF形式に変換して統合
+          for report in json_reports/*.json; do
+              # 必要に応じてJSONをSARIFスキーマに変換（適切な変換を実施）
+              jq --argfile input $report '{
+                  version: "2.1.0",
+                  runs: [$input | {
+                      tool: { driver: { name: "dotnet-format", version: "6.0.0" } },
+                      results: .[0].Diagnostics
+                  }]
+              }' >> tmp.sarif
+
+              # SARIFレポートの統合
+              jq '.runs as $new | {version: "2.1.0", runs: .runs + $new}' combined_report.sarif tmp.sarif > merged.sarif
+              mv merged.sarif combined_report.sarif
+              rm -f tmp.sarif
           done
 
       - name: Debug Raw Output Log
