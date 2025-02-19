@@ -61,6 +61,11 @@ jobs:
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
+
+          echo "  <ItemGroup>" >> TempProject.csproj
+          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
+          echo "  </ItemGroup>" >> TempProject.csproj
+
           echo "</Project>" >> TempProject.csproj
 
       - name: Collect Style Violations Log
