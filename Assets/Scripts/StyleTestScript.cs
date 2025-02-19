@@ -11,9 +11,9 @@ namespace Tests
 
         static readonly string s_staticField = "This is a static field";
 
-        string stringField;
+      string stringField;
         int _intField;
- double doubleField;
+        double doubleField;
         float floatField;
 
         public void improperlyStyledMethod()
