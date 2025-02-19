@@ -30,7 +30,7 @@ jobs:
           echo "  </PropertyGroup>" >> TempProject.csproj
           
           echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"/home/runner/work/Unity-GitHubActions/Unity-GitHubActions/stylecop.json\" />" >> TempProject.csproj
+          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
           echo "  </ItemGroup>" >> TempProject.csproj
           
           echo "</Project>" >> TempProject.csproj

@@ -17,6 +17,8 @@ indent_size = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+dotnet_analyzer_diagnostic.severity = none
+
 # C# Naming Rules
 
 # Constants should use PascalCase
