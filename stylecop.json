@@ -36,6 +36,11 @@
     "ruleSets": {
       "enabledRules": [
         "SA1300",
+        "SA1500",
+        "SA1307",
+        "SA1308",
+        "SA1311",
+        "SA1312",
         "SA1500"
       ]
     }
