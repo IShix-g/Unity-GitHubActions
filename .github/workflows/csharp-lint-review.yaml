@@ -91,14 +91,23 @@ jobs:
           cat output.sarif
           echo "=== END RAW OUTPUT.LOG ==="
 
+      - name: Setup reviewdog
+        if: steps.detect_cs_files.outputs.files != ''
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
-        uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: 'stylecop'
-          level: 'warning'
-          suggest_command: 'output.sarif'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Convert SARIF output to reviewdog compatible format
+          reviewdog -f=sarif \
+            -name="StyleCop" \
+            -reporter=github-pr-review \
+            -level=warning \
+            < output.sarif
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
