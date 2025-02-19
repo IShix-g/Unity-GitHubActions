@@ -71,15 +71,18 @@ jobs:
         run: |
           echo "Collecting style violations as SARIF reports for individual files..."
           mkdir -p sarif_reports
+          
+          # 各ファイルごとにSARIFレポートを収集
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
             echo "Analyzing $file and generating SARIF report..."
-            dotnet format --include $file --verify-no-changes --report sarif_reports/$(basename $file).sarif --report-format sarif || true
+            dotnet format style --include $file --verify-no-changes --report sarif_reports/$(basename $file).sarif --report-format sarif || true
           done
 
           echo "Combining SARIF reports into a single file..."
+          # SARIF統一フォーマットの初期化
           echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
           for report in sarif_reports/*.sarif; do
-              jq -s '.[0] * {"runs": .[0].runs + .[1].runs}' combined_report.sarif $report > tmp.sarif
+              jq '.runs as $new | {version: "2.1.0", runs: .runs + $new}' combined_report.sarif $report > tmp.sarif
               mv tmp.sarif combined_report.sarif
           done
 
