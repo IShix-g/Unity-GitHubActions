@@ -12,7 +12,7 @@ namespace Tests
         static readonly string s_staticField = "This is a static field";
 
         string stringField;
- int _intField;
+  int _intField;
         double doubleField;
         float floatField;
 
