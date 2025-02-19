@@ -28,18 +28,12 @@ jobs:
           echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
-          
-          echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
-          echo "  </ItemGroup>" >> TempProject.csproj
-          
           echo "</Project>" >> TempProject.csproj
 
       - name: Install StyleCop and dotnet-format
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
-          dotnet add package StyleCop.Analyzers
 
       - name: Detect Changed C# Files
         id: detect_cs_files
@@ -68,17 +62,6 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Debug csproj and stylecop.json
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "=== TempProject.csproj 内容 ==="
-          cat TempProject.csproj
-          echo "=== end ==="
-          
-          echo "=== stylecop.json の位置確認 ==="
-          ls -alh stylecop.json
-          echo "=== end ==="
-
       - name: Collect Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
@@ -94,6 +77,7 @@ jobs:
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Run StyleCop and Convert to SARIF
+        if: steps.detect_cs_files.outputs.files != ''
         run: |
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
 
