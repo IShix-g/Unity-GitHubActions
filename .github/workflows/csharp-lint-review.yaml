@@ -28,6 +28,9 @@ jobs:
           echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "  <ItemGroup>" >> TempProject.csproj
+          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
+          echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
       - name: Install StyleCop and dotnet-format
@@ -61,11 +64,6 @@ jobs:
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
-
-          echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
-          echo "  </ItemGroup>" >> TempProject.csproj
-
           echo "</Project>" >> TempProject.csproj
 
       - name: Collect Style Violations Log
