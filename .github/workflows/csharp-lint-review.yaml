@@ -92,13 +92,12 @@ jobs:
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
-        uses: reviewdog/action-reviewdog@v1
+        uses: reviewdog/action-suggester@v1
         with:
-          reporter: sarif
+          tool_name: 'stylecop'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          sarif_report: './combined_report.sarif'
+          filter_mode: 'file'
           level: 'warning'
-          fail_on_error: 'false'
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
