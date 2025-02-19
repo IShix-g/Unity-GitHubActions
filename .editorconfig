@@ -18,6 +18,12 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.SA1300.severity = warning
+dotnet_diagnostic.SA1500.severity = warning
+dotnet_diagnostic.SA1307.severity = warning
+dotnet_diagnostic.SA1308.severity = warning
+dotnet_diagnostic.SA1311.severity = warning
+dotnet_diagnostic.SA1312.severity = warning
 
 # C# Naming Rules
 
