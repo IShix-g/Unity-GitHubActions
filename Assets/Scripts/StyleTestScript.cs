@@ -12,14 +12,14 @@ namespace Tests
         static readonly string s_staticField = "This is a static field";
 
         string stringField;
-  int _intField;
+     int _intField;
         double doubleField;
         float floatField;
 
         public void improperlyStyledMethod()
         {
             int x = 10;
-        if (x > 5)
+       if (x > 5)
             {
                 Debug.Log("Improper styling with inconsistent spaces and format");
             }
