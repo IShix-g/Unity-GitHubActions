@@ -73,11 +73,20 @@ jobs:
           echo "Collecting style violations as JSON logs for individual files..."
           mkdir -p json_reports
 
-          # 各ファイルごとにレポートを収集
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
             echo "Analyzing $file and generating JSON report..."
             dotnet format style --include $file --verify-no-changes --report json_reports/$(basename $file).json || true
           done
+
+      - name: Debug Individual JSON Reports
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG INDIVIDUAL JSON REPORTS ==="
+          for report in json_reports/*.json; do
+            echo "--- $report ---"
+            cat $report
+          done
+          echo "=== END DEBUG ==="
 
       - name: Combine JSON Reports into a SARIF Report
         if: steps.detect_cs_files.outputs.files != ''
