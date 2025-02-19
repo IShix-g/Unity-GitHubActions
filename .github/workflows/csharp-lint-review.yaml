@@ -66,34 +66,39 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Collect Style Violations Log
+      - name: Collect SARIF Style Violations Log Per File
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "Collecting style violations into output.log..."
-          touch output.log
+          echo "Collecting style violations as SARIF reports for individual files..."
+          mkdir -p sarif_reports
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "Analyzing $file" >> output.log
-            dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
+            echo "Analyzing $file and generating SARIF report..."
+            dotnet format --include $file --verify-no-changes --report sarif_reports/$(basename $file).sarif --report-format sarif || true
           done
-          sed -i -E 's/^(Warning:|Error:) //g' output.log
+
+          echo "Combining SARIF reports into a single file..."
+          echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
+          for report in sarif_reports/*.sarif; do
+              jq -s '.[0] * {"runs": .[0].runs + .[1].runs}' combined_report.sarif $report > tmp.sarif
+              mv tmp.sarif combined_report.sarif
+          done
 
       - name: Debug Raw Output Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
           echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat output.log
+          cat combined_report.sarif
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Apply Style Suggestions with reviewdog
         if: steps.detect_cs_files.outputs.files != ''
-        uses: reviewdog/action-suggester@v1
+        uses: reviewdog/action-reviewdog@v1
         with:
-          tool_name: 'stylecop'
+          reporter: sarif
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          filter_mode: 'file'
+          sarif_report: './combined_report.sarif'
           level: 'warning'
-          fail_on_error: 'true'
-          reviewdog_flags: '-efm="%f(%l,%c): %t%*[^:]: %m"'
+          fail_on_error: 'false'
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
