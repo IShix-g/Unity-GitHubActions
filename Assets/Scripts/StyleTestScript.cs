@@ -35,4 +35,6 @@ namespace Tests
 
         public double GetDouble() => 10;
     }
+
+    public interface StyleTestInterface{}
 }
