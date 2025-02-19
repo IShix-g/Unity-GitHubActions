@@ -25,12 +25,18 @@ jobs:
         run: |
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
           echo "  <PropertyGroup>" >> TempProject.csproj
-          echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
+          echo "    <TargetFramework>net472</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
+          
           echo "  <ItemGroup>" >> TempProject.csproj
           echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
           echo "  </ItemGroup>" >> TempProject.csproj
+          
+          echo "  <ItemGroup>" >> TempProject.csproj
+          echo "    <PackageReference Include=\"StyleCop.Analyzers\" Version=\"1.1.118\" PrivateAssets=\"all\" />" >> TempProject.csproj
+          echo "  </ItemGroup>" >> TempProject.csproj
+          
           echo "</Project>" >> TempProject.csproj
 
       - name: Install StyleCop and dotnet-format
