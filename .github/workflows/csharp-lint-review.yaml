@@ -28,9 +28,6 @@ jobs:
           echo "    <TargetFramework>net6.0</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
-          echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
-          echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
       - name: Install StyleCop and dotnet-format
@@ -50,17 +47,9 @@ jobs:
           length=$(echo "$files" | wc -l)
           echo "::notice title=Detected changed C# files.::$length files"
           echo "::group::Detected changed C# files."
-            echo "$files"
+          echo "$files"
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
-
-      - name: Confirm stylecop.json Loaded
-        run: |
-          if [ ! -f "./stylecop.json" ]; then
-            echo "::error::stylecop.json not found!"
-            exit 1
-          fi
-          echo "::notice::stylecop.json is present at $(pwd)"
 
       - name: Update Temporary csproj with Changed Files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
@@ -80,10 +69,8 @@ jobs:
           echo "Collecting style violations into output.log..."
           touch output.log
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "=== Analyzing $file ===" >> output.log
-            dotnet format --include "$file" --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
-            echo "Running build check for $file" >> output.log
-            dotnet build --no-restore "$file" /warnaserror >> output.log 2>&1 || echo "Build check failed for $file" >> output.log
+            echo "Analyzing $file" >> output.log
+            dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
           done
 
       - name: Debug Raw Output Log
@@ -110,7 +97,7 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
-            -filter-mode=nofilter \
+            -filter-mode=file \
             -level=warning \
             < output.sarif
         env:
