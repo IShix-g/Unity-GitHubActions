@@ -80,8 +80,10 @@ jobs:
           echo "Collecting style violations into output.log..."
           touch output.log
           for file in ${{ steps.detect_cs_files.outputs.files }}; do
-            echo "Analyzing $file" >> output.log
-            dotnet format --include $file --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
+            echo "=== Analyzing $file ===" >> output.log
+            dotnet format --include "$file" --verify-no-changes >> output.log 2>&1 || echo "Style violation detected in $file" >> output.log
+            echo "Running build check for $file" >> output.log
+            dotnet build --no-restore "$file" /warnaserror >> output.log 2>&1 || echo "Build check failed for $file" >> output.log
           done
 
       - name: Debug Raw Output Log
