@@ -84,7 +84,11 @@ jobs:
         run: |
           echo "Collecting style violations into output.log..."
           touch output.log
-          dotnet format TempProject.csproj --verify-no-changes --diagnostics >> output.log 2>&1 || echo "Style violation detected" >> output.log
+
+          export DOTNET_CLI_TELEMETRY_OPTOUT=1
+          export DOTNET_CLI_CONTEXT_VERBOSE=1
+
+          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
         if: steps.detect_cs_files.outputs.files != ''
