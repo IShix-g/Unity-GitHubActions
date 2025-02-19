@@ -47,7 +47,7 @@ jobs:
           length=$(echo "$files" | wc -l)
           echo "::notice title=Detected changed C# files.::$length files"
           echo "::group::Detected changed C# files."
-            echo "$files"
+          echo "$files"
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
@@ -61,11 +61,6 @@ jobs:
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
-
-          echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
-          echo "  </ItemGroup>" >> TempProject.csproj
-
           echo "</Project>" >> TempProject.csproj
 
       - name: Collect Style Violations Log
