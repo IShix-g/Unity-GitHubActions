@@ -68,19 +68,23 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Debug csproj Output Log
+      - name: Debug csproj and stylecop.json
         if: steps.detect_cs_files.outputs.files != ''
         run: |
-          echo "=== DEBUG CSPROJ OUTPUT.LOG ==="
+          echo "=== TempProject.csproj 内容 ==="
           cat TempProject.csproj
-          echo "=== END CSPROJ OUTPUT.LOG ==="
+          echo "=== end ==="
+          
+          echo "=== stylecop.json の位置確認 ==="
+          ls -alh stylecop.json
+          echo "=== end ==="
 
       - name: Collect Style Violations Log
         if: steps.detect_cs_files.outputs.files != ''
         run: |
           echo "Collecting style violations into output.log..."
           touch output.log
-          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
+          dotnet format TempProject.csproj --verify-no-changes --diagnostics >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
         if: steps.detect_cs_files.outputs.files != ''
