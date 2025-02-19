@@ -97,6 +97,7 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
+            -filter-mode=file \
             -level=warning \
             < output.sarif
         env:

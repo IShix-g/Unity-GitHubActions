@@ -39,7 +39,9 @@ with open(input_log_path, "r") as log_file:
             column_number = int(match.group("column"))
             level = match.group("level").lower()
             rule_id = match.group("rule")
-            message = match.group("message")
+            
+            original_message = match.group("message")
+            message = re.sub(r"\s*\[.+?\]\s*$", "", original_message)
 
             sarif_result = {
                 "ruleId": rule_id,
