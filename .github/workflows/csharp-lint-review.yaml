@@ -54,6 +54,14 @@ jobs:
           echo "::endgroup::"
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
+      - name: Confirm stylecop.json Loaded
+        run: |
+          if [ ! -f "./stylecop.json" ]; then
+            echo "::error::stylecop.json not found!"
+            exit 1
+          fi
+          echo "::notice::stylecop.json is present at $(pwd)"
+
       - name: Update Temporary csproj with Changed Files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
@@ -100,7 +108,7 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
-            -filter-mode=file \
+            -filter-mode=nofilter \
             -level=warning \
             < output.sarif
         env:
