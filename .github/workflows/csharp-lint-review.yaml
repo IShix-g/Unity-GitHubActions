@@ -85,8 +85,7 @@ jobs:
           echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
 
           for report in json_reports/*.json; do
-              jq '.runs as $new | {version: "2.1.0", runs: .runs + ($new)}' \
-                 combined_report.sarif $report > tmp.sarif
+              jq '.runs += input' combined_report.sarif $report > tmp.sarif
               mv tmp.sarif combined_report.sarif
           done
 
