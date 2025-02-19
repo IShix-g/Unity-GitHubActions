@@ -30,7 +30,7 @@ jobs:
           echo "  </PropertyGroup>" >> TempProject.csproj
           
           echo "  <ItemGroup>" >> TempProject.csproj
-          echo "    <AdditionalFiles Include=\"stylecop.json\" />" >> TempProject.csproj
+          echo "    <AdditionalFiles Include=\"/home/runner/work/Unity-GitHubActions/Unity-GitHubActions/stylecop.json\" />" >> TempProject.csproj
           echo "  </ItemGroup>" >> TempProject.csproj
           
           echo "</Project>" >> TempProject.csproj
@@ -84,10 +84,6 @@ jobs:
         run: |
           echo "Collecting style violations into output.log..."
           touch output.log
-
-          export DOTNET_CLI_TELEMETRY_OPTOUT=1
-          export DOTNET_CLI_CONTEXT_VERBOSE=1
-
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
