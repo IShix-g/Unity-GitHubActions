@@ -89,10 +89,11 @@ jobs:
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: 'stylecop'
-          level: 'warning'
-          efm: "%f(%l,%c): %t%*[^:]: %m"
-          suggest_command: 'cat output.log'
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          filter_mode: 'file'
+          level: 'warning'
+          fail_on_error: 'true'
+          reviewdog_flags: '-efm="%f(%l,%c): %t%*[^:]: %m"'
 
       - name: Cleanup temporary files
         if: ${{ steps.detect_cs_files.outputs.files != '' }}
