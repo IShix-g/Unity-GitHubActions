@@ -84,13 +84,6 @@ jobs:
         run: |
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
 
-      - name: Debug SARIF Output Log
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat output.sarif
-          echo "=== END RAW OUTPUT.LOG ==="
-
       - name: Setup reviewdog
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-setup@v1
@@ -104,6 +97,7 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
+            -filter-mode=file \
             -level=warning \
             < output.sarif
         env:
