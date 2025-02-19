@@ -79,7 +79,6 @@ jobs:
           done
 
           echo "Combining SARIF reports into a single file..."
-          # SARIF統一フォーマットの初期化
           echo '{"version": "2.1.0", "runs": []}' > combined_report.sarif
           for report in sarif_reports/*.sarif; do
               jq '.runs as $new | {version: "2.1.0", runs: .runs + $new}' combined_report.sarif $report > tmp.sarif
