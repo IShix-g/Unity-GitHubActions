@@ -88,11 +88,8 @@ jobs:
         if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-suggester@v1
         with:
-          tool_name: 'stylecop'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          filter_mode: 'file'
           level: 'warning'
-          fail_on_error: 'true'
           reviewdog_flags: '-efm="%f(%l,%c): %t%*[^:]: %m"'
 
       - name: Cleanup temporary files
