@@ -31,6 +31,13 @@
       "general": {
         "analysisMode": "styleOnly"
       }
+    },
+    "disabledByDefault": true,
+    "ruleSets": {
+      "enabledRules": [
+        "SA1300",
+        "SA1500"
+      ]
     }
   }
 }

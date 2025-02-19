@@ -2,15 +2,13 @@ import sys
 import json
 import re
 
-# 引数を取得
 if len(sys.argv) != 3:
     print("Usage: python3 convert_to_sarif.py <input_log> <output_sarif>")
     sys.exit(1)
 
-input_log_path = sys.argv[1]     # 解析するStyleCopログファイルのパス
-output_sarif_path = sys.argv[2]  # 出力するSARIFファイルのパス
+input_log_path = sys.argv[1]
+output_sarif_path = sys.argv[2]
 
-# SARIF フォーマットの初期構造
 sarif_data = {
     "version": "2.1.0",
     "runs": [
@@ -28,12 +26,10 @@ sarif_data = {
     ]
 }
 
-# エラー/警告を解析する正規表現
 log_pattern = re.compile(
     r"(?P<file>.+)\((?P<line>\d+),(?P<column>\d+)\): (?P<level>\w+) (?P<rule>\w+): (?P<message>.+)"
 )
 
-# ログを走査して結果を抽出
 with open(input_log_path, "r") as log_file:
     for line in log_file:
         match = log_pattern.search(line)
@@ -41,11 +37,10 @@ with open(input_log_path, "r") as log_file:
             file_path = match.group("file")
             line_number = int(match.group("line"))
             column_number = int(match.group("column"))
-            level = match.group("level").lower()  # "error", "warning" を小文字化
+            level = match.group("level").lower()
             rule_id = match.group("rule")
             message = match.group("message")
 
-            # SARIF の result オブジェクト
             sarif_result = {
                 "ruleId": rule_id,
                 "level": level,
