@@ -56,7 +56,7 @@ dotnet_diagnostic.SA1208.severity = none
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = warning
 # Fields should use camelCase naming style.
-dotnet_diagnostic.SA1306.severity = none
+dotnet_diagnostic.SA1306.severity = warning
 # Field names should not use the "m_" prefix.
 dotnet_diagnostic.SA1307.severity = warning
 # Local variables should not use underscores in their names.
@@ -264,6 +264,7 @@ dotnet_naming_symbols.protected_fields.applicable_accessibilities = protected
 # Private fields
 dotnet_naming_rule.private_fields.style = camel_case_with_underscore
 dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_rule.private_fields.severity = error
 dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 
