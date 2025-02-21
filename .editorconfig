@@ -73,6 +73,8 @@ csharp_space_after_comma = true:warning
 # csharp_prefer_next_line_for_binary_operators = true:suggestion
 # Place 'using' directives at the beginning of the code file
 dotnet_sort_using_directives_first = true:error
+# Prefer omitting 'private' access modifier for fields and methods
+dotnet_style_require_accessibility_modifiers = always:warning
 
 # Readability and Code Quality
 # Prefer block bodies over expression-bodied members
