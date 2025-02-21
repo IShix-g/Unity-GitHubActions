@@ -59,8 +59,8 @@ jobs:
           echo "Adding modified C# files to TempProject.csproj..."
           sed -i '$d' TempProject.csproj # Remove last line
           echo "  <ItemGroup>" >> TempProject.csproj
-          IFS=',' read -ra FILES <<< "${{ steps.detect_cs_files.outputs.files }}"
-          for file in "${FILES[@]}"; do
+          IFS=',' read -ra files <<< "${{ steps.detect_cs_files.outputs.files }}"
+          for file in "${files[@]}"; do
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj

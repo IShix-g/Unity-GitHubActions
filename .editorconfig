@@ -19,7 +19,7 @@ insert_final_newline = true
 
 # StyleCop Diagnostic Rules =================
 
-dotnet_analyzer_diagnostic.severity = none
+# dotnet_analyzer_diagnostic.severity = none
 
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
