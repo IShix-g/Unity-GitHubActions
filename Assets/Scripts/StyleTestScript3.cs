@@ -8,7 +8,7 @@ namespace Tests
     {
         public const int ConstField = 10;
         public static readonly int StaticField = 10;
-        public int NonStaticField;
+  public int NonStaticField;
         private static int _s_static_Field = 10;
         private int m_nonStaticField;
         public int property_value { get; set; }
@@ -36,7 +36,6 @@ namespace Tests
             if(a>=5)
             {
                 Debug.Log(a);
-
             }
 
             var myList= new List<int>{1,2,3};
