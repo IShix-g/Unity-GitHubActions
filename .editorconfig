@@ -34,7 +34,7 @@ dotnet_diagnostic.SA1307.severity = warning
 # Local variables should not use underscores in their names.
 dotnet_diagnostic.SA1308.severity = none
 # Elements should be named in PascalCase, except for certain exceptional cases.
-dotnet_diagnostic.SA1309.severity = warning
+dotnet_diagnostic.SA1309.severity = none
 # Static members should not use underscores in their names.
 dotnet_diagnostic.SA1311.severity = warning
 # Parameter names should begin with a lowercase letter.
