@@ -19,6 +19,8 @@ insert_final_newline = true
 
 # StyleCop Diagnostic Rules =================
 
+dotnet_analyzer_diagnostic.severity = none
+
 # Keywords must be spaced correctly.
 dotnet_diagnostic.SA1000.severity = none
 # Commas should be spaced correctly.
