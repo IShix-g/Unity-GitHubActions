@@ -9,12 +9,12 @@ namespace Tests
         public string ProperlyStyledProperty { get; } = "This is a properly styled property";
         public int IntProperty => _intField;
 
-        static readonly string s_staticField = "This is a static field";
+      static readonly string s_staticField = "This is a static field";
 
         string stringField;
         int _intField;
         double doubleField;
-   float _floatField;
+        float _floatField;
 
         public void improperlyStyledMethod()
         {

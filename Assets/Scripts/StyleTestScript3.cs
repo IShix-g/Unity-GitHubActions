@@ -10,7 +10,6 @@ namespace Tests
         private int m_nonStaticField;
 
         private List<int> testCollection =  new List<int>();
-
         public int property_value { get; set; }
 
         public void test_Method() {
@@ -28,16 +27,15 @@ namespace Tests
 
         private void Very_Long_Method_With_No_Clear_Structure ()
         {
-            int a=0; // インデント、スペースの欠如
-            while (a<5) a++; // 見づらいコード、波括弧省略
+            int a=0;
+            while (a<5) a++;
 
             if(a>=5)
-            { // 不要な開業
-                Debug.Log(a); // 不適切なインデント (タブ vs スペース違反)
+            {
+                Debug.Log(a);
 
             }
 
-            // コレクションと演算で波括弧を使用せず、冗長
             var myList= new List<int>{1,2,3};
 
             foreach(int item in  myList) {
