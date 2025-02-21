@@ -54,7 +54,7 @@ dotnet_diagnostic.SA1206.severity = none
 # The "this." prefix should be used consistently in the code base.
 dotnet_diagnostic.SA1208.severity = none
 # Class, method, and member names should start with an uppercase letter.
-dotnet_diagnostic.SA1300.severity = warning
+dotnet_diagnostic.SA1300.severity = none
 # Fields should use camelCase naming style.
 dotnet_diagnostic.SA1306.severity = warning
 # Field names should not use the "m_" prefix.
