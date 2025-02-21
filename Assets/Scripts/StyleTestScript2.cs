@@ -4,10 +4,10 @@ namespace Tests
 {
     public class RuleChecker
     {
- private int _incorrect_field;
+        private int _incorrect_field;
         private string stringField;
-        int _intField;
-     public int CorrectProperty { get; set; }
+   int _intField;
+        public int CorrectProperty { get; set; }
 
         public void CheckRules()
         {
