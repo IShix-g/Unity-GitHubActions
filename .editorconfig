@@ -64,7 +64,7 @@ dotnet_diagnostic.SA1308.severity = none
 # Elements should be named in PascalCase, except for certain exceptional cases.
 dotnet_diagnostic.SA1309.severity = none
 # Static members should not use underscores in their names.
-dotnet_diagnostic.SA1311.severity = warning
+dotnet_diagnostic.SA1311.severity = none
 # Parameter names should begin with a lowercase letter.
 dotnet_diagnostic.SA1312.severity = warning
 # Access modifier should always be specified explicitly.
