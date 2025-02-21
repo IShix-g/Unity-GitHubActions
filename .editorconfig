@@ -19,8 +19,10 @@ insert_final_newline = true
 
 # StyleCop Diagnostic Rules =================
 
-dotnet_diagnostic.*.severity = none
-
+# Add braces (`{}`) to if or while statements
+dotnet_diagnostic.IDE0011.severity = warning
+# Naming rule violation
+dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
 dotnet_diagnostic.SA1000.severity = none
 # Commas should be spaced correctly.
@@ -39,6 +41,8 @@ dotnet_diagnostic.SA1006.severity = none
 dotnet_diagnostic.SA1027.severity = warning
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
+# Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
+dotnet_diagnostic.SA1101.severity = none
 # Using directives should be placed correctly (either top of file or inside namespace).
 dotnet_diagnostic.SA1200.severity = none
 # Static elements should appear before instance elements.
@@ -57,6 +61,8 @@ dotnet_diagnostic.SA1206.severity = none
 dotnet_diagnostic.SA1208.severity = none
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = none
+# Interface names must begin with an `I`
+dotnet_diagnostic.SA1302.severity = none
 # Fields should use camelCase naming style.
 dotnet_diagnostic.SA1306.severity = warning
 # Field names should not use the "m_" prefix.
@@ -83,12 +89,20 @@ dotnet_diagnostic.SA1500.severity = warning
 dotnet_diagnostic.SA1502.severity = none
 # All control blocks should use braces (e.g., if, for, while).
 dotnet_diagnostic.SA1503.severity = warning
+# Optional: Re-enable specific diagnostics
+dotnet_diagnostic.SA1505.severity = none
+# Ensures no blank lines appear before closing braces.
+dotnet_diagnostic.SA1508.severity = none
 # Single-line comment should be formatted correctly.
 dotnet_diagnostic.SA1511.severity = none
 # All files must end with a single newline.
 dotnet_diagnostic.SA1512.severity = none
 # Blank lines should be properly used within methods.
 dotnet_diagnostic.SA1515.severity = none
+# One or more adjacent elements must not be missing blank lines.
+dotnet_diagnostic.SA1516.severity = warning
+# No blank lines should exist at the start of the file
+dotnet_diagnostic.SA1517.severity = none
 # Elements must have XML documentation.
 dotnet_diagnostic.SA1600.severity = none
 # XML headers must contain summary tags.
@@ -99,6 +113,10 @@ dotnet_diagnostic.SA1602.severity = none
 dotnet_diagnostic.SA1612.severity = none
 # Properties must have appropriate XML documentation.
 dotnet_diagnostic.SA1613.severity = none
+# Missing required file header comment at the top of the file
+dotnet_diagnostic.SA1633.severity = warning
+# The file name should match the first defined type (e.g., class or struct name)
+dotnet_diagnostic.SA1649.severity = none
 # Field names must not match the names of methods.
 dotnet_diagnostic.SA1700.severity = none
 # Dispose objects according to IDisposable pattern.
@@ -266,7 +284,6 @@ dotnet_naming_symbols.protected_fields.applicable_accessibilities = protected
 # Private fields
 dotnet_naming_rule.private_fields.style = camel_case_with_underscore
 dotnet_naming_rule.private_fields.symbols = private_fields
-dotnet_naming_rule.private_fields.severity = error
 dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 
