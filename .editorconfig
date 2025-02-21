@@ -28,7 +28,7 @@ dotnet_diagnostic.SA1027.severity = warning
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = warning
 # Fields should use camelCase naming style.
-dotnet_diagnostic.SA1306.severity = warning
+dotnet_diagnostic.SA1306.severity = none
 # Field names should not use the "m_" prefix.
 dotnet_diagnostic.SA1307.severity = warning
 # Local variables should not use underscores in their names.
