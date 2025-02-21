@@ -19,12 +19,40 @@ insert_final_newline = true
 
 # StyleCop Diagnostic Rules =================
 
-# dotnet_analyzer_diagnostic.severity = none
-
-# Code must not contain trailing whitespace.
-dotnet_diagnostic.SA1028.severity = none
+# Keywords must be spaced correctly.
+dotnet_diagnostic.SA1000.severity = none
+# Commas should be spaced correctly.
+dotnet_diagnostic.SA1001.severity = none
+# Semicolons should be spaced correctly.
+dotnet_diagnostic.SA1002.severity = none
+# Binary operators should be spaced correctly.
+dotnet_diagnostic.SA1003.severity = none
+# Documentation lines should not begin with a space.
+dotnet_diagnostic.SA1004.severity = none
+# Single-line comments should begin with a space.
+dotnet_diagnostic.SA1005.severity = none
+# Preprocessor directives should not be preceded by space.
+dotnet_diagnostic.SA1006.severity = none
 # Use spaces instead of tabs for indentations.
 dotnet_diagnostic.SA1027.severity = warning
+# Code must not contain trailing whitespace.
+dotnet_diagnostic.SA1028.severity = none
+# Using directives should be placed correctly (either top of file or inside namespace).
+dotnet_diagnostic.SA1200.severity = none
+# Static elements should appear before instance elements.
+dotnet_diagnostic.SA1201.severity = none
+# Elements must be ordered by access level (public, internal, protected, private).
+dotnet_diagnostic.SA1202.severity = none
+# Constants must appear before fields.
+dotnet_diagnostic.SA1203.severity = none
+# Static read-only fields must appear before static read/write fields.
+dotnet_diagnostic.SA1204.severity = none
+# Partial elements should be declared last.
+dotnet_diagnostic.SA1205.severity = none
+# Declared accessibility must be ordered (e.g., public before internal, etc.)
+dotnet_diagnostic.SA1206.severity = none
+# The "this." prefix should be used consistently in the code base.
+dotnet_diagnostic.SA1208.severity = none
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = warning
 # Fields should use camelCase naming style.
@@ -39,14 +67,48 @@ dotnet_diagnostic.SA1309.severity = none
 dotnet_diagnostic.SA1311.severity = warning
 # Parameter names should begin with a lowercase letter.
 dotnet_diagnostic.SA1312.severity = warning
+# Access modifier should always be specified explicitly.
+dotnet_diagnostic.SA1400.severity = none
+# Fields must be private.
+dotnet_diagnostic.SA1401.severity = none
+# File may only contain a single class, struct, or interface.
+dotnet_diagnostic.SA1402.severity = none
+# File should contain a single namespace declaration.
+dotnet_diagnostic.SA1403.severity = none
 # Braces, indentation, and spacing should follow the standard pattern.
 dotnet_diagnostic.SA1500.severity = warning
+# While, for, do, and if-else statements must use braces.
+dotnet_diagnostic.SA1502.severity = none
 # All control blocks should use braces (e.g., if, for, while).
 dotnet_diagnostic.SA1503.severity = warning
+# Single-line comment should be formatted correctly.
+dotnet_diagnostic.SA1511.severity = none
 # All files must end with a single newline.
 dotnet_diagnostic.SA1512.severity = none
 # Blank lines should be properly used within methods.
 dotnet_diagnostic.SA1515.severity = none
+# Elements must have XML documentation.
+dotnet_diagnostic.SA1600.severity = none
+# XML headers must contain summary tags.
+dotnet_diagnostic.SA1601.severity = none
+# All enumeration items must be documented.
+dotnet_diagnostic.SA1602.severity = none
+# All exception types must be documented in XML.
+dotnet_diagnostic.SA1612.severity = none
+# Properties must have appropriate XML documentation.
+dotnet_diagnostic.SA1613.severity = none
+# Field names must not match the names of methods.
+dotnet_diagnostic.SA1700.severity = none
+# Dispose objects according to IDisposable pattern.
+dotnet_diagnostic.SA2000.severity = none
+# Use correct behavior for bitwise or logical operators.
+dotnet_diagnostic.SA2010.severity = none
+# Async methods must have "Async" suffix in their names.
+dotnet_diagnostic.SA3000.severity = none
+# Reserved for custom or experimental rules.
+dotnet_diagnostic.SA9001.severity = none
+# Reserved for custom or experimental rules.
+dotnet_diagnostic.SA9002.severity = none
 
 
 # Code Style Configuration =================
