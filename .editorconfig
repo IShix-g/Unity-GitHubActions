@@ -74,7 +74,7 @@ csharp_space_after_comma = true:warning
 # Place 'using' directives at the beginning of the code file
 dotnet_sort_using_directives_first = true:error
 # Prefer omitting 'private' access modifier for fields and methods
-dotnet_style_require_accessibility_modifiers = always:warning
+dotnet_style_require_accessibility_modifiers = never:warning
 
 # Readability and Code Quality
 # Prefer block bodies over expression-bodied members
