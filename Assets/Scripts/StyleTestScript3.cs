@@ -6,11 +6,14 @@ namespace Tests
 {
     public sealed class StyleTestScript3
     {
+        public const int ConstField = 10;
+        public static readonly int StaticField = 10;
+        public int NonStaticField;
         private static int _s_static_Field = 10;
         private int m_nonStaticField;
+        public int property_value { get; set; }
 
         private List<int> testCollection =  new List<int>();
-        public int property_value { get; set; }
 
         public void test_Method() {
             int testVariable = 42 ;
