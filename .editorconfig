@@ -114,7 +114,7 @@ dotnet_diagnostic.SA1612.severity = none
 # Properties must have appropriate XML documentation.
 dotnet_diagnostic.SA1613.severity = none
 # Missing required file header comment at the top of the file
-dotnet_diagnostic.SA1633.severity = warning
+dotnet_diagnostic.SA1633.severity = none
 # The file name should match the first defined type (e.g., class or struct name)
 dotnet_diagnostic.SA1649.severity = none
 # Field names must not match the names of methods.
