@@ -7,7 +7,7 @@ namespace Tests
     {
         private int _incorrect_field;
         private string stringField;
-  int _intField;
+        int _intField;
 
         public int CorrectProperty { get; set; }
 
@@ -30,13 +30,4 @@ namespace Tests
             int specificNumber = 10;
         }
     }
-
-    class improperly_named_class
-    {
-        public void ImproperMethod()
-        {
-
-        }
-    }
-
 }

@@ -11,7 +11,7 @@ namespace Tests
         public int NonStaticField;
         private static int _s_static_Field = 10;
         private int m_nonStaticField;
-  public int property_value { get; set; }
+        public int property_value { get; set; }
 
         private List<int> testCollection =  new List<int>();
 
@@ -27,22 +27,5 @@ namespace Tests
         private void runAdditionalLogic () {
 
         }
-
-        private void Very_Long_Method_With_No_Clear_Structure ()
-        {
-            int a=0;
-            while (a<5) a++;
-
-            if(a>=5)
-            {
-                Debug.Log(a);
-            }
-
-            var myList= new List<int>{1,2,3};
-
-            foreach(int item in  myList) {
-                if ( item%2 == 0) Debug.Log("偶数 アイテム") ; else Debug.Log ("奇数 アイテム") ; }
-        }
-
     }
 }

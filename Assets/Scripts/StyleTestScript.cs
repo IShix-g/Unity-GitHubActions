@@ -6,7 +6,7 @@ namespace Tests
     {
         public const string ConstProperty = "This is a const property";
         public static readonly string StaticProperty = "This is a static property";
- public string ProperlyStyledProperty { get; } = "This is a properly styled property";
+        public string ProperlyStyledProperty { get; } = "This is a properly styled property";
         public int IntProperty => _intField;
 
         static readonly string s_staticField = "This is a static field";
@@ -19,7 +19,7 @@ namespace Tests
         public void improperlyStyledMethod()
         {
             int x = 10;
-       if (x > 5)
+            if (x > 5)
             {
                 Debug.Log("Improper styling with inconsistent spaces and format");
             }
