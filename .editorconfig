@@ -173,29 +173,33 @@ dotnet_style_require_accessibility_modifiers = never:warning
 dotnet_comment_style_leading_space = true:warning
 
 
-# C# Naming Rules (Classes/Interfaces) =================
+# C# Naming Rules (Classes and Interfaces) =================
 
 # Public classes
 dotnet_naming_rule.public_classes.style = pascal_case
 dotnet_naming_rule.public_classes.symbols = public_classes
+dotnet_naming_rule.public_classes.severity = error
 dotnet_naming_symbols.public_classes.applicable_kinds = class
 dotnet_naming_symbols.public_classes.applicable_accessibilities = public
 
 # Internal classes
 dotnet_naming_rule.internal_classes.style = pascal_case
 dotnet_naming_rule.internal_classes.symbols = internal_classes
+dotnet_naming_rule.internal_classes.severity = error
 dotnet_naming_symbols.internal_classes.applicable_kinds = class
 dotnet_naming_symbols.internal_classes.applicable_accessibilities = internal
 
 # Private classes
 dotnet_naming_rule.private_classes.style = pascal_case
 dotnet_naming_rule.private_classes.symbols = private_classes
+dotnet_naming_rule.private_classes.severity = error
 dotnet_naming_symbols.private_classes.applicable_kinds = class
 dotnet_naming_symbols.private_classes.applicable_accessibilities = private
 
 # Interfaces
 dotnet_naming_rule.interfaces.style = interface_pascal_case
 dotnet_naming_rule.interfaces.symbols = interfaces
+dotnet_naming_rule.interfaces.severity = error
 dotnet_naming_symbols.interfaces.applicable_kinds = interface
 
 # C# Naming Rules (Constants) =================
@@ -203,6 +207,7 @@ dotnet_naming_symbols.interfaces.applicable_kinds = interface
 # Public constants
 dotnet_naming_rule.public_constants.style = pascal_case
 dotnet_naming_rule.public_constants.symbols = public_constants
+dotnet_naming_rule.public_constants.severity = error
 dotnet_naming_symbols.public_constants.applicable_kinds = field
 dotnet_naming_symbols.public_constants.applicable_accessibilities = public
 dotnet_naming_symbols.public_constants.applicable_modifiers = const
@@ -210,6 +215,7 @@ dotnet_naming_symbols.public_constants.applicable_modifiers = const
 # Internal constants
 dotnet_naming_rule.internal_constants.style = pascal_case
 dotnet_naming_rule.internal_constants.symbols = internal_constants
+dotnet_naming_rule.internal_constants.severity = error
 dotnet_naming_symbols.internal_constants.applicable_kinds = field
 dotnet_naming_symbols.internal_constants.applicable_accessibilities = internal
 dotnet_naming_symbols.internal_constants.applicable_modifiers = const
@@ -217,6 +223,7 @@ dotnet_naming_symbols.internal_constants.applicable_modifiers = const
 # Private constants
 dotnet_naming_rule.private_constants.style = camel_case_with_underscore
 dotnet_naming_rule.private_constants.symbols = private_constants
+dotnet_naming_rule.private_constants.severity = error
 dotnet_naming_symbols.private_constants.applicable_kinds = field
 dotnet_naming_symbols.private_constants.applicable_accessibilities = private
 dotnet_naming_symbols.private_constants.applicable_modifiers = const
@@ -226,6 +233,7 @@ dotnet_naming_symbols.private_constants.applicable_modifiers = const
 # Public static fields
 dotnet_naming_rule.public_static_fields.style = pascal_case
 dotnet_naming_rule.public_static_fields.symbols = public_static_fields
+dotnet_naming_rule.public_static_fields.severity = error
 dotnet_naming_symbols.public_static_fields.applicable_kinds = field
 dotnet_naming_symbols.public_static_fields.applicable_accessibilities = public
 dotnet_naming_symbols.public_static_fields.applicable_modifiers = static
@@ -233,6 +241,7 @@ dotnet_naming_symbols.public_static_fields.applicable_modifiers = static
 # Protected static fields
 dotnet_naming_rule.protected_static_fields.style = pascal_case
 dotnet_naming_rule.protected_static_fields.symbols = protected_static_fields
+dotnet_naming_rule.protected_static_fields.severity = error
 dotnet_naming_symbols.protected_static_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_static_fields.applicable_accessibilities = protected
 dotnet_naming_symbols.protected_static_fields.applicable_modifiers = static
@@ -240,6 +249,7 @@ dotnet_naming_symbols.protected_static_fields.applicable_modifiers = static
 # Private static fields
 dotnet_naming_rule.private_static_fields.style = camel_case_with_s
 dotnet_naming_rule.private_static_fields.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields.severity = error
 dotnet_naming_symbols.private_static_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_static_fields.applicable_modifiers = static
@@ -249,6 +259,7 @@ dotnet_naming_symbols.private_static_fields.applicable_modifiers = static
 # Public static readonly fields
 dotnet_naming_rule.public_static_readonly_fields.style = pascal_case
 dotnet_naming_rule.public_static_readonly_fields.symbols = public_static_readonly_fields
+dotnet_naming_rule.public_static_readonly_fields.severity = error
 dotnet_naming_symbols.public_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.public_static_readonly_fields.applicable_accessibilities = public
 dotnet_naming_symbols.public_static_readonly_fields.applicable_modifiers = static, readonly
@@ -256,6 +267,7 @@ dotnet_naming_symbols.public_static_readonly_fields.applicable_modifiers = stati
 # Protected static readonly fields
 dotnet_naming_rule.protected_static_readonly_fields.style = pascal_case
 dotnet_naming_rule.protected_static_readonly_fields.symbols = protected_static_readonly_fields
+dotnet_naming_rule.protected_static_readonly_fields.severity = error
 dotnet_naming_symbols.protected_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_static_readonly_fields.applicable_accessibilities = protected
 dotnet_naming_symbols.protected_static_readonly_fields.applicable_modifiers = static, readonly
@@ -263,6 +275,7 @@ dotnet_naming_symbols.protected_static_readonly_fields.applicable_modifiers = st
 # Private static readonly fields
 dotnet_naming_rule.private_static_readonly_fields.style = camel_case_with_s
 dotnet_naming_rule.private_static_readonly_fields.symbols = private_static_readonly_fields
+dotnet_naming_rule.private_static_readonly_fields.severity = error
 dotnet_naming_symbols.private_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_readonly_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_static_readonly_fields.applicable_modifiers = static, readonly
@@ -272,69 +285,80 @@ dotnet_naming_symbols.private_static_readonly_fields.applicable_modifiers = stat
 # Public fields
 dotnet_naming_rule.public_fields.style = pascal_case
 dotnet_naming_rule.public_fields.symbols = public_fields
+dotnet_naming_rule.public_fields.severity = error
 dotnet_naming_symbols.public_fields.applicable_kinds = field
 dotnet_naming_symbols.public_fields.applicable_accessibilities = public
 
 # Protected fields
 dotnet_naming_rule.protected_fields.style = pascal_case
 dotnet_naming_rule.protected_fields.symbols = protected_fields
+dotnet_naming_rule.protected_fields.severity = error
 dotnet_naming_symbols.protected_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_fields.applicable_accessibilities = protected
 
 # Private fields
 dotnet_naming_rule.private_fields.style = camel_case_with_underscore
 dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_rule.private_fields.severity = error
 dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 
-# C# Naming Rules (Propaties) =================
+# C# Naming Rules (Properties) =================
 
 # Public properties
 dotnet_naming_rule.public_properties.style = pascal_case
 dotnet_naming_rule.public_properties.symbols = public_properties
+dotnet_naming_rule.public_properties.severity = error
 dotnet_naming_symbols.public_properties.applicable_kinds = property
 dotnet_naming_symbols.public_properties.applicable_accessibilities = public
 
 # Protected properties
 dotnet_naming_rule.protected_properties.style = pascal_case
 dotnet_naming_rule.protected_properties.symbols = protected_properties
+dotnet_naming_rule.protected_properties.severity = error
 dotnet_naming_symbols.protected_properties.applicable_kinds = property
 dotnet_naming_symbols.protected_properties.applicable_accessibilities = protected
 
 # Private properties
 dotnet_naming_rule.private_properties.style = pascal_case
 dotnet_naming_rule.private_properties.symbols = private_properties
+dotnet_naming_rule.private_properties.severity = error
 dotnet_naming_symbols.private_properties.applicable_kinds = property
 dotnet_naming_symbols.private_properties.applicable_accessibilities = private
 
-# C# Naming Rules (Methods/Local variables) =================
+# C# Naming Rules (Methods and Local variables) =================
 
 # Methods
 dotnet_naming_rule.methods.style = pascal_case
 dotnet_naming_rule.methods.symbols = methods
+dotnet_naming_rule.methods.severity = error
 dotnet_naming_symbols.methods.applicable_kinds = method
 
 # Protected methods
 dotnet_naming_rule.protected_methods.style = pascal_case
 dotnet_naming_rule.protected_methods.symbols = protected_methods
+dotnet_naming_rule.protected_methods.severity = error
 dotnet_naming_symbols.protected_methods.applicable_kinds = method
 dotnet_naming_symbols.protected_methods.applicable_accessibilities = protected
 
 # Local variables
 dotnet_naming_rule.local_variables.style = camel_case
 dotnet_naming_rule.local_variables.symbols = locals
+dotnet_naming_rule.local_variables.severity = error
 dotnet_naming_symbols.locals.applicable_kinds = local
 
-# C# Naming Rules (Events/Enums) =================
+# C# Naming Rules (Events and Enums) =================
 
 # Events
 dotnet_naming_rule.events.style = pascal_case
 dotnet_naming_rule.events.symbols = event_symbols
+dotnet_naming_rule.events.severity = error
 dotnet_naming_symbols.event_symbols.applicable_kinds = event
 
 # Enums
 dotnet_naming_rule.enums.style = pascal_case
 dotnet_naming_rule.enums.symbols = enum_symbols
+dotnet_naming_rule.enums.severity = error
 dotnet_naming_symbols.enum_symbols.applicable_kinds = enum
 
 
