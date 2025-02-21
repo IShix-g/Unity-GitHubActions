@@ -20,7 +20,7 @@ namespace Tests
 
         }
 
-        public void variableDeclaration()
+        public void VariableDeclaration()
         {
 
         }
