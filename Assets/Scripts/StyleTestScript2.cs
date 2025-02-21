@@ -7,7 +7,7 @@ namespace Tests
     {
         private int _incorrect_field;
         private string stringField;
-        int _intField;
+            int _intField;
 
         public int CorrectProperty { get; set; }
 
