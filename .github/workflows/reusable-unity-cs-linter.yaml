@@ -1,0 +1,178 @@
+name: (Reusable) Unity C# Linter
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Target branch for investigation'
+        required: false
+        type: string
+        default: ''
+      include_paths:
+        description: 'Include files or directories (regex, comma-separated). For more information https://www.gnu.org/software/grep/manual/'
+        required: false
+        type: string
+        default: '.*'
+      exclude_paths:
+        description: 'Exclude files or directories (regex, comma-separated)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  check-editorconfig:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate .editorconfig file
+        run: |
+          if [ ! -f .editorconfig ]; then
+            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig"
+            exit 1
+          else
+            echo ".editorconfig file exists at the root of the repository."
+          fi
+
+  style-check:
+    needs: [check-editorconfig]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0'
+
+      - name: Create Temporary csproj for Analysis
+        run: |
+          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <PropertyGroup>" >> TempProject.csproj
+          echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
+          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
+          echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
+
+      - name: Install StyleCop and dotnet-format
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
+
+      - name: Detect Changed C# Files
+        id: detect_cs_files
+        run: |
+          files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+          if [ -z "$files" ]; then
+            echo "No C# files were changed in this PR."
+            exit 0
+          fi
+
+          include_regexes=$(echo "${{ inputs.include_paths }}" | tr ',' '\n')
+          exclude_regexes=$(echo "${{ inputs.exclude_paths }}" | tr ',' '\n')
+
+          included_files=""
+          for file in $files; do
+            include_matched=false
+            exclude_matched=false
+
+            for regex in $include_regexes; do
+              if [[ "$file" =~ $regex ]]; then
+                include_matched=true
+              fi
+            done
+
+            for regex in $exclude_regexes; do
+              if [[ "$file" =~ $regex ]]; then
+                exclude_matched=true
+              fi
+            done
+
+            if $include_matched && ! $exclude_matched; then
+              included_files+="${file}\n"
+            fi
+          done
+
+          if [ -z "$included_files" ]; then
+            echo "No C# files matched the include/exclude criteria."
+            exit 0
+          fi
+
+          included_files=$(echo -e "$included_files" | sed '/^\s*$/d')
+          length=$(echo "$included_files" | wc -l)
+          echo "::notice title=Detected changed C# files.::$length files"
+          echo "::group::Detected changed C# files."
+          echo -e "$included_files"
+          echo "::endgroup::"
+          echo "files=$(echo -e "$included_files" | tr '\n' ',')" >> "$GITHUB_OUTPUT"
+
+      - name: Update Temporary csproj with Changed Files
+        if: ${{ steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          echo "Adding modified C# files to TempProject.csproj..."
+          sed -i '$d' TempProject.csproj # Remove last line
+          echo "  <ItemGroup>" >> TempProject.csproj
+          IFS=',' read -ra files <<< "${{ steps.detect_cs_files.outputs.files }}"
+          for file in "${files[@]}"; do
+            echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
+          done
+          echo "  </ItemGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
+
+      - name: Debug csproj and stylecop.json
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== TempProject.csproj ==="
+          cat TempProject.csproj
+          echo "=== end ==="
+
+      - name: Collect Style Violations Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "Collecting style violations into output.log..."
+          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
+          sed -i "" -e "s/\\\s/space/g" output.log
+          echo "Formatted style violations collected in output.log"
+
+      - name: Debug Raw Output Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG RAW OUTPUT.LOG ==="
+          cat output.log
+          echo "=== END RAW OUTPUT.LOG ==="
+
+      - name: Run StyleCop and Convert to SARIF
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          python3 .github/scripts/convert_to_sarif.py output.log output.sarif
+
+      - name: Setup reviewdog
+        if: steps.detect_cs_files.outputs.files != ''
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Apply Style Suggestions with reviewdog
+        if: steps.detect_cs_files.outputs.files != ''
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Convert SARIF output to reviewdog compatible format
+          reviewdog -f=sarif \
+            -name="StyleCop" \
+            -reporter=github-pr-review \
+            -filter-mode=file \
+            -level=warning \
+            -fail-level=error \
+            < output.sarif
+
+      - name: Cleanup temporary files
+        if: ${{ always() && steps.detect_cs_files.outputs.files != '' }}
+        run: |
+          rm -f TempProject.csproj output.log output.sarif || true
