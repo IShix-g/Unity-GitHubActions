@@ -165,6 +165,7 @@ jobs:
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Checkout SARIF Conversion Script Repository
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         uses: actions/checkout@v4
         with:
           repository: IShix-g/Unity-GitHubActions
@@ -172,6 +173,7 @@ jobs:
           path: sarif-script-repo
 
       - name: Verify `convert_to_sarif.py` Exists
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           if [ ! -f sarif-script-repo/.github/scripts/convert_to_sarif.py ]; then
             echo "::error::convert_to_sarif.py script is missing in the target repository."
