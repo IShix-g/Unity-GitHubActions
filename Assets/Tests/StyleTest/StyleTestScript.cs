@@ -29,6 +29,10 @@ namespace Tests.StyleTest
             var number = 5;
             int specificNumber = 10;
         }
+
+        public void methord()
+        {
+        }
     }
 
     public interface StyleTestInterface{}
