@@ -58,7 +58,7 @@ jobs:
           echo "branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
 
           echo "::notice title=Base Branch::$base_branch"
-          echo "::notice title=Head Branch::"${{ inputs.head-branch }}"
+          echo "::notice title=Head Branch::${{ inputs.head-branch }}"
 
   setup-environment:
     needs: [set-base-branch]
