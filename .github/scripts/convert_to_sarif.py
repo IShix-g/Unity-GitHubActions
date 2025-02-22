@@ -60,10 +60,8 @@ with open(input_log_path, "r") as log_file:
                 ]
             }
 
-            # 結果を SARIF の results に追加
             sarif_data["runs"][0]["results"].append(sarif_result)
 
-# SARIF データをファイルに書き込む
 with open(output_sarif_path, "w") as sarif_file:
     json.dump(sarif_data, sarif_file, indent=2)
 

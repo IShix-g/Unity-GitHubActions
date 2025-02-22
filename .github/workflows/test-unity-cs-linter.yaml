@@ -9,4 +9,5 @@ jobs:
   release-notes:
     uses: ./.github/workflows/reusable-unity-cs-linter.yaml
     with:
-      branch: ${{ github.event.pull_request.head.ref }}
+      head-branch: ${{ github.event.pull_request.head.ref }}
+      base-branch: ${{ github.event.pull_request.base.ref }}

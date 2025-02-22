@@ -3,8 +3,13 @@ name: (Reusable) Unity C# Linter
 on:
   workflow_call:
     inputs:
-      branch:
-        description: 'Target branch for investigation'
+      head-branch:
+        description: 'Target head branch for investigation'
+        required: false
+        type: string
+        default: 'HEAD'
+      base-branch:
+        description: 'Target base branch for investigation'
         required: false
         type: string
         default: ''
@@ -35,14 +40,34 @@ jobs:
             echo ".editorconfig file exists at the root of the repository."
           fi
 
-  style-check:
-    needs: [check-editorconfig]
+  set-base-branch:
+    runs-on: ubuntu-22.04
+    outputs: 
+      branch: ${{ steps.set-base-branch.outputs.branch }}
+    steps:
+      - name: Set Base Branch
+        id: set-base-branch
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.base-branch }}" ]; then
+            base_branch="${{ inputs.base-branch }}"
+          else
+            base_branch=$(gh api /repos/${{ github.repository }} --jq '.base_branch')
+          fi
+          echo "branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+
+          echo "::notice title=Base Branch::$base_branch"
+          echo "::notice title=Head Branch::"${{ inputs.head-branch }}"
+
+  setup-environment:
+    needs: [set-base-branch]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.head-branch }}
           fetch-depth: 0
 
       - name: Install .NET SDK
@@ -50,25 +75,14 @@ jobs:
         with:
           dotnet-version: '7.0'
 
-      - name: Create Temporary csproj for Analysis
-        run: |
-          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
-          echo "  <PropertyGroup>" >> TempProject.csproj
-          echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
-          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
-          echo "  </PropertyGroup>" >> TempProject.csproj
-          echo "</Project>" >> TempProject.csproj
-
-      - name: Install StyleCop and dotnet-format
-        run: |
-          dotnet new tool-manifest
-          dotnet tool install dotnet-format
-          dotnet add package StyleCop.Analyzers
-
+  detect-changed-cs-files:
+    needs: [set-base-branch, setup-environment]
+    runs-on: ubuntu-22.04
+    steps:
       - name: Detect Changed C# Files
         id: detect_cs_files
         run: |
-          files=$(git diff --name-only origin/main...HEAD | grep '\.cs$' || true)
+          files=$(git diff --name-only origin/${{ needs.set-base-branch.outputs.branch }}...${{ inputs.head-branch }} | grep '\.cs$' || true)
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
@@ -110,60 +124,69 @@ jobs:
           echo "::group::Detected changed C# files."
           echo -e "$included_files"
           echo "::endgroup::"
+
           echo "files=$(echo -e "$included_files" | tr '\n' ',')" >> "$GITHUB_OUTPUT"
+          
+  generate-temp-csproj:
+    needs: [detect-changed-cs-files]
+    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Create Temporary csproj for Analysis
+        run: |
+          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
+          echo "  <PropertyGroup>" >> TempProject.csproj
+          echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
+          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
+          echo "  </PropertyGroup>" >> TempProject.csproj
+          echo "</Project>" >> TempProject.csproj
 
       - name: Update Temporary csproj with Changed Files
-        if: ${{ steps.detect_cs_files.outputs.files != '' }}
         run: |
           echo "Adding modified C# files to TempProject.csproj..."
           sed -i '$d' TempProject.csproj # Remove last line
           echo "  <ItemGroup>" >> TempProject.csproj
-          IFS=',' read -ra files <<< "${{ steps.detect_cs_files.outputs.files }}"
+          IFS=',' read -ra files <<< "${{ needs.detect-changed-cs-files.outputs.files }}"
           for file in "${files[@]}"; do
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
-      - name: Debug csproj and stylecop.json
-        if: steps.detect_cs_files.outputs.files != ''
+  run-style-check:
+    needs: [generate-temp-csproj]
+    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install StyleCop and dotnet-format
         run: |
-          echo "=== TempProject.csproj ==="
-          cat TempProject.csproj
-          echo "=== end ==="
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
 
       - name: Collect Style Violations Log
-        if: steps.detect_cs_files.outputs.files != ''
         run: |
           echo "Collecting style violations into output.log..."
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
-          sed -i "" -e "s/\\\s/space/g" output.log
-          echo "Formatted style violations collected in output.log"
 
-      - name: Debug Raw Output Log
-        if: steps.detect_cs_files.outputs.files != ''
-        run: |
-          echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat output.log
-          echo "=== END RAW OUTPUT.LOG ==="
-
+  convert-to-sarif-and-review:
+    needs: [run-style-check]
+    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
+    runs-on: ubuntu-22.04
+    steps:
       - name: Run StyleCop and Convert to SARIF
-        if: steps.detect_cs_files.outputs.files != ''
         run: |
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
-        if: steps.detect_cs_files.outputs.files != ''
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
 
       - name: Apply Style Suggestions with reviewdog
-        if: steps.detect_cs_files.outputs.files != ''
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Convert SARIF output to reviewdog compatible format
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
@@ -172,7 +195,11 @@ jobs:
             -fail-level=error \
             < output.sarif
 
+  cleanup:
+    needs: [convert-to-sarif-and-review]
+    if: ${{ always() && needs.detect-changed-cs-files.outputs.files != '' }}
+    runs-on: ubuntu-22.04
+    steps:
       - name: Cleanup temporary files
-        if: ${{ always() && steps.detect_cs_files.outputs.files != '' }}
         run: |
           rm -f TempProject.csproj output.log output.sarif || true
