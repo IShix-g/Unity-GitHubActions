@@ -25,25 +25,7 @@ on:
         default: ''
 
 jobs:
-  check-editorconfig:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.head-branch }}
-
-      - name: Validate .editorconfig file
-        run: |
-          if [ ! -f .editorconfig ]; then
-            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig"
-            exit 1
-          else
-            echo ".editorconfig file exists at the root of the repository."
-          fi
-
   set-base-branch:
-    needs: [check-editorconfig]
     runs-on: ubuntu-22.04
     outputs: 
       branch: ${{ steps.set-base-branch.outputs.branch }}
@@ -63,8 +45,26 @@ jobs:
           echo "::notice title=Base Branch::$base_branch"
           echo "::notice title=Head Branch::${{ inputs.head-branch }}"
 
-  detect-changed-cs-files:
+  check-editorconfig:
     needs: [set-base-branch]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-base-branch.outputs.branch }}
+
+      - name: Validate .editorconfig file
+        run: |
+          if [ ! -f .editorconfig ]; then
+            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig"
+            exit 1
+          else
+            echo ".editorconfig file exists at the root of the repository."
+          fi
+
+  detect-changed-cs-files:
+    needs: [set-base-branch, check-editorconfig]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
