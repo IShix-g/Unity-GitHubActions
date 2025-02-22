@@ -109,7 +109,7 @@ jobs:
           fi
 
           included_files=$(echo -e "$included_files" | sed '/^\s*$/d')
-          echo "::set-output name=files::$(echo $included_files | tr '\n' ',')"
+          echo "files=$(echo $included_files | tr '\n' ',')" >> "$GITHUB_OUTPUT"
 
       - name: Create Temporary csproj for Analysis
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -143,7 +143,14 @@ jobs:
           echo "Collecting style violations into output.log..."
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
-      - name: Run StyleCop and Convert to SARIF
+      - name: Debug Raw Output Log
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== DEBUG RAW OUTPUT.LOG ==="
+          cat output.log
+          echo "=== END RAW OUTPUT.LOG ==="
+
+      - name: Convert to SARIF
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
