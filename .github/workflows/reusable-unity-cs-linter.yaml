@@ -63,20 +63,14 @@ jobs:
             echo ".editorconfig file exists at the root of the repository."
           fi
 
-  detect-changed-cs-files:
+  check-style:
     needs: [set-base-branch, check-editorconfig]
     runs-on: ubuntu-22.04
     outputs:
       files: ${{ steps.detect_cs_files.outputs.files }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.head-branch }}
-          fetch-depth: 0
-
       - name: Detect Changed C# Files
-        id: detect_cs_files
+        id: detect-cs-files
         run: |
           files=$(git diff --name-only origin/${{ needs.set-base-branch.outputs.branch }}...${{ inputs.head-branch }} | grep '\.cs$' || true)
           if [ -z "$files" ]; then
@@ -115,50 +109,23 @@ jobs:
           fi
 
           included_files=$(echo -e "$included_files" | sed '/^\s*$/d')
-          length=$(echo "$included_files" | wc -l)
-          echo "::notice title=Detected changed C# files.::$length files"
-          echo "::group::Detected changed C# files."
-          echo -e "$included_files"
-          echo "::endgroup::"
+          echo "::set-output name=files::$(echo $included_files | tr '\n' ',')"
 
-          echo "files=$(echo -e "$included_files" | tr '\n' ',')" >> "$GITHUB_OUTPUT"
-
-  generate-temp-csproj:
-    needs: [detect-changed-cs-files]
-    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
-    runs-on: ubuntu-22.04
-    steps:
       - name: Create Temporary csproj for Analysis
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
           echo "  <PropertyGroup>" >> TempProject.csproj
           echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
           echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
           echo "  </PropertyGroup>" >> TempProject.csproj
-          echo "</Project>" >> TempProject.csproj
-
-      - name: Update Temporary csproj with Changed Files
-        run: |
-          echo "Adding modified C# files to TempProject.csproj..."
-          sed -i '$d' TempProject.csproj # Remove last line
           echo "  <ItemGroup>" >> TempProject.csproj
-          IFS=',' read -ra files <<< "${{ needs.detect-changed-cs-files.outputs.files }}"
+          IFS=',' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
           for file in "${files[@]}"; do
             echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
           done
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
-
-  run-style-check:
-    needs: [generate-temp-csproj]
-    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.head-branch }}
-          fetch-depth: 0
 
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v3
@@ -176,12 +143,8 @@ jobs:
           echo "Collecting style violations into output.log..."
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
-  convert-to-sarif-and-review:
-    needs: [run-style-check]
-    if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
-    runs-on: ubuntu-22.04
-    steps:
       - name: Run StyleCop and Convert to SARIF
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
 
@@ -191,6 +154,7 @@ jobs:
           reviewdog_version: latest
 
       - name: Apply Style Suggestions with reviewdog
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -202,11 +166,7 @@ jobs:
             -fail-level=error \
             < output.sarif
 
-  cleanup:
-    needs: [convert-to-sarif-and-review]
-    if: ${{ always() && needs.detect-changed-cs-files.outputs.files != '' }}
-    runs-on: ubuntu-22.04
-    steps:
       - name: Cleanup temporary files
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           rm -f TempProject.csproj output.log output.sarif || true
