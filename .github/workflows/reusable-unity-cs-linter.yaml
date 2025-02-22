@@ -7,7 +7,7 @@ on:
         description: 'Target head branch for investigation'
         required: false
         type: string
-        default: 'HEAD'
+        default: ''
       base-branch:
         description: 'Target base branch for investigation'
         required: false
@@ -25,13 +25,14 @@ on:
         default: ''
 
 jobs:
-  set-base-branch:
+  set-branch:
     runs-on: ubuntu-22.04
-    outputs: 
-      branch: ${{ steps.set-base-branch.outputs.branch }}
+    outputs:
+      base-branch: ${{ steps.set-branch.outputs.base-branch }}
+      head-branch: ${{ steps.set-branch.outputs.head-branch }}
     steps:
       - name: Set Base Branch
-        id: set-base-branch
+        id: set-branch
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
@@ -40,19 +41,24 @@ jobs:
           else
             base_branch=$(gh api /repos/${{ github.repository }} --jq '.base_branch')
           fi
-          echo "branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+          echo "base-branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+
+          if [ -n "${{ inputs.head-branch }}" ]; then
+            head_branch="${{ inputs.head-branch }}"
+            echo "head-branch=${head_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+          fi
 
           echo "::notice title=Base Branch::$base_branch"
-          echo "::notice title=Head Branch::${{ inputs.head-branch }}"
+          echo "::notice title=Head Branch::$head_branch"
 
   check-editorconfig:
-    needs: [set-base-branch]
+    needs: [set-branch]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.set-base-branch.outputs.branch }}
+          ref: ${{ needs.set-branch.outputs.base-branch }}
 
       - name: Validate .editorconfig file
         run: |
@@ -64,13 +70,19 @@ jobs:
           fi
 
   lint-cs-files:
-    needs: [set-base-branch, check-editorconfig]
+    needs: [set-branch, check-editorconfig]
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-branch.outputs.head-branch || needs.set-branch.outputs.base-branch }}
+          fetch-depth: 0
+
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          files=$(git diff --name-only origin/${{ needs.set-base-branch.outputs.branch }}...${{ inputs.head-branch }} | grep '\.cs$' || true)
+          files=$(git diff --name-only origin/${{ needs.set-branch.outputs.base-branch }}...${{ needs.set-branch.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
@@ -126,17 +138,20 @@ jobs:
           echo "</Project>" >> TempProject.csproj
 
       - name: Install .NET SDK
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0'
 
       - name: Install StyleCop and dotnet-format
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
           dotnet add package StyleCop.Analyzers
 
       - name: Collect Style Violations Log
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "Collecting style violations into output.log..."
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
@@ -154,6 +169,7 @@ jobs:
           python3 .github/scripts/convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
