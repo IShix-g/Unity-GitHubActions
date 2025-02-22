@@ -66,6 +66,8 @@ jobs:
   detect-changed-cs-files:
     needs: [set-base-branch, check-editorconfig]
     runs-on: ubuntu-22.04
+    outputs:
+      files: ${{ steps.detect_cs_files.outputs.files }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
