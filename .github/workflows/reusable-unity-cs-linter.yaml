@@ -157,7 +157,7 @@ jobs:
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
-        if: steps.detect_cs_files.outputs.files != ''
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "=== DEBUG RAW OUTPUT.LOG ==="
           cat output.log
