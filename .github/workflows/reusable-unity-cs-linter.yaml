@@ -154,7 +154,8 @@ jobs:
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "Collecting style violations into output.log..."
-          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
+          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 \
+            || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -163,10 +164,24 @@ jobs:
           cat output.log
           echo "=== END RAW OUTPUT.LOG ==="
 
+      - name: Checkout SARIF Conversion Script Repository
+        uses: actions/checkout@v4
+        with:
+          repository: IShix-g/Unity-GitHubActions
+          ref: main
+          path: sarif-script-repo
+
+      - name: Verify `convert_to_sarif.py` Exists
+        run: |
+          if [ ! -f sarif-script-repo/.github/scripts/convert_to_sarif.py ]; then
+            echo "::error::convert_to_sarif.py script is missing in the target repository."
+            exit 1
+          fi
+
       - name: Convert to SARIF
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          python3 .github/scripts/convert_to_sarif.py output.log output.sarif
+          python3 sarif-script-repo/.github/scripts/convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
