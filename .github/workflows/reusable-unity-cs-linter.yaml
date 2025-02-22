@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head-branch }}
 
       - name: Validate .editorconfig file
         run: |
@@ -41,6 +43,7 @@ jobs:
           fi
 
   set-base-branch:
+    needs: [check-editorconfig]
     runs-on: ubuntu-22.04
     outputs: 
       branch: ${{ steps.set-base-branch.outputs.branch }}
@@ -60,7 +63,7 @@ jobs:
           echo "::notice title=Base Branch::$base_branch"
           echo "::notice title=Head Branch::${{ inputs.head-branch }}"
 
-  setup-environment:
+  detect-changed-cs-files:
     needs: [set-base-branch]
     runs-on: ubuntu-22.04
     steps:
@@ -70,15 +73,6 @@ jobs:
           ref: ${{ inputs.head-branch }}
           fetch-depth: 0
 
-      - name: Install .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0'
-
-  detect-changed-cs-files:
-    needs: [set-base-branch, setup-environment]
-    runs-on: ubuntu-22.04
-    steps:
       - name: Detect Changed C# Files
         id: detect_cs_files
         run: |
@@ -126,7 +120,7 @@ jobs:
           echo "::endgroup::"
 
           echo "files=$(echo -e "$included_files" | tr '\n' ',')" >> "$GITHUB_OUTPUT"
-          
+
   generate-temp-csproj:
     needs: [detect-changed-cs-files]
     if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
@@ -158,6 +152,17 @@ jobs:
     if: ${{ needs.detect-changed-cs-files.outputs.files != '' }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head-branch }}
+          fetch-depth: 0
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0'
+
       - name: Install StyleCop and dotnet-format
         run: |
           dotnet new tool-manifest
