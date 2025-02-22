@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       branch:
-        description: 'Branch name to delete. Only deletes branches created by github-actions[bot] and not the default branch.'
+        description: 'Branch name to delete. Must not be the default branch.'
         required: true
         type: string
     secrets:
