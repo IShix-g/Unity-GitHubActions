@@ -210,7 +210,7 @@ dotnet_naming_rule.public_constants.symbols = public_constants
 dotnet_naming_rule.public_constants.severity = error
 dotnet_naming_symbols.public_constants.applicable_kinds = field
 dotnet_naming_symbols.public_constants.applicable_accessibilities = public
-dotnet_naming_symbols.public_constants.applicable_modifiers = const
+dotnet_naming_symbols.public_constants.required_modifiers = const
 
 # Internal constants
 dotnet_naming_rule.internal_constants.style = pascal_case
@@ -218,7 +218,7 @@ dotnet_naming_rule.internal_constants.symbols = internal_constants
 dotnet_naming_rule.internal_constants.severity = error
 dotnet_naming_symbols.internal_constants.applicable_kinds = field
 dotnet_naming_symbols.internal_constants.applicable_accessibilities = internal
-dotnet_naming_symbols.internal_constants.applicable_modifiers = const
+dotnet_naming_symbols.internal_constants.required_modifiers = const
 
 # Private constants
 dotnet_naming_rule.private_constants.style = camel_case_with_underscore
@@ -226,7 +226,7 @@ dotnet_naming_rule.private_constants.symbols = private_constants
 dotnet_naming_rule.private_constants.severity = error
 dotnet_naming_symbols.private_constants.applicable_kinds = field
 dotnet_naming_symbols.private_constants.applicable_accessibilities = private
-dotnet_naming_symbols.private_constants.applicable_modifiers = const
+dotnet_naming_symbols.private_constants.required_modifiers = const
 
 # C# Naming Rules (Fields) =================
 
@@ -259,7 +259,7 @@ dotnet_naming_rule.public_static_fields.symbols = public_static_fields
 dotnet_naming_rule.public_static_fields.severity = error
 dotnet_naming_symbols.public_static_fields.applicable_kinds = field
 dotnet_naming_symbols.public_static_fields.applicable_accessibilities = public
-dotnet_naming_symbols.public_static_fields.applicable_modifiers = static
+dotnet_naming_symbols.public_static_fields.required_modifiers = static
 
 # Protected static fields
 dotnet_naming_rule.protected_static_fields.style = pascal_case
@@ -267,7 +267,7 @@ dotnet_naming_rule.protected_static_fields.symbols = protected_static_fields
 dotnet_naming_rule.protected_static_fields.severity = error
 dotnet_naming_symbols.protected_static_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_static_fields.applicable_accessibilities = protected
-dotnet_naming_symbols.protected_static_fields.applicable_modifiers = static
+dotnet_naming_symbols.protected_static_fields.required_modifiers = static
 
 # Private static fields
 dotnet_naming_rule.private_static_fields.style = camel_case_with_s
@@ -275,7 +275,7 @@ dotnet_naming_rule.private_static_fields.symbols = private_static_fields
 dotnet_naming_rule.private_static_fields.severity = error
 dotnet_naming_symbols.private_static_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
-dotnet_naming_symbols.private_static_fields.applicable_modifiers = static
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
 
 # C# Naming Rules (Static readonly fields) =================
 
@@ -285,7 +285,7 @@ dotnet_naming_rule.public_static_readonly_fields.symbols = public_static_readonl
 dotnet_naming_rule.public_static_readonly_fields.severity = error
 dotnet_naming_symbols.public_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.public_static_readonly_fields.applicable_accessibilities = public
-dotnet_naming_symbols.public_static_readonly_fields.applicable_modifiers = static, readonly
+dotnet_naming_symbols.public_static_readonly_fields.required_modifiers = static, readonly
 
 # Protected static readonly fields
 dotnet_naming_rule.protected_static_readonly_fields.style = pascal_case
@@ -293,7 +293,7 @@ dotnet_naming_rule.protected_static_readonly_fields.symbols = protected_static_r
 dotnet_naming_rule.protected_static_readonly_fields.severity = error
 dotnet_naming_symbols.protected_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.protected_static_readonly_fields.applicable_accessibilities = protected
-dotnet_naming_symbols.protected_static_readonly_fields.applicable_modifiers = static, readonly
+dotnet_naming_symbols.protected_static_readonly_fields.required_modifiers = static, readonly
 
 # Private static readonly fields
 dotnet_naming_rule.private_static_readonly_fields.style = camel_case_with_s
@@ -301,7 +301,7 @@ dotnet_naming_rule.private_static_readonly_fields.symbols = private_static_reado
 dotnet_naming_rule.private_static_readonly_fields.severity = error
 dotnet_naming_symbols.private_static_readonly_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_readonly_fields.applicable_accessibilities = private
-dotnet_naming_symbols.private_static_readonly_fields.applicable_modifiers = static, readonly
+dotnet_naming_symbols.private_static_readonly_fields.required_modifiers = static, readonly
 
 # C# Naming Rules (Properties) =================
 
