@@ -138,7 +138,7 @@ jobs:
           echo "</Project>" >> TempProject.csproj
 
       - name: Debug csproj
-        if: steps.detect_cs_files.outputs.files != ''
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "=== TempProject.csproj ==="
           cat TempProject.csproj
