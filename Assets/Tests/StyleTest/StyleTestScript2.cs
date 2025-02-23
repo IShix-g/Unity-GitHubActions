@@ -3,7 +3,7 @@ namespace Tests.StyleTest
     public sealed class StyleTestScript2
     {
         private int _incorrectField;
-        string stringField;
+            string stringField;
 
         public int CorrectProperty { get; set; }
 
