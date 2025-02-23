@@ -119,6 +119,7 @@ jobs:
           fi
 
           included_files=$(echo -e "$included_files" | sed '/^\s*$/d')
+          echo $included_files
           echo "files=$(echo $included_files | tr '\n' ',')" >> "$GITHUB_OUTPUT"
 
       - name: Create Temporary csproj for Analysis
