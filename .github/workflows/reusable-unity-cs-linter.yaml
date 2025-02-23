@@ -162,7 +162,14 @@ jobs:
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "Collecting style violations into output.log..."
-          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
+          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 \
+          || echo "Style violation detected" >> output.log
+          
+          while IFS= read -r line; do
+              modified_line=$(echo "$line" | sed -E 's/(\\s){6}/6 spaces/g' | sed -E 's/(\\s){4}/4 spaces/g' | sed -E 's/(\\s){2}/2 spaces/g' | sed -E 's/\\s/1 space/g')
+              echo "$modified_line" >> output_temp.log
+          done < output.log
+          mv output_temp.log output.log
 
       - name: Debug Raw Output Log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -212,6 +219,6 @@ jobs:
             < output.sarif
 
       - name: Cleanup temporary files
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.detect-cs-files.outputs.files != '' && always() }}
         run: |
           rm -f TempProject.csproj output.log output.sarif || true
