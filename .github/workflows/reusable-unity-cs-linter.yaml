@@ -118,8 +118,9 @@ jobs:
             exit 0
           fi
 
-          included_files=$(echo -e "$included_files" | sed '/^\s*$/d')
-          echo "files=$(echo $included_files | tr '\n' ',')" >> "$GITHUB_OUTPUT"
+          included_files=$(echo -e "$included_files" | sed '/^\s*$/d' | tr '\n' ',')
+          included_files=$(echo "$included_files" | sed 's/,$//' )
+          echo "files=$included_files" >> "$GITHUB_OUTPUT"
 
       - name: Create Temporary csproj for Analysis
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
