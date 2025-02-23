@@ -11,3 +11,4 @@ jobs:
     with:
       head-branch: ${{ github.event.pull_request.head.ref }}
       base-branch: ${{ github.event.pull_request.base.ref }}
+      include_paths: 'Assets/Tests/StyleTest/.*'

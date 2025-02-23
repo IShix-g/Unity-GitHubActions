@@ -17,7 +17,7 @@ on:
         description: 'Include files or directories (regex, comma-separated). For more information https://www.gnu.org/software/grep/manual/'
         required: false
         type: string
-        default: '.*'
+        default: 'Assets/.*'
       exclude_paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
@@ -137,6 +137,13 @@ jobs:
           echo "  </ItemGroup>" >> TempProject.csproj
           echo "</Project>" >> TempProject.csproj
 
+      - name: Debug csproj
+        if: steps.detect_cs_files.outputs.files != ''
+        run: |
+          echo "=== TempProject.csproj ==="
+          cat TempProject.csproj
+          echo "=== end ==="
+
       - name: Install .NET SDK
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         uses: actions/setup-dotnet@v3
@@ -157,16 +164,32 @@ jobs:
           dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 || echo "Style violation detected" >> output.log
 
       - name: Debug Raw Output Log
-        if: steps.detect_cs_files.outputs.files != ''
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "=== DEBUG RAW OUTPUT.LOG ==="
           cat output.log
           echo "=== END RAW OUTPUT.LOG ==="
 
+      - name: Checkout SARIF Conversion Script Repository
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: IShix-g/Unity-GitHubActions
+          ref: main
+          path: sarif-script-repo
+
+      - name: Verify `convert_to_sarif.py` Exists
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          if [ ! -f sarif-script-repo/.github/scripts/convert_to_sarif.py ]; then
+            echo "::error::convert_to_sarif.py script is missing in the target repository."
+            exit 1
+          fi
+
       - name: Convert to SARIF
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          python3 .github/scripts/convert_to_sarif.py output.log output.sarif
+          python3 sarif-script-repo/.github/scripts/convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
