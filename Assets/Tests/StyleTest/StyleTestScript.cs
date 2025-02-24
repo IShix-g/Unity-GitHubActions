@@ -7,7 +7,7 @@ namespace Tests.StyleTest
     {
         int _incorrect_field;
         string _stringField;
-        int _intField;
+        　int _intField;
 
         public int CorrectProperty { get; set; }
 
