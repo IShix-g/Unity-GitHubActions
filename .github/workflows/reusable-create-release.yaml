@@ -96,7 +96,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ needs.validate.outputs.normalized-tag }} $([[ "${{ inputs.dry-run }}" == "true" || "${{ inputs.draft-release }}" == "true" ]] && echo "--draft") \
+          draft_flag=""
+          if [[ "${{ inputs.dry-run }}" == "true" || "${{ inputs.draft-release }}" == "true" ]]; then
+            draft_flag="--draft"
+          fi
+
+          gh release create ${{ needs.validate.outputs.normalized-tag }} $draft_flag \
             --verify-tag \
             --title "${{ format(inputs.release-format, needs.validate.outputs.normalized-tag) }}" \
             --generate-notes \
