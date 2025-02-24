@@ -94,8 +94,15 @@ jobs:
 
           if git ls-remote --tags origin | grep -q "$tag"; then
             echo "::notice::Remote tag '$tag' exists. Attempting to delete..."
-            git push --delete origin "$tag" || { echo "::error::Failed to delete remote tag '$tag'. Exiting."; exit 1; }
-            echo "::notice::Remote tag '$tag' deleted successfully."
+            if git push --delete origin "$tag"; then
+              if git ls-remote --tags origin "$tag" | grep -q "$tag"; then
+                echo "::error::Failed to delete remote tag '$tag'. Exiting."
+                exit 1
+              fi
+            else
+              echo "::error::Failed to delete remote tag '$tag'. Check protection rules or permissions."
+              exit 1
+            fi
           else
             echo "::notice::Remote tag '$tag' does not exist. Skipping remote deletion."
           fi
