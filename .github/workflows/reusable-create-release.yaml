@@ -85,7 +85,17 @@ jobs:
         run: |
           git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
 
+      - name: Check if Tag Already Exists
+        id: check-tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git ls-remote --tags origin ${{ inputs.tag }} | grep -q ${{ inputs.tag }}; then
+            echo "exists=1" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Tag
+        if: ${{ steps.check-tag.outputs.exists == '1' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
