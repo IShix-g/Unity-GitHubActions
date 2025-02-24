@@ -87,7 +87,7 @@ jobs:
 
       - name: Delete Existing Tag
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           echo "Tag '${{ inputs.tag }}' already exists. Deleting it..."
           git tag -d ${{ inputs.tag }} || echo "Local tag not found."
