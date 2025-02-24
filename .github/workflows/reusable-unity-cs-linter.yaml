@@ -1,0 +1,242 @@
+name: (Reusable) Unity C# Linter
+
+on:
+  workflow_call:
+    inputs:
+      head-branch:
+        description: 'Target head branch for investigation'
+        required: true
+        type: string
+      base-branch:
+        description: 'Target base branch for investigation'
+        required: false
+        type: string
+        default: ''
+      editorconfig-branch:
+        description: 'Branch where .editorconfig is placed. If not specified, base-branch will be used.'
+        required: false
+        type: string
+        default: ''
+      include-paths:
+        description: 'Include files or directories (regex, comma-separated). https://www.gnu.org/software/grep/manual/'
+        required: false
+        type: string
+        default: 'Assets/.*'
+      exclude-paths:
+        description: 'Exclude files or directories (regex, comma-separated)'
+        required: false
+        type: string
+        default: ''
+      review-level:
+        description: 'You can change the report level. [info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
+        required: false
+        type: string
+        default: "warning"
+      review-exit-code:
+        description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
+        required: false
+        type: string
+        default: "error"
+
+env:
+  EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
+  CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
+
+jobs:
+  lint-cs-files:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Branch Configuration
+        id: branch-conf
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.base-branch }}" ]; then
+            base_branch="${{ inputs.base-branch }}"
+          else
+            base_branch=$(gh api /repos/${{ github.repository }} --jq '.base_branch')
+          fi
+          echo "base-branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+
+          if [ -n "${{ inputs.head-branch }}" ]; then
+            head_branch="${{ inputs.head-branch }}"
+            echo "head-branch=${head_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -n "${{ inputs.editorconfig-branch }}" ]; then
+            editorconfig_branch="${{ inputs.editorconfig-branch }}"
+          else
+            editorconfig_branch=$base_branch
+          fi
+          echo "editorconfig-branch=${editorconfig_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+
+          echo "Base Branch: $base_branch"
+          echo "Head Branch: $head_branch"
+          echo "Editorconfig Branch: $editorconfig_branch"
+
+      - name: Check for .editorconfig via API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch=${{ steps.branch-conf.outputs.editorconfig-branch }}
+          file_path=".editorconfig"
+          max_retries=3
+          retry_delay_sec=5
+          
+          for ((i=1; i<=max_retries; i++)); do
+            response=$(timeout 10s gh api "repos/${{ github.repository }}/contents/$file_path?ref=$branch" --jq ". | select(.type==\"file\") | select(.name==\"$file_path\")")          
+          
+            if [ $? -eq 124 ]; then
+              echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay_sec seconds..."
+              sleep $retry_delay_sec
+            elif [ -z "$response" ]; then
+              if [ $i -eq $max_retries ]; then
+                echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
+                exit 1
+              fi
+            else
+              echo ".editorconfig file exists at the root of the repository."
+              exit 0
+            fi
+          done
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch-conf.outputs.head-branch || steps.branch-conf.outputs.base-branch }}
+          fetch-depth: 0
+
+      - name: Detect Changed C# Files
+        id: detect-cs-files
+        run: |
+          base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
+          head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
+          files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
+          include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',' '\n')
+          exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',' '\n')
+
+          included_files=""
+          for file in $files; do
+            include_matched=false
+            for regex in $include_regexes; do
+              if [[ "$file" =~ $regex ]]; then
+                include_matched=true
+                break
+              fi
+            done
+
+            exclude_matched=false
+            for regex in $exclude_regexes; do
+              if [[ "$file" =~ $regex ]]; then
+                exclude_matched=true
+                break
+              fi
+            done
+
+            if $include_matched && ! $exclude_matched; then
+              if [ -z "$included_files" ]; then
+                included_files="$file"
+              else
+                included_files="$included_files|$file"
+              fi
+            fi
+          done
+
+          if [ -z "$included_files" ]; then
+            echo "No files matched the include/exclude criteria."
+            exit 0
+          fi
+
+          echo "files=$included_files" >> "$GITHUB_OUTPUT"
+
+      - name: Create Temporary csproj for Analysis
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          {
+            echo "<Project Sdk=\"Microsoft.NET.Sdk\">"
+            echo "  <PropertyGroup>"
+            echo "    <TargetFramework>netstandard2.1</TargetFramework>"
+            echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>"
+            echo "  </PropertyGroup>"
+            echo "  <ItemGroup>"
+            IFS='|' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
+            for file in "${files[@]}"; do
+                echo "    <Compile Include=\"$file\" />"
+            done
+            echo "  </ItemGroup>"
+            echo "</Project>"
+          } > TempProject.csproj
+
+      - name: Debug csproj
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          echo "=== TempProject.csproj ==="
+          cat TempProject.csproj
+          echo "=== end ==="
+
+      - name: Install .NET SDK
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0'
+
+      - name: Install StyleCop and dotnet-format
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
+
+      - name: Collect Style Violations Log
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          echo "Collecting style violations into output.log..."
+          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 \
+          || echo "Style violation detected" >> output.log
+          
+          while IFS= read -r line; do
+              modified_line=$(echo "$line" | sed -E 's/(\\s){6}/6 spaces/g' | sed -E 's/(\\s){4}/4 spaces/g' | sed -E 's/(\\s){2}/2 spaces/g' | sed -E 's/\\s/1 space/g')
+              echo "$modified_line" >> output_temp.log
+          done < output.log
+          mv output_temp.log output.log
+
+      - name: Debug Raw Output Log
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          echo "=== DEBUG RAW OUTPUT.LOG ==="
+          cat output.log
+          echo "=== END RAW OUTPUT.LOG ==="
+
+      - name: Download `convert_to_sarif.py`
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          curl --fail --silent --show-error --max-time 10 -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} || { echo "Failed to download script"; exit 1; }
+
+      - name: Convert to SARIF
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        run: |
+          python3 convert_to_sarif.py output.log output.sarif
+
+      - name: Setup reviewdog
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Apply Style Suggestions with reviewdog
+        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=sarif \
+            -name="StyleCop" \
+            -reporter=github-pr-review \
+            -filter-mode=file \
+            -level=${{ inputs.review-level }} \
+            -fail-level=${{ inputs.review-exit-code }} \
+            < output.sarif
+
+      - name: Cleanup temporary files
+        if: ${{ steps.detect-cs-files.outputs.files != '' && always() }}
+        run: |
+          rm -f TempProject.csproj convert_to_sarif.py output.log output.sarif || true

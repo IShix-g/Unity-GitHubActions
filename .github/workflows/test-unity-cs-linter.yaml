@@ -1,0 +1,14 @@
+name: (Test) Unity C# Linter
+
+on:
+  pull_request:
+    branches:
+      - feature/csharp-lint
+
+jobs:
+  release-notes:
+    uses: ./.github/workflows/reusable-unity-cs-linter.yaml
+    with:
+      head-branch: ${{ github.event.pull_request.head.ref }}
+      base-branch: ${{ github.event.pull_request.base.ref }}
+      include-paths: 'Assets/Tests/StyleTest/.*'

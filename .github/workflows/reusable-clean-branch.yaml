@@ -60,7 +60,7 @@ jobs:
 
           branch="${{ inputs.branch }}"
           branch_info=$(gh api /repos/${{ github.repository }}/branches/$branch 2>/dev/null)
-          if [[ $? -ne 0 ]]; then
+          if ! my_command; then
             echo "::notice::Branch does not exist or failed to fetch branch info for '$branch'."
           fi
 
