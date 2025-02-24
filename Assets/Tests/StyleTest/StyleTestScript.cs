@@ -5,9 +5,9 @@ namespace Tests.StyleTest
 {
     public sealed class StyleTestScript
     {
-        private int _incorrect_field;
-        private string stringField;
-  int _intField;
+        int _incorrect_field;
+        string _stringField;
+        int _intField;
 
         public int CorrectProperty { get; set; }
 
@@ -35,5 +35,5 @@ namespace Tests.StyleTest
         }
     }
 
-    public interface StyleTestInterface{}
+    public interface StyleTestInterface {}
 }
