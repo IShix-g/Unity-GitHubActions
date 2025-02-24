@@ -121,7 +121,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           tag="${{ needs.validate.outputs.normalized-tag }}"
-          git tag "$tag" HEAD
+          git tag "$tag" ${{ inputs.commit-id }}
           if git push origin "$tag"; then
             echo "::notice::Successfully created and pushed tag '$tag'."
           else
