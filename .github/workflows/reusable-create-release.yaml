@@ -94,7 +94,6 @@ jobs:
           git push --delete origin ${{ inputs.tag }}
 
       - name: Create Tag
-        if: ${{ steps.check-tag.outputs.exists == '1' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
