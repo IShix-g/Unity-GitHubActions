@@ -78,7 +78,7 @@ jobs:
         id: normalize-branches
         run: |
           normalize_branch() {
-            echo "$1" | sed 's|^refs/heads/||'
+            echo "${1#refs/heads/}"
           }
           target_branch_normalized=$(normalize_branch "${{ inputs.target-branch }}")
           push_branch_normalized=$(normalize_branch "${{ steps.set-push-branch.outputs.push-branch }}")
@@ -119,8 +119,8 @@ jobs:
           git fetch origin
           merge_log=$(git merge --no-commit --no-ff origin/${{ steps.normalize-branches.outputs.target-branch }} 2>&1)
 
-          log_length=$(echo "$merge_log" | wc -c)
-          
+          log_length=${#merge_log}
+
           if [ "$log_length" -ge 100 ]; then
             echo "$merge_log" > dry-run-log.txt
             echo "log-exists=1" >> "$GITHUB_OUTPUT"
@@ -148,7 +148,7 @@ jobs:
           merge_target="origin/${{ steps.normalize-branches.outputs.target-branch }}"
           current_branch=$(git rev-parse --abbrev-ref HEAD)
           
-          if git log ${current_branch}..${merge_target} --oneline | grep -q .; then
+          if git log "${current_branch}".."${merge_target}" --oneline | grep -q .; then
             echo "Changes detected. Proceeding with merge..."
 
             if [ "${{ inputs.fast-forward }}" == "true" ]; then
@@ -191,8 +191,8 @@ jobs:
       - name: Get Current Commit SHA
         id: set-sha
         run: |
-          if ([ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.branches-match.outputs.identical }}" == "1" ]) \
-              || ([ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.check-update.outputs.changed }}" != "1" ]); then
+          if { [ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.branches-match.outputs.identical }}" == "1" ]; } \
+            || { [ -n "${{ inputs.commit-id }}" ] && [ "${{ steps.check-update.outputs.changed }}" != "1" ]; }; then
             echo "sha=${{ inputs.commit-id }}" >> "$GITHUB_OUTPUT"
           else
             echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
