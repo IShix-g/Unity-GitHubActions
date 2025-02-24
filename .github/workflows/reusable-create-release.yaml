@@ -107,15 +107,14 @@ jobs:
           else
             echo "::notice::Local tag '$tag' does not exist. Skipping local deletion."
           fi
-  
+
       - name: Create Tag
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           tag="${{ needs.validate.outputs.normalized-tag }}"
           git tag "$tag" HEAD
-          git push origin "$tag"
-          if [[ $? -eq 0 ]]; then
+          if git push origin "$tag"; then
             echo "::notice::Successfully created and pushed tag '$tag'."
           else
             echo "::error::Failed to push new tag '$tag'. Exiting."
