@@ -118,32 +118,35 @@ jobs:
           included_files=""
           for file in $files; do
             include_matched=false
-            exclude_matched=false
-
             for regex in $include_regexes; do
               if [[ "$file" =~ $regex ]]; then
                 include_matched=true
+                break
               fi
             done
 
+            exclude_matched=false
             for regex in $exclude_regexes; do
               if [[ "$file" =~ $regex ]]; then
                 exclude_matched=true
+                break
               fi
             done
 
             if $include_matched && ! $exclude_matched; then
-              included_files+="${file}\n"
+              if [ -z "$included_files" ]; then
+                included_files="$file"
+              else
+                included_files="$included_files|$file"
+              fi
             fi
           done
 
           if [ -z "$included_files" ]; then
-            echo "No C# files matched the include/exclude criteria."
+            echo "No files matched the include/exclude criteria."
             exit 0
           fi
 
-          included_files=$(printf "%s\n" "$included_files" | awk NF | paste -sd ',' -)
-          included_files=${included_files%,}
           echo "files=$included_files" >> "$GITHUB_OUTPUT"
 
       - name: Create Temporary csproj for Analysis
@@ -156,7 +159,7 @@ jobs:
             echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>"
             echo "  </PropertyGroup>"
             echo "  <ItemGroup>"
-            IFS=',' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
+            IFS='|' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
             for file in "${files[@]}"; do
                 echo "    <Compile Include=\"$file\" />"
             done
