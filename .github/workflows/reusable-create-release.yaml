@@ -79,6 +79,7 @@ jobs:
         with:
           ref: ${{ inputs.commit-id }}
           persist-credentials: ${{ steps.check-secrets.outputs.available != '1' }}
+          fetch-depth: 0
 
       - name: Configure Git Authentication with Custom Token
         if: ${{ steps.check-secrets.outputs.available == '1' }}
@@ -87,18 +88,46 @@ jobs:
 
       - name: Delete Existing Tag
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          echo "Tag '${{ inputs.tag }}' already exists. Deleting it..."
-          git tag -d ${{ inputs.tag }} || echo "Local tag not found."
-          git push --delete origin ${{ inputs.tag }}
+          tag="${{ needs.validate.outputs.normalized-tag }}"
+          echo "Tag '$tag' already exists. Checking for deletion requirements..."
+
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
+            echo "::notice::Remote tag '$tag' exists. Attempting to delete..."
+            if git push --delete origin "$tag"; then
+              if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
+                echo "::error::Failed to delete remote tag '$tag'. Exiting."
+                exit 1
+              fi
+            else
+              echo "::error::Failed to delete remote tag '$tag'. Check protection rules or permissions."
+              exit 1
+            fi
+          else
+            echo "::notice::Remote tag '$tag' does not exist. Skipping remote deletion."
+          fi
+
+          if git tag -l | grep -q "$tag"; then
+            echo "::notice::Local tag '$tag' exists. Attempting to delete..."
+            git tag -d "$tag" || { echo "::error::Failed to delete local tag '$tag'. Exiting."; exit 1; }
+            echo "::notice::Local tag '$tag' deleted successfully."
+          else
+            echo "::notice::Local tag '$tag' does not exist. Skipping local deletion."
+          fi
 
       - name: Create Tag
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          git tag ${{ needs.validate.outputs.normalized-tag }}
-          git push origin ${{ needs.validate.outputs.normalized-tag }}
+          tag="${{ needs.validate.outputs.normalized-tag }}"
+          git tag "$tag" ${{ inputs.commit-id }}
+          if git push origin "$tag"; then
+            echo "::notice::Successfully created and pushed tag '$tag'."
+          else
+            echo "::error::Failed to push new tag '$tag'. Exiting."
+            exit 1
+          fi
 
       - name: Create Release
         env:
