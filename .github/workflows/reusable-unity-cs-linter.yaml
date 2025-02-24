@@ -109,7 +109,9 @@ jobs:
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          files=$(git diff --name-only "origin/${{ steps.branch-conf.outputs.base-branch }}"..."${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}" | awk '/\.cs$/')
+          base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
+          head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
+          files=$(git diff --name-only "$base_branch"..."$head_branch" | awk '/\.cs$/')
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
