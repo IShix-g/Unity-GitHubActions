@@ -111,7 +111,15 @@ jobs:
         run: |
           base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
           head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
-          files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
+          files=$(git diff --name-only "$base_branch"..."$head_branch")
+          cs_files=""
+          for file in $files; do
+            if [[ "$file" == *.cs ]]; then
+              cs_files+="$file"$'\n'
+            fi
+          done
+          files=$cs_files
+
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
