@@ -17,28 +17,34 @@ on:
         required: false
         type: string
         default: ''
-      include_paths:
-        description: 'Include files or directories (regex, comma-separated). For more information https://www.gnu.org/software/grep/manual/'
+      include-paths:
+        description: 'Include files or directories (regex, comma-separated). https://www.gnu.org/software/grep/manual/'
         required: false
         type: string
         default: 'Assets/.*'
-      exclude_paths:
+      exclude-paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
         type: string
         default: ''
+      review-level:
+        description: 'You can change the report level. [info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
+        required: false
+        type: string
+        default: "warning"
+      review-exit-code:
+        description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
+        required: false
+        type: string
+        default: "error"
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
 jobs:
-  branch-conf:
+  lint-cs-files:
     runs-on: ubuntu-22.04
-    outputs:
-      base-branch: ${{ steps.branch-conf.outputs.base-branch }}
-      head-branch: ${{ steps.branch-conf.outputs.head-branch }}
-      editorconfig-branch: ${{ steps.branch-conf.outputs.editorconfig-branch }}
     steps:
       - name: Set Base Branch
         id: branch-conf
@@ -68,19 +74,15 @@ jobs:
           echo "::notice title=Head Branch::$head_branch"
           echo "::notice title=Editorconfig Branch::$editorconfig_branch"
 
-  check-editorconfig:
-    needs: [branch-conf]
-    runs-on: ubuntu-22.04
-    steps:
       - name: Check for .editorconfig via API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch=${{ needs.branch-conf.outputs.editorconfig-branch }}
+          branch=${{ steps.branch-conf.outputs.editorconfig-branch }}
           file_path=".editorconfig"
           max_retries=3
           retry_delay=5  # sec
-  
+          
           for ((i=1; i<=max_retries; i++)); do
             response=$(timeout 10s gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")')
 
@@ -90,34 +92,31 @@ jobs:
             elif [ -z "$response" ]; then
               if [ $i -eq $max_retries ]; then
                 echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
-              exit 1
-            fi
+                exit 1
+              fi
             else
               echo ".editorconfig file exists at the root of the repository."
+              exit 0
             fi
           done
 
-  lint-cs-files:
-    needs: [branch-conf, check-editorconfig]
-    runs-on: ubuntu-22.04
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
+          ref: ${{ steps.branch-conf.outputs.head-branch || steps.branch-conf.outputs.base-branch }}
           fetch-depth: 0
 
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          files=$(git diff --name-only origin/${{ needs.branch-conf.outputs.base-branch }}...${{ needs.branch-conf.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
+          files=$(git diff --name-only origin/${{ steps.branch-conf.outputs.base-branch }}...${{ steps.branch-conf.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
           fi
 
-          include_regexes=$(echo "${{ inputs.include_paths }}" | tr ',' '\n')
-          exclude_regexes=$(echo "${{ inputs.exclude_paths }}" | tr ',' '\n')
+          include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',' '\n')
+          exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',' '\n')
 
           included_files=""
           for file in $files; do
@@ -231,8 +230,8 @@ jobs:
             -name="StyleCop" \
             -reporter=github-pr-review \
             -filter-mode=file \
-            -level=warning \
-            -fail-level=error \
+            -level=${{ inputs.review-level }} \
+            -fail-level=${{ inputs.review-exit-code }} \
             < output.sarif
 
       - name: Cleanup temporary files
