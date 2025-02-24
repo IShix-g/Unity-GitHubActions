@@ -93,10 +93,10 @@ jobs:
           tag="${{ needs.validate.outputs.normalized-tag }}"
           echo "Tag '$tag' already exists. Checking for deletion requirements..."
 
-          if git ls-remote --tags origin | grep -q "$tag"; then
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
             echo "::notice::Remote tag '$tag' exists. Attempting to delete..."
             if git push --delete origin "$tag"; then
-              if git ls-remote --tags origin "$tag" | grep -q "$tag"; then
+              if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
                 echo "::error::Failed to delete remote tag '$tag'. Exiting."
                 exit 1
               fi
