@@ -15,7 +15,12 @@ namespace Tests.StyleTest
 
         }
 
-        internal void methord()
+        public void variableDeclaration()
+        {
+
+        }
+
+        internal void Methord()
         {
 
         }

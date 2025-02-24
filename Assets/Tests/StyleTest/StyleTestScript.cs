@@ -5,10 +5,10 @@ namespace Tests.StyleTest
 {
     public sealed class StyleTestScript
     {
+        public int CorrectProperty { get; set; }
+
         int _incorrect_field;
         string stringField;
-
-        public int CorrectProperty { get; set; }
 
         public void CheckRules()
         {
@@ -32,7 +32,7 @@ namespace Tests.StyleTest
 
         }
 
-        void _PrivateMethod()
+        void PrivateMethod()
         {
 
         }
