@@ -79,6 +79,7 @@ jobs:
         with:
           ref: ${{ inputs.commit-id }}
           persist-credentials: ${{ steps.check-secrets.outputs.available != '1' }}
+          fetch-depth: 0
 
       - name: Configure Git Authentication with Custom Token
         if: ${{ steps.check-secrets.outputs.available == '1' }}
