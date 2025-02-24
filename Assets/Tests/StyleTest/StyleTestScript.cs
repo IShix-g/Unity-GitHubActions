@@ -34,5 +34,5 @@ namespace Tests.StyleTest
         }
     }
 
-    public interface IStyleTestInterface {}
+    public interface IStyleTestInterface { }
 }
