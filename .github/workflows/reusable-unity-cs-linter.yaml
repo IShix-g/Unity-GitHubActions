@@ -78,13 +78,24 @@ jobs:
         run: |
           branch=${{ needs.branch-conf.outputs.editorconfig-branch }}
           file_path=".editorconfig"
-          response=$(gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")' --silent)
-          if [ -z "$response" ]; then
-            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
-            exit 1
-          else
-            echo ".editorconfig file exists at the root of the repository."
-          fi
+          max_retries=3
+          retry_delay=5  # sec
+  
+          for ((i=1; i<=max_retries; i++)); do
+            response=$(timeout 10s gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")')
+
+            if [ $? -eq 124 ]; then
+              echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay seconds..."
+              sleep $retry_delay
+            elif [ -z "$response" ]; then
+              if [ $i -eq $max_retries ]; then
+                echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
+              exit 1
+            fi
+            else
+              echo ".editorconfig file exists at the root of the repository."
+            fi
+          done
 
   lint-cs-files:
     needs: [branch-conf, check-editorconfig]
