@@ -112,11 +112,6 @@ jobs:
           base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
           head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
           files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
-          if [ -z "$files" ]; then
-            echo "No C# files were changed in this PR."
-            exit 0
-          fi
-
           include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',' '\n')
           exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',' '\n')
 
