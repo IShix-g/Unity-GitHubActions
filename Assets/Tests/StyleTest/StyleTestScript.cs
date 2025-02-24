@@ -7,12 +7,13 @@ namespace Tests.StyleTest
     {
         int _incorrect_field;
         string _stringField;
-        　int _intField;
+        int _intField;
 
         public int CorrectProperty { get; set; }
 
         public void CheckRules()
         {
+
             // 条件ブロックにブレースがないのでルール違反 (SA1503)
             if (CorrectProperty > 0)
                 Debug.Log("Correct Property is greater than zero");
