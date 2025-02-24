@@ -28,7 +28,7 @@ on:
         type: string
         default: ''
       review-level:
-        description: 'You can change the report level. https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
+        description: 'You can change the report level. [info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
         required: false
         type: string
         default: "warning"
