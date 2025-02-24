@@ -13,7 +13,6 @@ namespace Tests.StyleTest
 
         public void CheckRules()
         {
-
             // 条件ブロックにブレースがないのでルール違反 (SA1503)
             if (CorrectProperty > 0)
                 Debug.Log("Correct Property is greater than zero");
