@@ -17,16 +17,26 @@ on:
         required: false
         type: string
         default: ''
-      include_paths:
-        description: 'Include files or directories (regex, comma-separated). For more information https://www.gnu.org/software/grep/manual/'
+      include-paths:
+        description: 'Include files or directories (regex, comma-separated). https://www.gnu.org/software/grep/manual/'
         required: false
         type: string
         default: 'Assets/.*'
-      exclude_paths:
+      exclude-paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
         type: string
         default: ''
+      review-level:
+        description: 'You can change the report level. https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
+        required: false
+        type: string
+        default: "warning"
+      review-exit-code:
+        description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
+        required: false
+        type: string
+        default: "error"
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
@@ -94,6 +104,7 @@ jobs:
             fi
             else
               echo ".editorconfig file exists at the root of the repository."
+              exit 0
             fi
           done
 
@@ -116,8 +127,8 @@ jobs:
             exit 0
           fi
 
-          include_regexes=$(echo "${{ inputs.include_paths }}" | tr ',' '\n')
-          exclude_regexes=$(echo "${{ inputs.exclude_paths }}" | tr ',' '\n')
+          include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',' '\n')
+          exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',' '\n')
 
           included_files=""
           for file in $files; do
@@ -231,8 +242,8 @@ jobs:
             -name="StyleCop" \
             -reporter=github-pr-review \
             -filter-mode=file \
-            -level=warning \
-            -fail-level=error \
+            -level=${{ inputs.review-level }} \
+            -fail-level=${{ inputs.review-exit-code }} \
             < output.sarif
 
       - name: Cleanup temporary files
