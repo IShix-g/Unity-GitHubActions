@@ -111,15 +111,7 @@ jobs:
         run: |
           base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
           head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
-          files=$(git diff --name-only "$base_branch"..."$head_branch")
-          cs_files=""
-          for file in $files; do
-            if [[ "$file" == *.cs ]]; then
-              cs_files+="$file"$'\n'
-            fi
-          done
-          files=$cs_files
-
+          files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
@@ -155,8 +147,8 @@ jobs:
             exit 0
           fi
 
-          included_files=$(echo -e "$included_files" | sed '/^\s*$/d' | tr '\n' ',')
-          included_files=$(echo "$included_files" | sed 's/,$//' )
+          included_files=$(printf "%s\n" "$included_files" | awk NF | paste -sd ',' -)
+          included_files=${included_files%,}
           echo "files=$included_files" >> "$GITHUB_OUTPUT"
 
       - name: Create Temporary csproj for Analysis
