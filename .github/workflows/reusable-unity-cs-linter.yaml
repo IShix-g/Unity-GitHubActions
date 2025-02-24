@@ -84,10 +84,8 @@ jobs:
           retry_delay_sec=5
           
           for ((i=1; i<=max_retries; i++)); do
-            api_url="repos/${{ github.repository }}/contents/$file_path?ref=$branch"
-            jq_filter=". | select(.type==\"file\") | select(.name==\"$file_path\")"
-            response=$(timeout 10s gh api "$api_url" --jq "$jq_filter")
-  
+            response=$(timeout 10s gh api "repos/${{ github.repository }}/contents/$file_path?ref=$branch" --jq ". | select(.type==\"file\") | select(.name==\"$file_path\")")          
+          
             if [ $? -eq 124 ]; then
               echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay_sec seconds..."
               sleep $retry_delay_sec
