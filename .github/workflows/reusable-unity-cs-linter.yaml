@@ -49,7 +49,7 @@ jobs:
       - name: Branch Configuration
         id: branch-conf
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -n "${{ inputs.base-branch }}" ]; then
             base_branch="${{ inputs.base-branch }}"
@@ -84,8 +84,8 @@ jobs:
           retry_delay_sec=5
           
           for ((i=1; i<=max_retries; i++)); do
-            response=$(timeout 10s gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")')
-
+            response=$(timeout 10s gh api repos/${{ github.repository }}/contents/$file_path?ref=$branch --jq '. | select(.type=="file") | select(.name=="'$file_path'")')
+  
             if [ $? -eq 124 ]; then
               echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay_sec seconds..."
               sleep $retry_delay_sec
@@ -109,7 +109,7 @@ jobs:
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          files=$(git diff --name-only origin/${{ steps.branch-conf.outputs.base-branch }}...${{ steps.branch-conf.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
+          files=$(git diff --name-only "origin/${{ steps.branch-conf.outputs.base-branch }}"..."${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}" | awk '/\.cs$/')
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
@@ -152,18 +152,20 @@ jobs:
       - name: Create Temporary csproj for Analysis
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          echo "<Project Sdk=\"Microsoft.NET.Sdk\">" > TempProject.csproj
-          echo "  <PropertyGroup>" >> TempProject.csproj
-          echo "    <TargetFramework>netstandard2.1</TargetFramework>" >> TempProject.csproj
-          echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>" >> TempProject.csproj
-          echo "  </PropertyGroup>" >> TempProject.csproj
-          echo "  <ItemGroup>" >> TempProject.csproj
-          IFS=',' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
-          for file in "${files[@]}"; do
-            echo "    <Compile Include=\"$file\" />" >> TempProject.csproj
-          done
-          echo "  </ItemGroup>" >> TempProject.csproj
-          echo "</Project>" >> TempProject.csproj
+          {
+            echo "<Project Sdk=\"Microsoft.NET.Sdk\">"
+            echo "  <PropertyGroup>"
+            echo "    <TargetFramework>netstandard2.1</TargetFramework>"
+            echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>"
+            echo "  </PropertyGroup>"
+            echo "  <ItemGroup>"
+            IFS=',' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
+            for file in "${files[@]}"; do
+                echo "    <Compile Include=\"$file\" />"
+            done
+            echo "  </ItemGroup>"
+            echo "</Project>"
+          } > TempProject.csproj
 
       - name: Debug csproj
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -174,7 +176,7 @@ jobs:
 
       - name: Install .NET SDK
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '7.0'
 
