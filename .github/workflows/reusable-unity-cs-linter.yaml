@@ -46,7 +46,7 @@ jobs:
   lint-cs-files:
     runs-on: ubuntu-22.04
     steps:
-      - name: Set Base Branch
+      - name: Branch Configuration
         id: branch-conf
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
@@ -70,9 +70,9 @@ jobs:
           fi
           echo "editorconfig-branch=${editorconfig_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
 
-          echo "::notice title=Base Branch::$base_branch"
-          echo "::notice title=Head Branch::$head_branch"
-          echo "::notice title=Editorconfig Branch::$editorconfig_branch"
+          echo "Base Branch: $base_branch"
+          echo "Head Branch: $head_branch"
+          echo "Editorconfig Branch: $editorconfig_branch"
 
       - name: Check for .editorconfig via API
         env:
@@ -81,14 +81,14 @@ jobs:
           branch=${{ steps.branch-conf.outputs.editorconfig-branch }}
           file_path=".editorconfig"
           max_retries=3
-          retry_delay=5  # sec
+          retry_delay_sec=5
           
           for ((i=1; i<=max_retries; i++)); do
             response=$(timeout 10s gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")')
 
             if [ $? -eq 124 ]; then
-              echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay seconds..."
-              sleep $retry_delay
+              echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay_sec seconds..."
+              sleep $retry_delay_sec
             elif [ -z "$response" ]; then
               if [ $i -eq $max_retries ]; then
                 echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
