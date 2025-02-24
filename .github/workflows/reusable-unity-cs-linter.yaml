@@ -5,11 +5,15 @@ on:
     inputs:
       head-branch:
         description: 'Target head branch for investigation'
+        required: true
+        type: string
+      base-branch:
+        description: 'Target base branch for investigation'
         required: false
         type: string
         default: ''
-      base-branch:
-        description: 'Target base branch for investigation'
+      editorconfig-branch:
+        description: 'Branch where .editorconfig is placed. If not specified, base-branch will be used.'
         required: false
         type: string
         default: ''
@@ -24,15 +28,20 @@ on:
         type: string
         default: ''
 
+env:
+  EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
+  CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
+
 jobs:
-  set-branch:
+  branch-conf:
     runs-on: ubuntu-22.04
     outputs:
-      base-branch: ${{ steps.set-branch.outputs.base-branch }}
-      head-branch: ${{ steps.set-branch.outputs.head-branch }}
+      base-branch: ${{ steps.branch-conf.outputs.base-branch }}
+      head-branch: ${{ steps.branch-conf.outputs.head-branch }}
+      editorconfig-branch: ${{ steps.branch-conf.outputs.editorconfig-branch }}
     steps:
       - name: Set Base Branch
-        id: set-branch
+        id: branch-conf
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
@@ -48,41 +57,49 @@ jobs:
             echo "head-branch=${head_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
           fi
 
+          if [ -n "${{ inputs.editorconfig-branch }}" ]; then
+            editorconfig_branch="${{ inputs.editorconfig-branch }}"
+          else
+            editorconfig_branch=$base_branch
+          fi
+          echo "editorconfig-branch=${editorconfig_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+
           echo "::notice title=Base Branch::$base_branch"
           echo "::notice title=Head Branch::$head_branch"
+          echo "::notice title=Editorconfig Branch::$editorconfig_branch"
 
   check-editorconfig:
-    needs: [set-branch]
+    needs: [branch-conf]
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.set-branch.outputs.base-branch }}
-
-      - name: Validate .editorconfig file
+      - name: Check for .editorconfig via API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ ! -f .editorconfig ]; then
-            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig"
+          branch=${{ needs.branch-conf.outputs.editorconfig-branch }}
+          file_path=".editorconfig"
+          response=$(gh api repos/${{ github.repository }}/contents/$file_path --jq '. | select(.type=="file") | select(.name=="'$file_path'")' --silent)
+          if [ -z "$response" ]; then
+            echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
             exit 1
           else
             echo ".editorconfig file exists at the root of the repository."
           fi
 
   lint-cs-files:
-    needs: [set-branch, check-editorconfig]
+    needs: [branch-conf, check-editorconfig]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.set-branch.outputs.head-branch || needs.set-branch.outputs.base-branch }}
+          ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
           fetch-depth: 0
 
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          files=$(git diff --name-only origin/${{ needs.set-branch.outputs.base-branch }}...${{ needs.set-branch.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
+          files=$(git diff --name-only origin/${{ needs.branch-conf.outputs.base-branch }}...${{ needs.branch-conf.outputs.head-branch || 'HEAD' }} | grep '\.cs$' || true)
           if [ -z "$files" ]; then
             echo "No C# files were changed in this PR."
             exit 0
@@ -178,26 +195,15 @@ jobs:
           cat output.log
           echo "=== END RAW OUTPUT.LOG ==="
 
-      - name: Checkout SARIF Conversion Script Repository
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
-        uses: actions/checkout@v4
-        with:
-          repository: IShix-g/Unity-GitHubActions
-          ref: main
-          path: sarif-script-repo
-
-      - name: Verify `convert_to_sarif.py` Exists
+      - name: Download `convert_to_sarif.py`
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          if [ ! -f sarif-script-repo/.github/scripts/convert_to_sarif.py ]; then
-            echo "::error::convert_to_sarif.py script is missing in the target repository."
-            exit 1
-          fi
+          curl --fail --silent --show-error --max-time 10 -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} || { echo "Failed to download script"; exit 1; }
 
       - name: Convert to SARIF
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          python3 sarif-script-repo/.github/scripts/convert_to_sarif.py output.log output.sarif
+          python3 convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -221,4 +227,4 @@ jobs:
       - name: Cleanup temporary files
         if: ${{ steps.detect-cs-files.outputs.files != '' && always() }}
         run: |
-          rm -f TempProject.csproj output.log output.sarif || true
+          rm -f TempProject.csproj convert_to_sarif.py output.log output.sarif || true
