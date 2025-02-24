@@ -8,14 +8,19 @@ namespace Tests.StyleTest
         public int CorrectProperty { get; set; }
 
         private int _incorrectField;
-        string stringField;
+        string _stringField;
 
         public void CheckRules()
         {
 
         }
 
-        public void variableDeclaration()
+        public void VariableDeclaration()
+        {
+
+        }
+
+        internal void methord()
         {
 
         }

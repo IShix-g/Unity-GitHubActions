@@ -28,7 +28,12 @@ namespace Tests.StyleTest
             int specificNumber = 10;
         }
 
-        public void methord()
+        public void Methord()
+        {
+
+        }
+
+        void _PrivateMethod()
         {
 
         }
