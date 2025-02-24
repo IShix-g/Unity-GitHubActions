@@ -66,9 +66,13 @@ jobs:
       - name: Set Default Push Branch
         id: set-push-branch
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "push-branch=${{ inputs.push-branch || github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+          push_branch=${{ inputs.push-branch }}
+          if [ -z "$push_branch" ]; then
+            push_branch=$(gh api /repos/${{ github.repository }} --jq '.push_branch')
+          fi
+          echo "push-branch=$push_branch" >> "$GITHUB_OUTPUT"
 
       - name: Normalize Branch Names
         id: normalize-branches
