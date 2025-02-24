@@ -89,29 +89,38 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          tag=${{ inputs.tag }}
+          tag="${{ needs.validate.outputs.normalized-tag }}"
           echo "Tag '$tag' already exists. Checking for deletion requirements..."
-          
-          if git ls-remote --tags origin $tag | grep -q $tag; then
-            echo "Remote tag '$tag' exists. Attempting to delete..."
-            git push --delete origin $tag && echo "Remote tag '$tag' deleted successfully." || echo "Failed to delete remote tag '$tag'."
+
+          if git ls-remote --tags origin | grep -q "$tag"; then
+            echo "::notice::Remote tag '$tag' exists. Attempting to delete..."
+            git push --delete origin "$tag" || { echo "::error::Failed to delete remote tag '$tag'. Exiting."; exit 1; }
+            echo "::notice::Remote tag '$tag' deleted successfully."
           else
-            echo "Remote tag '$tag' does not exist. Skipping remote deletion."
+            echo "::notice::Remote tag '$tag' does not exist. Skipping remote deletion."
           fi
 
-          if git tag -l | grep -q $tag; then
-            echo "Local tag '$tag' exists. Attempting to delete..."
-            git tag -d $tag && echo "Local tag '$tag' deleted successfully." || echo "Failed to delete local tag '$tag'."
+          if git tag -l | grep -q "$tag"; then
+            echo "::notice::Local tag '$tag' exists. Attempting to delete..."
+            git tag -d "$tag" || { echo "::error::Failed to delete local tag '$tag'. Exiting."; exit 1; }
+            echo "::notice::Local tag '$tag' deleted successfully."
           else
-            echo "Local tag '$tag' does not exist. Skipping local deletion."
+            echo "::notice::Local tag '$tag' does not exist. Skipping local deletion."
           fi
-
+  
       - name: Create Tag
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          git tag ${{ needs.validate.outputs.normalized-tag }}
-          git push origin ${{ needs.validate.outputs.normalized-tag }}
+          tag="${{ needs.validate.outputs.normalized-tag }}"
+          git tag "$tag" HEAD
+          git push origin "$tag"
+          if [[ $? -eq 0 ]]; then
+            echo "::notice::Successfully created and pushed tag '$tag'."
+          else
+            echo "::error::Failed to push new tag '$tag'. Exiting."
+            exit 1
+          fi
 
       - name: Create Release
         env:
