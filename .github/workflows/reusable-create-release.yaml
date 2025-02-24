@@ -87,11 +87,24 @@ jobs:
 
       - name: Delete Existing Tag
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          echo "Tag '${{ inputs.tag }}' already exists. Deleting it..."
-          git tag -d ${{ inputs.tag }} || echo "Local tag not found."
-          git push --delete origin ${{ inputs.tag }}
+          tag=${{ inputs.tag }}
+          echo "Tag '$tag' already exists. Checking for deletion requirements..."
+          
+          if git ls-remote --tags origin $tag | grep -q $tag; then
+            echo "Remote tag '$tag' exists. Attempting to delete..."
+            git push --delete origin $tag && echo "Remote tag '$tag' deleted successfully." || echo "Failed to delete remote tag '$tag'."
+          else
+            echo "Remote tag '$tag' does not exist. Skipping remote deletion."
+          fi
+
+          if git tag -l | grep -q $tag; then
+            echo "Local tag '$tag' exists. Attempting to delete..."
+            git tag -d $tag && echo "Local tag '$tag' deleted successfully." || echo "Failed to delete local tag '$tag'."
+          else
+            echo "Local tag '$tag' does not exist. Skipping local deletion."
+          fi
 
       - name: Create Tag
         env:
