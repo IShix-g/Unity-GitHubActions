@@ -32,8 +32,9 @@ namespace Tests.StyleTest
 
         public void methord()
         {
+
         }
     }
 
-    public interface StyleTestInterface {}
+    public interface IStyleTestInterface {}
 }
