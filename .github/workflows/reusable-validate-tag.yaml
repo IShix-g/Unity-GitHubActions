@@ -92,13 +92,13 @@ jobs:
             else
               message_type="::warning::"
             fi
-            echo "$message_type Tag is reverting. Bump version. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $release_latest"
+            echo "$message_type Tag is reverting. Bump version. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $latest_tag"
             echo "validated=false" | tee -a "$GITHUB_OUTPUT"
             if [[ "${{ inputs.require-validation }}" == "true" ]]; then
               exit 1
             fi
           else
-            echo "::notice::Great, tag is latest. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $release_latest"
+            echo "::notice::Great, tag is latest. tag: ${{ inputs.tag }}, normalized: ${{ steps.trim.outputs.normalized-tag }}, latest: $latest_tag"
             echo "validated=true" | tee -a "$GITHUB_OUTPUT"
           fi
 
