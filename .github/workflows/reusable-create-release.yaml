@@ -108,6 +108,7 @@ jobs:
           commit_id="${{ inputs.commit-id }}"
 
           if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Deleting existing local tag '$tag'..."
             git tag -d "$tag" || {
               echo "::error::Failed to delete the existing local tag '$tag'. Exiting."
               exit 1
@@ -115,20 +116,21 @@ jobs:
             echo "Deleted the existing local tag '$tag'."
           fi
 
-          echo "Attempting to delete the remote tag '$tag'..."
-          git push origin ":refs/tags/$tag" || {
+          echo "Deleting existing remote tag '$tag' (if it exists)..."
+          git push --delete origin "$tag" || {
             echo "::error::Failed to delete the remote tag '$tag'. Exiting due to critical issue."
             exit 1
           }
-          echo "Successfully deleted the remote tag '$tag' (if it existed)."
+          echo "Successfully deleted the remote tag '$tag'."
 
+          echo "Creating new tag '$tag' for commit '$commit_id'..."
           git tag "$tag" "$commit_id" || {
             echo "::error::Unable to create the tag '$tag' on commit '$commit_id'. Exiting."
             exit 1
           }
           echo "Tag '$tag' created on commit '$commit_id'."
 
-          echo "Pushing the new tag '$tag' to remote..."
+          echo "Pushing new tag '$tag' to remote..."
           git push origin "$tag" || {
             echo "::error::Failed to push the updated tag '$tag' to remote. Exiting."
             exit 1
