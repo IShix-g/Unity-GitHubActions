@@ -86,71 +86,19 @@ jobs:
         run: |
           git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
 
-      - name: Check If Tag Exists
-        id: check-tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag="${{ inputs.tag }}"
-
-          if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
-            echo "Tag '$tag' exists in the remote repository."
-            echo "exists=1" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Reassign Tag
-        id: reassign-tag
-        if: ${{ steps.check-tag.outputs.exists == '1' }}
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
-        run: |
-          tag="${{ inputs.tag }}"
-          commit_id="${{ inputs.commit-id }}"
-
-          echo "Fetching the latest tags to update cache..."
-          git fetch --tags || {
-            echo "::error::Failed to fetch tags. Exiting."
-            exit 1
-          }
-          git remote prune origin || echo "Failed to prune stale references; continuing..."
-
-          if git rev-parse "$tag" >/dev/null 2>&1; then
-            echo "Deleting existing local tag '$tag'..."
-            git tag -d "$tag" || {
-              echo "::error::Failed to delete the existing local tag '$tag'. Exiting."
-              exit 1
-            }
-            echo "Deleted the existing local tag '$tag'."
-          fi
-
-          echo "Deleting existing remote tag '$tag'..."
-          git push origin --delete "$tag" || {
-            echo "::error::Failed to delete the remote tag '$tag'. Exiting."
-            exit 1
-          }
-          echo "Successfully deleted the remote tag '$tag'."
-
-          echo "Creating new tag '$tag' for commit '$commit_id'..."
-          git tag "$tag" "$commit_id" || {
-            echo "::error::Unable to create the tag '$tag' on commit '$commit_id'. Exiting."
-            exit 1
-          }
-          echo "Tag '$tag' created on commit '$commit_id'."
-
-          echo "Force pushing the new tag '$tag' to remote..."
-          git push --force origin "$tag" || {
-            echo "::error::Failed to push the updated tag '$tag' to remote. Exiting."
-            exit 1
-          }
-          echo "::notice::Tag '$tag' successfully reassigned and pushed to remote on commit '$commit_id'."
-
       - name: Create Tag
-        if: ${{ steps.check-tag.outputs.exists != '1' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           tag="${{ needs.validate.outputs.normalized-tag }}"
-          git tag "$tag" ${{ inputs.commit-id }}
+          commit_id="${{ inputs.commit-id }}"
+          
+          if git tag "$tag" "$commit_id"; then
+            echo "Tag '$tag' created on commit '$commit_id'."
+          else
+            echo "::error::Unable to create the tag '$tag' on commit '$commit_id'. Exiting."
+            exit 1
+          fi
           
           if git push origin "$tag"; then
             echo "::notice::Successfully created and pushed tag '$tag'."
