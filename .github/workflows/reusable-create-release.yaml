@@ -116,14 +116,13 @@ jobs:
             echo "Deleted the existing local tag '$tag'."
           fi
 
-          echo "Deleting existing remote tag '$tag' (if it exists)..."
-          git push --delete origin "$tag" || {
-            echo "::error::Failed to delete the remote tag '$tag'. Exiting due to critical issue."
+          echo "Deleting existing remote tag '$tag'..."
+          git push origin --delete "$tag" || {
+            echo "::error::Failed to delete the remote tag '$tag'. Exiting."
             exit 1
           }
           echo "Successfully deleted the remote tag '$tag'."
 
-          echo "Creating new tag '$tag' for commit '$commit_id'..."
           git tag "$tag" "$commit_id" || {
             echo "::error::Unable to create the tag '$tag' on commit '$commit_id'. Exiting."
             exit 1
