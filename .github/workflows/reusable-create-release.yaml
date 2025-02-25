@@ -86,7 +86,37 @@ jobs:
         run: |
           git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
 
+      - name: Check If Tag Exists
+        id: check-tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ inputs.tag }}"
+
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
+            echo "Tag '$tag' exists in the remote repository."
+            echo "exists=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate Existing Tag
+        id: validate-tag
+        if: ${{ steps.check-tag.outputs.exists == '1' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ inputs.tag }}"
+          commit_id="${{ inputs.commit-id }}"
+          existing_commit_id=$(git rev-parse "$tag")
+
+          if [ "$existing_commit_id" = "$commit_id" ]; then
+            echo "The existing tag '$tag' already points to the specified commit ID '$commit_id'. No further action required."
+          else
+            echo "::error::The existing tag '$tag' points to a different commit ID ('$existing_commit_id'). Expected commit ID: '$commit_id'. Exiting."
+            exit 1
+          fi
+
       - name: Create Tag
+        if: ${{ steps.check-tag.outputs.exists != '1' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
