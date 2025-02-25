@@ -94,7 +94,7 @@ jobs:
           echo "Tag '$tag' already exists. Checking for deletion requirements..."
 
           if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
-            echo "::notice::Remote tag '$tag' exists. Attempting to delete..."
+            echo "Remote tag '$tag' exists. Attempting to delete..."
             if git push --delete origin "$tag"; then
               if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
                 echo "::error::Failed to delete remote tag '$tag'. Exiting."
@@ -105,15 +105,15 @@ jobs:
               exit 1
             fi
           else
-            echo "::notice::Remote tag '$tag' does not exist. Skipping remote deletion."
+            echo "Remote tag '$tag' does not exist. Skipping remote deletion."
           fi
 
           if git tag -l | grep -q "$tag"; then
-            echo "::notice::Local tag '$tag' exists. Attempting to delete..."
+            echo "Local tag '$tag' exists. Attempting to delete..."
             git tag -d "$tag" || { echo "::error::Failed to delete local tag '$tag'. Exiting."; exit 1; }
-            echo "::notice::Local tag '$tag' deleted successfully."
+            echo "Local tag '$tag' deleted successfully."
           else
-            echo "::notice::Local tag '$tag' does not exist. Skipping local deletion."
+            echo "Local tag '$tag' does not exist. Skipping local deletion."
           fi
 
       - name: Create Tag
