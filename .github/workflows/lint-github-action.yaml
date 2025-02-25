@@ -1,4 +1,4 @@
-name: Reviewdog actionlint
+name: Lint Github Action
 
 on:
   workflow_dispatch:
