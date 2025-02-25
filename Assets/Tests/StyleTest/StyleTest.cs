@@ -8,7 +8,7 @@ namespace Tests.StyleTest
 
         string _test;
         string _test2;
-        int Test3;
+        int _test3;
 
         void Test()
         {
