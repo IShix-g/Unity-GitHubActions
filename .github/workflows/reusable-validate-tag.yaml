@@ -78,10 +78,14 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          release_latest=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName,isLatest | jq -r '.[] | select(.isLatest) | .tagName')
-          [[ -z "$release_latest" ]] && echo "There is not release tag." && echo "validated=true" | tee -a "$GITHUB_OUTPUT" && exit 0
+          latest_tag=$(git tag --sort=-v:refname | head -n 1)
+          if [[ -z "$latest_tag" ]]; then
+            echo "::notice::No tags found in the repository. Skipping validation."
+            echo "validated=true" | tee -a "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-          sorted_latest=$(echo -e "$release_latest\n${{ steps.trim.outputs.normalized-tag }}" | sort -V | tail -n1)
+          sorted_latest=$(echo -e "$latest_tag\n${{ steps.trim.outputs.normalized-tag }}" | sort -V | tail -n 1)
           if [[ "$sorted_latest" == "$release_latest" ]]; then
             if [[ "${{ inputs.require-validation }}" == "true" ]]; then
               message_type="::error::"
