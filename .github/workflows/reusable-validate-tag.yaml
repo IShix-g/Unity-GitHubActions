@@ -78,7 +78,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_tag=$(gh api repos/$GITHUB_REPOSITORY/tags --jq '.[0].name')
+          latest_tag=$(gh api repos/"$GITHUB_REPOSITORY"/tags --jq '.[0].name')
           if [[ -z "$latest_tag" ]]; then
             echo "::notice::No tags found in the repository. Skipping validation."
             echo "validated=true" | tee -a "$GITHUB_OUTPUT"
