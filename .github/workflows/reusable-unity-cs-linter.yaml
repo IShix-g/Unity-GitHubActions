@@ -188,6 +188,7 @@ jobs:
           dotnet add package StyleCop.Analyzers
 
       - name: Collect Style Violations Log
+        id: violations-log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           echo "Collecting style violations into output.log..."
@@ -198,33 +199,38 @@ jobs:
               modified_line=$(echo "$line" | sed -E 's/(\\s){6}/6 spaces/g' | sed -E 's/(\\s){4}/4 spaces/g' | sed -E 's/(\\s){2}/2 spaces/g' | sed -E 's/\\s/1 space/g')
               echo "$modified_line" >> output_temp.log
           done < output.log
-          mv output_temp.log output.log
+          if [ -f output_temp.log ]; then
+            mv output_temp.log output.log
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No issues were found in the code"
+          fi
 
       - name: Debug Raw Output Log
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.violations-log.outputs.available == '1' }}
         run: |
           echo "=== DEBUG RAW OUTPUT.LOG ==="
           cat output.log
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Download `convert_to_sarif.py`
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.violations-log.outputs.available == '1' }}
         run: |
           curl --fail --silent --show-error --max-time 10 -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} || { echo "Failed to download script"; exit 1; }
 
       - name: Convert to SARIF
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.violations-log.outputs.available == '1' }}
         run: |
           python3 convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.violations-log.outputs.available == '1' }}
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
 
       - name: Apply Style Suggestions with reviewdog
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
+        if: ${{ steps.violations-log.outputs.available == '1' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -237,6 +243,6 @@ jobs:
             < output.sarif
 
       - name: Cleanup temporary files
-        if: ${{ steps.detect-cs-files.outputs.files != '' && always() }}
+        if: ${{ steps.violations-log.outputs.available == '1' && always() }}
         run: |
           rm -f TempProject.csproj convert_to_sarif.py output.log output.sarif || true
