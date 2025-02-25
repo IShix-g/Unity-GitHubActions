@@ -86,42 +86,50 @@ jobs:
         run: |
           git config --global url."https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
 
-      - name: Delete Existing Tag
+      - name: Check If Tag Exists
+        id: check-tag
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag="${{ needs.validate.outputs.normalized-tag }}"
-          echo "Tag '$tag' already exists. Checking for deletion requirements..."
-
+          tag="${{ inputs.tag }}"
+          echo "Checking if tag '$tag' exists in remote repository..."
+          
           if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
-            echo "Remote tag '$tag' exists. Attempting to delete..."
-            if git push --delete origin "$tag"; then
-              if git ls-remote --tags origin "refs/tags/$tag" | grep -q "refs/tags/$tag"; then
-                echo "::error::Failed to delete remote tag '$tag'. Exiting."
-                exit 1
-              fi
-            else
-              echo "::error::Failed to delete remote tag '$tag'. Check protection rules or permissions."
-              exit 1
-            fi
-          else
-            echo "Remote tag '$tag' does not exist. Skipping remote deletion."
+            echo "Tag '$tag' exists in the remote repository."
+            echo "exists=1" >> "$GITHUB_OUTPUT"
           fi
 
-          if git tag -l | grep -q "$tag"; then
-            echo "Local tag '$tag' exists. Attempting to delete..."
-            git tag -d "$tag" || { echo "::error::Failed to delete local tag '$tag'. Exiting."; exit 1; }
-            echo "Local tag '$tag' deleted successfully."
-          else
-            echo "Local tag '$tag' does not exist. Skipping local deletion."
-          fi
+      - name: Reassign Tag
+        id: reassign-tag
+        if: ${{ steps.reassign-tag.outputs.exists == '1' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ inputs.tag }}"
+          commit_id="${{ inputs.commit-id }}"
+
+          echo "Reassigning tag '$tag' to commit '$commit_id'..."
+
+          git tag -f "$tag" "$commit_id" || {
+            echo "::error::Unable to update the tag '$tag'. Exiting."
+            exit 1
+          }
+          echo "Tag '$tag' updated successfully on commit '$commit_id'."
+
+          git push origin -f "$tag" || {
+            echo "::error::Failed to push the updated tag '$tag' to remote. Exiting."
+            exit 1
+          }
+          echo "::notice::Tag '$tag' pushed to remote successfully."
 
       - name: Create Tag
+        if: ${{ steps.reassign-tag.outputs.exists != '1' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           tag="${{ needs.validate.outputs.normalized-tag }}"
           git tag "$tag" ${{ inputs.commit-id }}
+          
           if git push origin "$tag"; then
             echo "::notice::Successfully created and pushed tag '$tag'."
           else
