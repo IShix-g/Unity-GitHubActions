@@ -106,7 +106,7 @@ jobs:
         id: set-validated
         run: |
           if [ -n "${{ steps.validate-tag.outputs.validated }}" ]; then
-            echo "validated=${{ steps.validate-tag.outputs.validated }}" >> $GITHUB_OUTPUT
+            echo "validated=${{ steps.validate-tag.outputs.validated }}" >> "$GITHUB_OUTPUT"
           else
-            echo "validated=${{ steps.validate-format.outputs.validated }}" >> $GITHUB_OUTPUT
+            echo "validated=${{ steps.validate-format.outputs.validated }}" >> "$GITHUB_OUTPUT"
           fi
