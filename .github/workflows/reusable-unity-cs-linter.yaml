@@ -191,20 +191,28 @@ jobs:
         id: violations-log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          echo "Collecting style violations into output.log..."
-          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 \
-          || echo "Style violation detected" >> output.log
-          
-          while IFS= read -r line; do
-              modified_line=$(echo "$line" | sed -E 's/(\\s){6}/6 spaces/g' | sed -E 's/(\\s){4}/4 spaces/g' | sed -E 's/(\\s){2}/2 spaces/g' | sed -E 's/\\s/1 space/g')
-              echo "$modified_line" >> output_temp.log
-          done < output.log
-          if [ -f output_temp.log ]; then
-            mv output_temp.log output.log
-            echo "exits=1" >> "$GITHUB_OUTPUT"
-          else
+          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
+
+          if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
+            exit 0
           fi
+
+          output=$(echo "$output" | awk '{
+            while (match($0, /\\s+/)) {
+              count = RLENGTH
+              if (count == 1) {
+                replacement = "1 space"
+              } else {
+                replacement = count " spaces"
+              }
+              $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH)
+            }
+            print
+          }')
+
+          echo "$output" > output.log
+          echo "exits=1" >> "$GITHUB_OUTPUT"
 
       - name: Debug Raw Output Log
         if: ${{ steps.violations-log.outputs.exits == '1' }}
