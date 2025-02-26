@@ -42,6 +42,14 @@ on:
         required: false
         type: string
         default: 50
+      retention-days:
+        description: >
+          Duration after which artifact will expire in days. 0 means using default retention.
+          Minimum 1 day.
+          Maximum 90 days unless changed from the repository settings page.
+        required: false
+        type: string
+        default: '0'
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
@@ -254,10 +262,22 @@ jobs:
           fi
           echo "=== END RAW OUTPUT.LOG ==="
 
+      - uses: actions/upload-artifact@v4
+        id: upload-artifact
+        with:
+          name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
+          path: ${{ steps.path-normalizer.outputs.export-path }}
+          retention-days: ${{ inputs.retention-days }}
+
       - name: Download `convert_to_sarif.py`
         if: ${{ steps.violations-log.outputs.exits == '1' }}
         run: |
-          curl --fail --silent --show-error --max-time 10 -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} || { echo "Failed to download script"; exit 1; }
+          curl --fail \
+            --silent \
+            --show-error \
+            --max-time 10 \
+            -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} \
+            || { echo "Failed to download script"; exit 1; }
 
       - name: Convert to SARIF
         if: ${{ steps.violations-log.outputs.exits == '1' }}
