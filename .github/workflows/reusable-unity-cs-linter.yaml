@@ -219,7 +219,7 @@ jobs:
           fi
 
           output=$(echo "$output" | awk '{
-            while (match($0, /\\s+/)) {
+            if (match($0, /\\s+/)) {
               count = RLENGTH
               if (count == 1) {
                 replacement = "1 space"
