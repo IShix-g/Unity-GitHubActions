@@ -227,7 +227,7 @@ jobs:
                 replacement = count " spaces"
               }
               $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH)
-              $0 = gensub(/( spaces | space )'\$/, "\\1\'", "g", $0)
+              sub(/ (spaces|space) '\$/, "\\1\'") # Remove unwanted space before final quote
             }
             print
           }')
