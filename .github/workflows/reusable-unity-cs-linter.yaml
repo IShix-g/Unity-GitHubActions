@@ -58,6 +58,7 @@ env:
 jobs:
   lint-cs-files:
     runs-on: ubuntu-22.04
+    timeout-minutes: 12
     steps:
       - name: Branch Configuration
         id: branch-conf
