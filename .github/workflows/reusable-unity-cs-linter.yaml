@@ -219,8 +219,8 @@ jobs:
           fi
 
           output=$(echo "$output" | awk '{
-            if (match($0, /\\s{2,}/)) {
-              count = RLENGTH
+            if (match($0, /\\s+/)) {
+              count = gsub(/\\s/, " ")
               if (count == 1) {
                 replacement = "1 space"
               } else {
