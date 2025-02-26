@@ -37,6 +37,19 @@ on:
         required: false
         type: string
         default: "error"
+      max-log-lines:
+        description: "Maximum number of lines to print from the log"
+        required: false
+        type: string
+        default: 50
+      retention-days:
+        description: >
+          Duration after which artifact will expire in days. 0 means using default retention.
+          Minimum 1 day.
+          Maximum 90 days unless changed from the repository settings page.
+        required: false
+        type: string
+        default: '0'
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
@@ -45,6 +58,7 @@ env:
 jobs:
   lint-cs-files:
     runs-on: ubuntu-22.04
+    timeout-minutes: 12
     steps:
       - name: Branch Configuration
         id: branch-conf
@@ -170,9 +184,23 @@ jobs:
       - name: Debug csproj
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          echo "=== TempProject.csproj ==="
-          cat TempProject.csproj
-          echo "=== end ==="
+          if [ ! -f TempProject.csproj ]; then
+            echo "::error::TempProject.csproj does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < TempProject.csproj)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW TempProject.csproj ==="
+            cat TempProject.csproj
+          else
+            echo "=== DEBUG RAW TempProject.csproj (TRUNCATED) ==="
+            tail -n "$max_lines" TempProject.csproj
+            echo "...(truncated: number of lines=${line_count})"
+          fi
+          echo "=== END RAW TempProject.csproj ==="
 
       - name: Install .NET SDK
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -191,46 +219,80 @@ jobs:
         id: violations-log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          echo "Collecting style violations into output.log..."
-          dotnet format TempProject.csproj --verify-no-changes >> output.log 2>&1 \
-          || echo "Style violation detected" >> output.log
-          
-          while IFS= read -r line; do
-              modified_line=$(echo "$line" | sed -E 's/(\\s){6}/6 spaces/g' | sed -E 's/(\\s){4}/4 spaces/g' | sed -E 's/(\\s){2}/2 spaces/g' | sed -E 's/\\s/1 space/g')
-              echo "$modified_line" >> output_temp.log
-          done < output.log
-          if [ -f output_temp.log ]; then
-            mv output_temp.log output.log
-            echo "available=1" >> "$GITHUB_OUTPUT"
-          else
+          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
+
+          if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
+            exit 0
           fi
 
+          output=$(echo "$output" | awk '{
+            while (match($0, /\\s+/)) {
+              count = RLENGTH
+              if (count == 1) {
+                replacement = "1 space"
+              } else {
+                replacement = count " spaces"
+              }
+              $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH)
+            }
+            print
+          }')
+
+          echo "$output" > output.log
+          echo "exits=1" >> "$GITHUB_OUTPUT"
+
       - name: Debug Raw Output Log
-        if: ${{ steps.violations-log.outputs.available == '1' }}
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
         run: |
-          echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat output.log
+          if [ ! -f output.log ]; then
+            echo "::error::output.log does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < output.log)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW OUTPUT.LOG ==="
+            cat output.log
+          else
+            echo "=== DEBUG RAW OUTPUT.LOG (TRUNCATED) ==="
+            head -n "$max_lines" output.log
+            echo "...(truncated: number of lines=${line_count})"
+          fi
           echo "=== END RAW OUTPUT.LOG ==="
 
+      - uses: actions/upload-artifact@v4
+        id: upload-artifact
+        with:
+          name: ${{ steps.path-normalizer.outputs.normalized-package-name }}
+          path: ${{ steps.path-normalizer.outputs.export-path }}
+          retention-days: ${{ inputs.retention-days }}
+
       - name: Download `convert_to_sarif.py`
-        if: ${{ steps.violations-log.outputs.available == '1' }}
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
         run: |
-          curl --fail --silent --show-error --max-time 10 -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} || { echo "Failed to download script"; exit 1; }
+          curl --fail \
+            --silent \
+            --show-error \
+            --max-time 10 \
+            -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} \
+            || { echo "Failed to download script"; exit 1; }
 
       - name: Convert to SARIF
-        if: ${{ steps.violations-log.outputs.available == '1' }}
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
         run: |
           python3 convert_to_sarif.py output.log output.sarif
 
       - name: Setup reviewdog
-        if: ${{ steps.violations-log.outputs.available == '1' }}
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
 
       - name: Apply Style Suggestions with reviewdog
-        if: ${{ steps.violations-log.outputs.available == '1' }}
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -243,6 +305,6 @@ jobs:
             < output.sarif
 
       - name: Cleanup temporary files
-        if: ${{ steps.violations-log.outputs.available == '1' && always() }}
+        if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
         run: |
           rm -f TempProject.csproj convert_to_sarif.py output.log output.sarif || true
