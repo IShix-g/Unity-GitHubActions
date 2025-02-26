@@ -31,17 +31,17 @@ on:
         description: 'You can change the report level. [info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-checks--reportergithub-pr-check'
         required: false
         type: string
-        default: "warning"
+        default: 'warning'
       review-exit-code:
         description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
         required: false
         type: string
-        default: "error"
+        default: 'error'
       max-log-lines:
         description: "Maximum number of lines to print from the log"
         required: false
         type: string
-        default: 50
+        default: '50'
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
