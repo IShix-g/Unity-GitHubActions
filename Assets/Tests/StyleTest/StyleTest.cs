@@ -11,11 +11,11 @@ namespace Tests.StyleTest
         string _test2;
         int _test3;
         double _test4;
-        float Test5;
+        float _test5;
 
         void Test()
         {
 
-          }
+        }
     }
 }
