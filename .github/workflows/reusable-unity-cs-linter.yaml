@@ -38,7 +38,7 @@ on:
         type: string
         default: 'error'
       max-log-lines:
-        description: "Maximum number of lines to print from the log"
+        description: 'Maximum number of lines to print from the log'
         required: false
         type: string
         default: '50'
