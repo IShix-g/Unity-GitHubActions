@@ -226,7 +226,7 @@ jobs:
               } else {
                 replacement = count " spaces"
               }
-              $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH)
+              $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH - 1)
             }
             print
           }')
