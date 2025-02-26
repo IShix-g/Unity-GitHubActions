@@ -37,6 +37,11 @@ on:
         required: false
         type: string
         default: "error"
+      max-log-lines:
+        description: "Maximum number of lines to print from the log"
+        required: false
+        type: string
+        default: 50
 
 env:
   EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
@@ -170,9 +175,23 @@ jobs:
       - name: Debug csproj
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          echo "=== TempProject.csproj ==="
-          cat TempProject.csproj
-          echo "=== end ==="
+          if [ ! -f TempProject.csproj ]; then
+            echo "::error::TempProject.csproj does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < TempProject.csproj)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW TempProject.csproj ==="
+            cat TempProject.csproj
+          else
+            echo "=== DEBUG RAW TempProject.csproj (TRUNCATED) ==="
+            tail -n "$max_lines" TempProject.csproj
+            echo "...(truncated: number of lines=${line_count})"
+          fi
+          echo "=== END RAW TempProject.csproj ==="
 
       - name: Install .NET SDK
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
@@ -217,8 +236,22 @@ jobs:
       - name: Debug Raw Output Log
         if: ${{ steps.violations-log.outputs.exits == '1' }}
         run: |
-          echo "=== DEBUG RAW OUTPUT.LOG ==="
-          cat output.log
+          if [ ! -f output.log ]; then
+            echo "::error::output.log does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < output.log)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW OUTPUT.LOG ==="
+            cat output.log
+          else
+            echo "=== DEBUG RAW OUTPUT.LOG (TRUNCATED) ==="
+            head -n "$max_lines" output.log
+            echo "...(truncated: number of lines=${line_count})"
+          fi
           echo "=== END RAW OUTPUT.LOG ==="
 
       - name: Download `convert_to_sarif.py`
