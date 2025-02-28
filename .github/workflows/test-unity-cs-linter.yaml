@@ -3,7 +3,7 @@ name: (Test) Unity C# Linter
 on:
   pull_request:
     branches:
-      - feature/unity-lint
+      - develop/unity-lint**
 
 jobs:
   release-notes:
