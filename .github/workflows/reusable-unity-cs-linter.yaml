@@ -211,7 +211,7 @@ jobs:
         id: violations-log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
+          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1)
 
           if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"

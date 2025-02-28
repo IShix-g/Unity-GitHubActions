@@ -37,12 +37,16 @@ dotnet_diagnostic.SA1004.severity = none
 dotnet_diagnostic.SA1005.severity = none
 # Preprocessor directives should not be preceded by space.
 dotnet_diagnostic.SA1006.severity = none
+# Closing parenthesis should not be preceded by a space.
+dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
 dotnet_diagnostic.SA1027.severity = warning
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
 dotnet_diagnostic.SA1101.severity = none
+# Closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
 # Use string.Empty for empty strings
 dotnet_diagnostic.SA1122.severity = warning
 # Using directives should be placed correctly (either top of file or inside namespace).
@@ -61,6 +65,8 @@ dotnet_diagnostic.SA1205.severity = none
 dotnet_diagnostic.SA1206.severity = none
 # The "this." prefix should be used consistently in the code base.
 dotnet_diagnostic.SA1208.severity = none
+# Readonly fields should appear before non-readonly fields
+dotnet_diagnostic.SA1214.severity = none
 # Class, method, and member names should start with an uppercase letter.
 dotnet_diagnostic.SA1300.severity = none
 # Interface names must begin with an `I`
@@ -101,6 +107,8 @@ dotnet_diagnostic.SA1508.severity = none
 dotnet_diagnostic.SA1511.severity = none
 # All files must end with a single newline.
 dotnet_diagnostic.SA1512.severity = none
+# Closing brace should be followed by blank line
+dotnet_diagnostic.SA1513.severity = none
 # Blank lines should be properly used within methods.
 dotnet_diagnostic.SA1515.severity = none
 # One or more adjacent elements must not be missing blank lines.
@@ -387,3 +395,15 @@ dotnet_naming_style.camel_case_with_s.capitalization = camel_case
 dotnet_naming_style.interface_pascal_case.required_prefix = I
 dotnet_naming_style.interface_pascal_case.required_suffix =
 dotnet_naming_style.interface_pascal_case.capitalization = pascal_case
+
+
+# File-specific C# Naming Style Settings =================
+
+[Assets/Tests/StyleTest/IgnoreStyleTest.cs]
+
+dotnet_naming_rule.private_fields.style = camel_case
+dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.camel_case.capitalization = camel_case
