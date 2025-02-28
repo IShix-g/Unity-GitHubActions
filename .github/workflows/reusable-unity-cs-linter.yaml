@@ -97,7 +97,7 @@ jobs:
               sleep $retry_delay_sec
             elif [ -z "$response" ]; then
               if [ $i -eq $max_retries ]; then
-                echo "::error title=.editorconfig Missing::The root of the repository is missing an .editorconfig file. For reference, you can look at: ${{ env.EDITORCONFIG_SAMPLE_URI }}"
+                echo "::error title=.editorconfig Missing::The repository is missing an .editorconfig file in the base branch (${{ steps.branch-conf.outputs.base-branch }}); see ${{ env.EDITORCONFIG_SAMPLE_URI }} for reference."
                 exit 1
               fi
             else
@@ -291,6 +291,19 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=github-pr-review \
+            -filter-mode=file \
+            -level=${{ inputs.review-level }} \
+            -fail-level=${{ inputs.review-exit-code }} \
+            < output.sarif
+
+      - name: Apply Style Suggestions with reviewdog
+        if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=sarif \
+            -name="StyleCop" \
+            -reporter=github-pr-check \
             -filter-mode=file \
             -level=${{ inputs.review-level }} \
             -fail-level=${{ inputs.review-exit-code }} \
