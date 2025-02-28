@@ -84,7 +84,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch=${{ steps.branch-conf.outputs.editorconfig-branch }}
+          branch="${{ steps.branch-conf.outputs.editorconfig-branch }}"
           file_path=".editorconfig"
           max_retries=3
           retry_delay_sec=5
@@ -102,7 +102,7 @@ jobs:
               fi
             else
               echo ".editorconfig file exists at the root of the repository."
-              exit 0
+              break
             fi
           done
 
@@ -111,6 +111,13 @@ jobs:
         with:
           ref: ${{ steps.branch-conf.outputs.head-branch || steps.branch-conf.outputs.base-branch }}
           fetch-depth: 0
+
+      - name: Fetch .editorconfig from Default Branch
+        if: ${{ steps.branch-conf.outputs.editorconfig-branch != steps.branch-conf.outputs.head-branch }}
+        run: |
+          branch="${{ steps.branch-conf.outputs.editorconfig-branch }}"
+          git fetch origin "$branch"
+          git checkout origin/"$branch" -- .editorconfig
 
       - name: Detect Changed C# Files
         id: detect-cs-files
@@ -211,8 +218,8 @@ jobs:
         id: violations-log
         if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
-          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1)
-
+          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
+          
           if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
             exit 0
