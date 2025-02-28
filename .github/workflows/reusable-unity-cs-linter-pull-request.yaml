@@ -80,31 +80,12 @@ jobs:
           echo "Head Branch: $head_branch"
           echo "Editorconfig Branch: $editorconfig_branch"
 
-      - name: Check for .editorconfig via API
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          branch="${{ steps.branch-conf.outputs.editorconfig-branch }}"
-          file_path=".editorconfig"
-          max_retries=3
-          retry_delay_sec=5
-          
-          for ((i=1; i<=max_retries; i++)); do
-            response=$(timeout 10s gh api "repos/${{ github.repository }}/contents/$file_path?ref=$branch" --jq ". | select(.type==\"file\") | select(.name==\"$file_path\")")          
-          
-            if [ $? -eq 124 ]; then
-              echo "Attempt $i: Timeout occurred while requesting GitHub API. Retrying in $retry_delay_sec seconds..."
-              sleep $retry_delay_sec
-            elif [ -z "$response" ]; then
-              if [ $i -eq $max_retries ]; then
-                echo "::error title=.editorconfig Missing::The repository is missing an .editorconfig file in the base branch (${{ steps.branch-conf.outputs.base-branch }}); see ${{ env.EDITORCONFIG_SAMPLE_URI }} for reference."
-                exit 1
-              fi
-            else
-              echo ".editorconfig file exists at the root of the repository."
-              break
-            fi
-          done
+      - uses: IShix-g/Unity-GitHubActions/.github/actions/check-editorconfig@main
+        with:
+          ref: ${{ steps.branch-conf.outputs.editorconfig-branch }}
+          max-retries: '3'
+          retry-delay: '5'
+          fail-on-missing: true
 
       - name: Checkout repository
         uses: actions/checkout@v4
