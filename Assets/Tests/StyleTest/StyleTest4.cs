@@ -2,9 +2,9 @@ namespace Tests.StyleTest
 {
     public sealed class StyleTest4
     {
-        static string _staticField = string.Empty;
+        static string s_staticField = string.Empty;
         string _test;
-        string _test2;
+       string _test2;
 
         void Test()
         {
