@@ -296,19 +296,6 @@ jobs:
             -fail-level=${{ inputs.review-exit-code }} \
             < output.sarif
 
-      - name: Apply Style Suggestions with reviewdog
-        if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          reviewdog -f=sarif \
-            -name="StyleCop" \
-            -reporter=github-pr-check \
-            -filter-mode=file \
-            -level=${{ inputs.review-level }} \
-            -fail-level=${{ inputs.review-exit-code }} \
-            < output.sarif
-
       - name: Cleanup temporary files
         if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
         run: |
