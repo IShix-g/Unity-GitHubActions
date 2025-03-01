@@ -7,7 +7,7 @@ namespace Tests.StyleTest
         string _test2;
 
         void Test()
-            {
+        {
             var test = this._test2;
 
         }
