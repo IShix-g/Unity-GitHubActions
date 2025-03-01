@@ -7,6 +7,11 @@ on:
         description: "Specify a branch or commit ID"
         required: true
         type: string
+      editorconfig-branch:
+        description: 'Branch where .editorconfig is located. If not specified, ref will be used.'
+        required: false
+        type: string
+        default: ''
       files:
         description: 'List of file paths to be linted, separated by a comma (`,`), pipe (`|`), or semicolon (`;`).'
         required: true
@@ -45,6 +50,34 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
+
+      - name: Branch Configuration
+        id: branch-conf
+        run: |
+          if [ -n "${{ inputs.editorconfig-branch }}" ]; then
+            editorconfig_branch="${{ inputs.editorconfig-branch }}"
+          else
+            editorconfig_branch="${{ inputs.ref }}"
+          fi
+          echo "editorconfig-branch=${editorconfig_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
+          echo "Editorconfig Branch: $editorconfig_branch"
+
+      - name: Fetch .editorconfig from Default Branch
+        if: ${{ inputs.ref != steps.branch-conf.outputs.editorconfig-branch }}
+        run: |
+          ref="${{ steps.branch-conf.outputs.editorconfig-branch }}"
+          git fetch origin "$ref"
+          
+          if git show-ref --verify --quiet refs/heads/"$ref"; then
+            echo "$ref was recognized as a branch"
+            git checkout origin/"$ref" -- .editorconfig
+          elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] && git rev-parse --quiet "$ref"; then
+            echo "$ref was recognized as a commit id"
+            git checkout "$ref" -- .editorconfig
+          else
+            echo "An invalid reference was specified: $ref"
+            exit 1
+          fi
 
       - name: Create Temporary csproj for Analysis
         run: |
