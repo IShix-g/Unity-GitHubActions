@@ -3,7 +3,7 @@ namespace Tests.StyleTest
     public sealed class StyleTest2
     {
         static string s_staticField = string.Empty;
-        string _test;
+        string test;
         string _test2;
 
         void Test()
