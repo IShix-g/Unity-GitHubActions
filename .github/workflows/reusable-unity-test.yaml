@@ -38,6 +38,9 @@ on:
       UNITY_SERIAL:
         required: false
 
+permissions:
+  checks: write
+
 jobs:
   print-unity-version:
     runs-on: ubuntu-22.04
