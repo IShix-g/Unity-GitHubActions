@@ -40,6 +40,8 @@ on:
         default: '50'
 
 permissions:
+  contents: read
+  actions: read
   checks: write
 
 jobs:
@@ -159,6 +161,6 @@ jobs:
       editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       files: ${{ needs.detect-cs-files.outputs.files }}
       max-log-lines: ${{ inputs.max-log-lines }}
-      review-reporter: 'github-pr-check'
+      review-reporter: 'github-check'
       review-level: ${{ inputs.review-level }}
       review-exit-code: ${{ inputs.review-exit-code }}
