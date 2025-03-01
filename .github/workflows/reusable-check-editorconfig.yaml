@@ -25,11 +25,13 @@ on:
     outputs:
       exists:
         description: "Indicates whether the .editorconfig file exists"
-        value: ${{ steps.check-editorconfig.outputs.exists }}
+        value: ${{ jobs.check-editorconfig.outputs.exists }}
 
 jobs:
   check-editorconfig:
     runs-on: ubuntu-22.04
+    outputs:
+      exists: ${{ steps.check-editorconfig.outputs.exists }}
     steps:
       - name: Check for .editorconfig
         id: check-editorconfig

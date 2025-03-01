@@ -51,9 +51,9 @@ jobs:
   branch-conf:
     runs-on: ubuntu-22.04
     outputs:
-      base-branch: ${{ needs.branch-conf.outputs.base-branch }}
-      head-branch: ${{ needs.branch-conf.outputs.head-branch }}
-      editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
+      base-branch: ${{ steps.branch-conf.outputs.base-branch }}
+      head-branch: ${{ steps.branch-conf.outputs.head-branch }}
+      editorconfig-branch: ${{ steps.branch-conf.outputs.editorconfig-branch }}
     steps:
       - name: Branch Configuration
         id: branch-conf
@@ -85,7 +85,7 @@ jobs:
 
   check-editorconfig:
     needs: [branch-conf]
-    -uses: ./.github/workflows/reusable-check-editorconfig.yaml
+    uses: ./.github/workflows/reusable-check-editorconfig.yaml
     with:
       ref: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       max-retries: '3'
