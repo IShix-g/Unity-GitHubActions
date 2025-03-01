@@ -27,6 +27,7 @@ permissions:
   actions: read
   checks: write
   statuses: write
+  pull-requests: write
 
 jobs:
   unity-cs-linter:
