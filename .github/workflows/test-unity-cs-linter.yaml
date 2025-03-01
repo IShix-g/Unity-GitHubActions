@@ -6,10 +6,17 @@ on:
       - develop/unity-lint**
 
 jobs:
-  release-notes:
+  unity-cs-linter:
     uses: ./.github/workflows/reusable-unity-cs-linter-pull-request.yaml
     with:
       head-branch: ${{ github.event.pull_request.head.ref }}
       base-branch: ${{ github.event.pull_request.base.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
       include-paths: 'Assets/Tests/StyleTest/.*'
+
+  summary:
+    name: "Unity C# Linter"
+    needs: [unity-cs-linter]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Lint Completed Successfully!"
