@@ -159,6 +159,6 @@ jobs:
       editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       files: ${{ needs.detect-cs-files.outputs.files }}
       max-log-lines: ${{ inputs.max-log-lines }}
-      review-reporter: 'github-check'
+      review-reporter: 'github-pr-check'
       review-level: ${{ inputs.review-level }}
       review-exit-code: ${{ inputs.review-exit-code }}
