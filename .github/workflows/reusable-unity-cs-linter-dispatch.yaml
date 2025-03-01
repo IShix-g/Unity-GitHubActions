@@ -41,7 +41,6 @@ on:
 
 permissions:
   checks: write
-  statuses: write
 
 jobs:
   branch-conf:
