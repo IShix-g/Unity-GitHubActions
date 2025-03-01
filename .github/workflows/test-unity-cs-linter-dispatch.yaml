@@ -24,7 +24,7 @@ on:
 
 jobs:
   unity-cs-linter:
-    uses: ./.github/workflows/reusable-unity-cs-linter-pull-request.yaml
+    uses: ./.github/workflows/reusable-unity-cs-linter-dispatch.yaml
     with:
       base-branch: ${{ github.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
