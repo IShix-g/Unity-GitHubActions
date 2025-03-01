@@ -4,6 +4,7 @@
 [![Test Release Notes Generator](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-release-notes.yaml)  
 [![Test Build Package](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml)  
 [![Test Unity Test](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml)
+[![Test Unity C# Linter](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml)
 
 [README - 日本語版](Docs/README_jp.md)
 
