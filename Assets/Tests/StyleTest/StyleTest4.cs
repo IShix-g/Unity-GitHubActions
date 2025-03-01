@@ -10,6 +10,6 @@ namespace Tests.StyleTest
         {
             var test = this._test2;
 
-  }
+     }
     }
 }
