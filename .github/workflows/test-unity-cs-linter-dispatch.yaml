@@ -1,0 +1,32 @@
+name: (Test) Unity C# Linter
+
+on:
+  workflow_dispatch:
+    inputs:
+      include-paths:
+        description: 'Comma-separated regex patterns for files or directories to include. More info: https://www.gnu.org/software/grep/manual/'
+        required: false
+        type: string
+        default: 'Assets/.*'
+      exclude-paths:
+        description: 'Exclude files or directories (regex, comma-separated)'
+        required: false
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      include-paths:
+        type: string
+        default: 'Assets/.*'
+      exclude-paths:
+        type: string
+        default: ''
+
+jobs:
+  unity-cs-linter:
+    uses: ./.github/workflows/reusable-unity-cs-linter-dispatch.yaml
+    with:
+      base-branch: ${{ github.ref }}
+      editorconfig-branch: ${{ github.event.repository.default_branch }}
+      include-paths: ${{ inputs.include-paths }}
+      exclude-paths: ${{ inputs.exclude-paths }}

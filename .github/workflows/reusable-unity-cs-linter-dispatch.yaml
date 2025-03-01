@@ -1,12 +1,8 @@
-name: (Reusable) Unity C# Linter for Pull Request
+name: (Reusable) Unity C# Linter for Dispatch
 
 on:
   workflow_call:
     inputs:
-      head-branch:
-        description: 'Target head branch for investigation'
-        required: true
-        type: string
       base-branch:
         description: 'Target base branch for investigation'
         required: false
@@ -63,11 +59,6 @@ jobs:
           fi
           echo "base-branch=${base_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
 
-          if [ -n "${{ inputs.head-branch }}" ]; then
-            head_branch="${{ inputs.head-branch }}"
-            echo "head-branch=${head_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
-          fi
-
           if [ -n "${{ inputs.editorconfig-branch }}" ]; then
             editorconfig_branch="${{ inputs.editorconfig-branch }}"
           else
@@ -76,7 +67,6 @@ jobs:
           echo "editorconfig-branch=${editorconfig_branch#refs/heads/}" >> "$GITHUB_OUTPUT"
 
           echo "Base Branch: $base_branch"
-          echo "Head Branch: $head_branch"
           echo "Editorconfig Branch: $editorconfig_branch"
 
   check-editorconfig:
@@ -92,21 +82,20 @@ jobs:
   detect-cs-files:
     needs: [branch-conf, check-editorconfig]
     runs-on: ubuntu-22.04
-    outputs: 
+    outputs:
       files: ${{ steps.detect-cs-files.outputs.files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
+          ref: ${{ needs.branch-conf.outputs.base-branch }}
           fetch-depth: 0
 
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          base_branch=origin/${{ needs.branch-conf.outputs.base-branch }}
-          head_branch=${{ needs.branch-conf.outputs.head-branch || 'HEAD' }}
-          files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
+          files=$(find . -type f -name "*.cs" | sed 's|./||' || true)
+
           include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',|;' '\n')
           exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',|;' '\n')
 
@@ -166,4 +155,4 @@ jobs:
       ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
       editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       files: ${{ needs.detect-cs-files.outputs.files }}
-      review-reporter: 'github-pr-review'
+      review-reporter: 'github-check'
