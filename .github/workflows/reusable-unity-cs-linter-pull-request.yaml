@@ -150,5 +150,6 @@ jobs:
     uses: ./.github/workflows/reusable-lint-cs-files.yaml
     with:
       ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
+      editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       files: ${{ needs.detect-cs-files.outputs.files }}
       review-reporter: 'github-pr-review'
