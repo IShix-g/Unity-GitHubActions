@@ -142,7 +142,7 @@ jobs:
             exit 0
           fi
 
-          if [ "$(echo "$included_files" | wc -c)" -gt 100000 ]; then
+          if [ "${#included_files}" -gt 100000 ]; then
             echo "File list is too long to output."
             echo -e "$included_files" > detected_files_list.txt
             echo "::error::Detected file list saved to detected_files_list.txt"
