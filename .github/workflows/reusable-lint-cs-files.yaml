@@ -37,6 +37,11 @@ on:
         type: string
         default: 'error'
 
+permissions:
+  actions: read
+  contents: read
+  checks: write
+
 env:
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
