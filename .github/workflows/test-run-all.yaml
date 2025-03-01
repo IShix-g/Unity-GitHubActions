@@ -36,11 +36,11 @@ jobs:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
   test-runner:
-    uses: ./.github/workflows/test-test-runner.yaml
+    uses: ./.github/workflows/test-unity-test.yaml
     secrets:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  
+
   test-unity-cs-linter:
     uses: ./.github/workflows/test-unity-cs-linter-dispatch.yaml
