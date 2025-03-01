@@ -68,8 +68,8 @@ jobs:
           ref="${{ steps.branch-conf.outputs.editorconfig-branch }}"
           git fetch origin "$ref"
           
-          if git show-ref --verify --quiet refs/heads/"$ref"; then
-            echo "$ref was recognized as a branch"
+          if git show-ref --verify --quiet refs/remotes/origin/"$ref"; then
+            echo "$ref was recognized as a remote branch"
             git checkout origin/"$ref" -- .editorconfig
           elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] && git rev-parse --quiet "$ref"; then
             echo "$ref was recognized as a commit id"
