@@ -26,6 +26,9 @@ on:
       UNITY_LICENSE:
         required: true
 
+permissions:
+  checks: write
+
 jobs:
   unity-test:
     uses: ./.github/workflows/reusable-unity-test.yaml

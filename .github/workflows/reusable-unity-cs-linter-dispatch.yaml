@@ -32,7 +32,7 @@ on:
         description: 'Exit code string based on reviewdog exit codes. [none,any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
         required: false
         type: string
-        default: 'none'
+        default: 'error'
       max-log-lines:
         description: 'Maximum number of lines to print from the log'
         required: false
