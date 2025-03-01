@@ -5,7 +5,7 @@ namespace Tests.StyleTest
         public static readonly string TestStaticReadonly = "TestStaticReadonly";
         static string s_staticField = string.Empty;
         string _test;
-        string _test2;
+        string test2;
 
         void Test()
         {
