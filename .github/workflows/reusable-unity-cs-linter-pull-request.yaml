@@ -43,10 +43,6 @@ on:
         type: string
         default: '50'
 
-env:
-  EDITORCONFIG_SAMPLE_URI: 'https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig'
-  CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
-
 jobs:
   branch-conf:
     runs-on: ubuntu-22.04
@@ -104,13 +100,6 @@ jobs:
         with:
           ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
           fetch-depth: 0
-
-      - name: Fetch .editorconfig from Default Branch
-        if: ${{ needs.branch-conf.outputs.editorconfig-branch != needs.branch-conf.outputs.head-branch }}
-        run: |
-          branch="${{ needs.branch-conf.outputs.editorconfig-branch }}"
-          git fetch origin "$branch"
-          git checkout origin/"$branch" -- .editorconfig
 
       - name: Detect Changed C# Files
         id: detect-cs-files
