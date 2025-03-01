@@ -23,7 +23,7 @@ on:
         default: ''
 
 permissions:
-  contents: read
+  actions: read
   checks: write
 
 jobs:
