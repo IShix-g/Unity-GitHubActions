@@ -1,13 +1,13 @@
-name: (Test) Unity C# Linter
+name: (Test) Unity C# Linter for Dispatch
 
 on:
   workflow_dispatch:
     inputs:
       include-paths:
         description: 'Comma-separated regex patterns for files or directories to include. More info: https://www.gnu.org/software/grep/manual/'
-        required: false
+        required: true
         type: string
-        default: 'Assets/.*'
+        default: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
       exclude-paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
@@ -17,7 +17,7 @@ on:
     inputs:
       include-paths:
         type: string
-        default: 'Assets/.*'
+        default: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
       exclude-paths:
         type: string
         default: ''

@@ -33,7 +33,7 @@ on:
         type: string
         default: 'warning'
       review-exit-code:
-        description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
+        description: 'Exit code string based on reviewdog exit codes. [none,any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
         required: false
         type: string
         default: 'error'
@@ -166,4 +166,7 @@ jobs:
       ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
       editorconfig-branch: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       files: ${{ needs.detect-cs-files.outputs.files }}
+      max-log-lines: ${{ inputs.max-log-lines }}
       review-reporter: 'github-pr-review'
+      review-level: ${{ inputs.review-level }}
+      review-exit-code: ${{ inputs.review-exit-code }}
