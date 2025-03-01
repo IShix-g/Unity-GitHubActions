@@ -1,4 +1,4 @@
-name: (Test) Unity C# Linter
+name: (Test) Unity C# Linter for Dispatch
 
 on:
   workflow_dispatch:
