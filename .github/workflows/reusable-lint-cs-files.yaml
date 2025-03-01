@@ -1,0 +1,181 @@
+name: (Reusable) Lint C# Files for Unity
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Specify a branch or commit ID"
+        required: true
+        type: string
+      files:
+        description: 'List of file paths to be linted, separated by a comma (`,`), pipe (`|`), or semicolon (`;`).'
+        required: true
+        type: string
+      max-log-lines:
+        description: 'Maximum number of lines to print from logs.'
+        required: false
+        type: string
+        default: '50'
+      review-reporter:
+        description: 'Set the reporter for reviewdog (e.g., github-pr-review, github-check, etc.).'
+        required: false
+        type: string
+        default: 'github-pr-review'
+      review-level:
+        description: 'Set the review level (info, warning, error).'
+        required: false
+        type: string
+        default: 'warning'
+      review-exit-code:
+        description: 'Configure the exit code behavior based on reviewdog results [any, info, warning, error].'
+        required: false
+        type: string
+        default: 'error'
+
+env:
+  CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
+
+jobs:
+  lint-cs-files:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Create Temporary csproj for Analysis
+        run: |
+          {
+            echo "<Project Sdk=\"Microsoft.NET.Sdk\">"
+            echo "  <PropertyGroup>"
+            echo "    <TargetFramework>netstandard2.1</TargetFramework>"
+            echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>"
+            echo "  </PropertyGroup>"
+            echo "  <ItemGroup>"
+            IFS=',|;' read -ra files <<< "${{ inputs.files }}"
+            for file in "${files[@]}"; do
+                echo "    <Compile Include=\"$file\" />"
+            done
+            echo "  </ItemGroup>"
+            echo "</Project>"
+          } > TempProject.csproj
+
+      - name: Debug csproj
+        run: |
+          if [ ! -f TempProject.csproj ]; then
+            echo "::error::TempProject.csproj does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < TempProject.csproj)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW TempProject.csproj ==="
+            cat TempProject.csproj
+          else
+            echo "=== DEBUG RAW TempProject.csproj (TRUNCATED) ==="
+            tail -n "$max_lines" TempProject.csproj
+            echo "...(truncated: number of lines=${line_count})"
+          fi
+          echo "=== END RAW TempProject.csproj ==="
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0'
+
+      - name: Install StyleCop and dotnet-format
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-format
+          dotnet add package StyleCop.Analyzers
+
+      - name: Collect Style Violations Log
+        id: violations-log
+        run: |
+          output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
+          
+          if [ -z "$output" ]; then
+            echo "::notice::No issues were found in the code"
+            exit 0
+          fi
+
+          output=$(echo "$output" | awk '{
+            if (match($0, /\\s+/)) {
+              count = gsub(/\\s/, " ")
+              if (count == 1) {
+                replacement = "1 space"
+              } else {
+                replacement = count " spaces"
+              }
+              $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH - 1)
+            }
+            print
+          }')
+
+          echo "$output" > output.log
+          echo "exits=1" >> "$GITHUB_OUTPUT"
+
+      - name: Debug Raw Output Log
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
+        run: |
+          if [ ! -f output.log ]; then
+            echo "::error::output.log does not exist."
+            exit 1
+          fi
+
+          line_count=$(wc -l < output.log)
+          max_lines="${{ inputs.max-log-lines }}"
+
+          if [ "$line_count" -le "$max_lines" ]; then
+            echo "=== DEBUG RAW OUTPUT.LOG ==="
+            cat output.log
+          else
+            echo "=== DEBUG RAW OUTPUT.LOG (TRUNCATED) ==="
+            head -n "$max_lines" output.log
+            echo "...(truncated: number of lines=${line_count})"
+          fi
+          echo "=== END RAW OUTPUT.LOG ==="
+
+      - name: Download `convert_to_sarif.py`
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
+        run: |
+          curl --fail \
+            --silent \
+            --show-error \
+            --max-time 10 \
+            -o convert_to_sarif.py ${{ env.CONVERT_TO_SARIF_URI }} \
+            || { echo "Failed to download script"; exit 1; }
+
+      - name: Convert to SARIF
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
+        run: |
+          python3 convert_to_sarif.py output.log output.sarif
+
+      - name: Setup reviewdog
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Apply Style Suggestions with reviewdog
+        if: ${{ steps.violations-log.outputs.exits == '1' }}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=sarif \
+            -name="StyleCop" \
+            -reporter=${{ inputs.review-reporter }} \
+            -filter-mode=file \
+            -level=${{ inputs.review-level }} \
+            -fail-level=${{ inputs.review-exit-code }} \
+            < output.sarif
+
+      - name: Cleanup temporary files
+        if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
+        run: |
+          rm -f TempProject.csproj convert_to_sarif.py output.log output.sarif || true
