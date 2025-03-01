@@ -203,7 +203,7 @@ jobs:
           reviewdog -f=sarif \
             -name="StyleCop" \
             -reporter=${{ inputs.review-reporter }} \
-            -filter-mode=file \
+            -filter-mode=nofilter \
             -level=${{ inputs.review-level }} \
             -fail-level=${{ inputs.review-exit-code }} \
             < output.sarif
