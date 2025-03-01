@@ -48,9 +48,12 @@ env:
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
 jobs:
-  lint-cs-files:
+  branch-conf:
     runs-on: ubuntu-22.04
-    timeout-minutes: 12
+    outputs:
+      base-branch: ${{ steps.branch-conf.outputs.base-branch }}
+      head-branch: ${{ steps.branch-conf.outputs.head-branch }}
+      editorconfig-branch: ${{ steps.branch-conf.outputs.editorconfig-branch }}
     steps:
       - name: Branch Configuration
         id: branch-conf
@@ -80,33 +83,39 @@ jobs:
           echo "Head Branch: $head_branch"
           echo "Editorconfig Branch: $editorconfig_branch"
 
-      - uses: IShix-g/Unity-GitHubActions/.github/actions/check-editorconfig@main
-        with:
-          ref: ${{ steps.branch-conf.outputs.editorconfig-branch }}
-          max-retries: '3'
-          retry-delay: '5'
-          fail-on-missing: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  check-editorconfig:
+    needs: [branch-conf]
+    uses: ./.github/workflows/reusable-check-editorconfig.yaml
+    with:
+      ref: ${{ needs.branch-conf.outputs.editorconfig-branch }}
+      max-retries: '3'
+      retry-delay: '5'
+      fail-on-missing: true
+    secrets: inherit
 
+  lint-cs-files:
+    needs: [branch-conf, check-editorconfig]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.branch-conf.outputs.head-branch || steps.branch-conf.outputs.base-branch }}
+          ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
           fetch-depth: 0
 
       - name: Fetch .editorconfig from Default Branch
-        if: ${{ steps.branch-conf.outputs.editorconfig-branch != steps.branch-conf.outputs.head-branch }}
+        if: ${{ needs.branch-conf.outputs.editorconfig-branch != needs.branch-conf.outputs.head-branch }}
         run: |
-          branch="${{ steps.branch-conf.outputs.editorconfig-branch }}"
+          branch="${{ needs.branch-conf.outputs.editorconfig-branch }}"
           git fetch origin "$branch"
           git checkout origin/"$branch" -- .editorconfig
 
       - name: Detect Changed C# Files
         id: detect-cs-files
         run: |
-          base_branch=origin/${{ steps.branch-conf.outputs.base-branch }}
-          head_branch=${{ steps.branch-conf.outputs.head-branch || 'HEAD' }}
+          base_branch=origin/${{ needs.branch-conf.outputs.base-branch }}
+          head_branch=${{ needs.branch-conf.outputs.head-branch || 'HEAD' }}
           files=$(git diff --name-only "$base_branch"..."$head_branch" | grep '\.cs$' || true)
           include_regexes=$(echo "${{ inputs.include-paths }}" | tr ',' '\n')
           exclude_regexes=$(echo "${{ inputs.exclude-paths }}" | tr ',' '\n')
