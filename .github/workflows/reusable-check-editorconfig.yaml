@@ -49,9 +49,8 @@ jobs:
           success=false
   
           for ((i=1; i<=max_retries; i++)); do
-            response=$(gh api "repos/${{ github.repository }}/contents/$file_path?ref=$ref" \
+            response=$(timeout 10s gh api "repos/${{ github.repository }}/contents/$file_path?ref=$ref" \
               --header "Authorization: Bearer $GH_TOKEN" \
-              --timeout 10s \
               --jq ". | select(.type==\"file\") | select(.name==\"$file_path\")")
   
             api_exit_code=$?
