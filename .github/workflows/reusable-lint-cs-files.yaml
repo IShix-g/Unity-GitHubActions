@@ -47,7 +47,6 @@ jobs:
           fetch-depth: 0
 
       - name: Create Temporary csproj for Analysis
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           {
             echo "<Project Sdk=\"Microsoft.NET.Sdk\">"
@@ -56,7 +55,7 @@ jobs:
             echo "    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>"
             echo "  </PropertyGroup>"
             echo "  <ItemGroup>"
-            IFS=',|;' read -ra files <<< "${{ steps.detect-cs-files.outputs.files }}"
+            IFS=',|;' read -ra files <<< "${{ inputs.files }}"
             for file in "${files[@]}"; do
                 echo "    <Compile Include=\"$file\" />"
             done
@@ -65,7 +64,6 @@ jobs:
           } > TempProject.csproj
 
       - name: Debug csproj
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           if [ ! -f TempProject.csproj ]; then
             echo "::error::TempProject.csproj does not exist."
@@ -86,13 +84,11 @@ jobs:
           echo "=== END RAW TempProject.csproj ==="
 
       - name: Install .NET SDK
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '7.0'
 
       - name: Install StyleCop and dotnet-format
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           dotnet new tool-manifest
           dotnet tool install dotnet-format
@@ -100,7 +96,6 @@ jobs:
 
       - name: Collect Style Violations Log
         id: violations-log
-        if: ${{ steps.detect-cs-files.outputs.files != '' }}
         run: |
           output=$(dotnet format TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
           

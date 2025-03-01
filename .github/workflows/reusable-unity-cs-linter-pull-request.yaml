@@ -157,6 +157,7 @@ jobs:
 
   lint-cs-files:
     needs: [branch-conf, check-editorconfig, detect-cs-files]
+    if: ${{ needs.detect-cs-files.outputs.files != '' }}
     uses: ./.github/workflows/reusable-lint-cs-files.yaml
     with:
       ref: ${{ needs.branch-conf.outputs.head-branch || needs.branch-conf.outputs.base-branch }}
