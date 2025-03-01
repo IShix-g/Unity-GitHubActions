@@ -1,4 +1,4 @@
-name: (Reusable) Unity C# Linter
+name: (Reusable) Unity C# Linter for Dispatch
 
 on:
   workflow_call:
