@@ -39,9 +39,6 @@ on:
         type: string
         default: '50'
 
-permissions:
-  checks: write
-
 jobs:
   branch-conf:
     runs-on: ubuntu-22.04

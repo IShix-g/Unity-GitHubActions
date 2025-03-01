@@ -23,6 +23,9 @@ on:
         default: ''
 
 permissions:
+  contents: write
+  actions: read
+  checks: write
   statuses: write
 
 jobs:
