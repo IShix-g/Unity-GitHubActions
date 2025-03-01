@@ -22,12 +22,6 @@ on:
         type: string
         default: ''
 
-permissions:
-  contents: write
-  actions: read
-  checks: write
-  statuses: write
-
 jobs:
   unity-cs-linter:
     uses: ./.github/workflows/reusable-unity-cs-linter-dispatch.yaml
