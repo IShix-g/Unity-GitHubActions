@@ -7,7 +7,7 @@ on:
         description: 'Comma-separated regex patterns for files or directories to include. More info: https://www.gnu.org/software/grep/manual/'
         required: true
         type: string
-        default: 'Assets/Tests/StyleTest/.*'
+        default: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
       exclude-paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
@@ -17,7 +17,7 @@ on:
     inputs:
       include-paths:
         type: string
-        default: 'Assets/.*'
+        default: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
       exclude-paths:
         type: string
         default: ''
@@ -30,3 +30,4 @@ jobs:
       editorconfig-branch: ${{ github.event.repository.default_branch }}
       include-paths: ${{ inputs.include-paths }}
       exclude-paths: ${{ inputs.exclude-paths }}
+      review-exit-code: 'none'

@@ -29,7 +29,7 @@ on:
         type: string
         default: 'warning'
       review-exit-code:
-        description: 'Exit code string based on reviewdog exit codes. [any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
+        description: 'Exit code string based on reviewdog exit codes. [none,any,info,warning,error] https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes'
         required: false
         type: string
         default: 'error'
