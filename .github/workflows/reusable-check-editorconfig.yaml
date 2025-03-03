@@ -33,7 +33,7 @@ jobs:
     outputs:
       exists: ${{ steps.check-editorconfig.outputs.exists }}
     steps:
-      - name: Checkout the target branch/commit
+      - name: Check out ${{ inputs.ref }}
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
