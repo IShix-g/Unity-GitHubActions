@@ -27,16 +27,18 @@ on:
         description: "Indicates whether the .editorconfig file exists"
         value: ${{ jobs.check-editorconfig.outputs.exists }}
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   check-editorconfig:
     runs-on: ubuntu-22.04
     outputs:
       exists: ${{ steps.check-editorconfig.outputs.exists }}
     steps:
-      - name: Check out ${{ inputs.ref }}
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
           fetch-depth: 1
 

@@ -79,7 +79,6 @@ jobs:
       ref: ${{ needs.branch-conf.outputs.editorconfig-branch }}
       max-retries: '3'
       retry-delay: '5'
-      fail-on-missing: true
     secrets: inherit
 
   detect-cs-files:
