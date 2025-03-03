@@ -11,5 +11,10 @@ namespace Tests.StyleTest
         {
 
         }
+
+        void test2()
+        {
+
+        }
     }
 }
