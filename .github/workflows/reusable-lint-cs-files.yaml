@@ -42,7 +42,6 @@ env:
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   lint-cs-files:
