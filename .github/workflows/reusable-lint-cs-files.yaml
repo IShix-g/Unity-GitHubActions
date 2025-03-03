@@ -40,9 +40,6 @@ on:
 env:
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
-permissions:
-  contents: read
-
 jobs:
   lint-cs-files:
     runs-on: ubuntu-22.04
