@@ -40,6 +40,10 @@ on:
 env:
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   lint-cs-files:
     runs-on: ubuntu-22.04
@@ -153,7 +157,7 @@ jobs:
           output=$(echo "$output" | awk '{
             if (match($0, /\\n+/)) {
             count = gsub(/\\n/, "newline ↵")
-            $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH - 1)
+            $0 = substr($0, 1, RSTART) replacement substr($0, RSTART + RLENGTH - 1)
           }
             print
           }')
