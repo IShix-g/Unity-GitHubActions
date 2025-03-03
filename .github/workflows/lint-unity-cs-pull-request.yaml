@@ -1,4 +1,4 @@
-name: Lint Unity Csharp
+name: Lint Unity Csharp for Pull Request
 
 on:
   pull_request:
@@ -18,3 +18,4 @@ jobs:
       base-branch: ${{ github.event.pull_request.base.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
       include-paths: 'Assets/Tests/StyleTest/.*'
+      exclude-paths: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
