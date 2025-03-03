@@ -43,6 +43,10 @@ on:
         type: string
         default: '50'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   branch-conf:
     runs-on: ubuntu-22.04
