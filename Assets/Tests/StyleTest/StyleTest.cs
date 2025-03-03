@@ -12,7 +12,12 @@ namespace Tests.StyleTest
 
         }
 
-        void test2()
+        void Test2()
+        {
+
+        }
+
+        void _Test3()
         {
 
         }
