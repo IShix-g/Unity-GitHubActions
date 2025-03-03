@@ -40,10 +40,8 @@ on:
 env:
   CONVERT_TO_SARIF_URI: 'https://raw.githubusercontent.com/IShix-g/Unity-GitHubActions/HEAD/.github/scripts/convert_to_sarif.py'
 
-permissions:
-  contents: read
-  checks: none # Set to 'write' if using github-check based reporting
-  pull-requests: none # Set to 'write' if using github-pr-review based reporting
+# For github-pr-review, set permissions.checks to write.
+# For github-check, set permissions.pull-requests to write.
 
 jobs:
   lint-cs-files:

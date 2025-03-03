@@ -174,3 +174,4 @@ jobs:
       review-reporter: 'github-pr-review'
       review-level: ${{ inputs.review-level }}
       review-exit-code: ${{ inputs.review-exit-code }}
+    secrets: inherit
