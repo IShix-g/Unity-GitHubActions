@@ -41,6 +41,8 @@ on:
 
 permissions:
   checks: write
+  contents: read
+  actions: read
 
 jobs:
   branch-conf:
