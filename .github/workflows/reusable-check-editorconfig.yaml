@@ -36,6 +36,7 @@ jobs:
       - name: Check out ${{ inputs.ref }}
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
           fetch-depth: 1
 
