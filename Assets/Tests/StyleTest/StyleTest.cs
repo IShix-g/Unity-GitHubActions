@@ -7,17 +7,12 @@ namespace Tests.StyleTest
         string _test;
         string _test2;
 
-        void Test()
+        void _Test1()
         {
 
         }
 
         void Test2()
-        {
-
-        }
-
-        void _Test3()
         {
 
         }
