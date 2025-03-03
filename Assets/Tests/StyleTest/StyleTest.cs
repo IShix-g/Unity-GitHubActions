@@ -6,6 +6,7 @@ namespace Tests.StyleTest
         static string s_staticField = string.Empty;
         string _test;
         string _test2;
+        static string _test3;
 
         void Test1()
         {
@@ -17,7 +18,7 @@ namespace Tests.StyleTest
 
         }
 
-        void _test3()
+        void Test3()
         {
 
         }
