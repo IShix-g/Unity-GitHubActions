@@ -40,9 +40,8 @@ on:
         default: '50'
 
 permissions:
-  checks: write
   contents: read
-  actions: read
+  checks: write
 
 jobs:
   branch-conf:
