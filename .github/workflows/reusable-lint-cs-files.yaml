@@ -149,6 +149,14 @@ jobs:
             }
             print
           }')
+          
+          output=$(echo "$output" | awk '{
+            if (match($0, /\\n+/)) {
+            count = gsub(/\\n/, "newline ↵")
+            $0 = substr($0, 1, RSTART-1) replacement substr($0, RSTART + RLENGTH - 1)
+          }
+            print
+          }')
 
           echo "$output" > output.log
           echo "exits=1" >> "$GITHUB_OUTPUT"
