@@ -42,6 +42,8 @@ env:
 
 permissions:
   contents: read
+  checks: none # Set to 'write' if using github-check based reporting
+  pull-requests: none # Set to 'write' if using github-pr-review based reporting
 
 jobs:
   lint-cs-files:

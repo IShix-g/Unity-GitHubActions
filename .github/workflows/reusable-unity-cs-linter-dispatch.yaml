@@ -162,3 +162,4 @@ jobs:
       review-reporter: 'github-check'
       review-level: ${{ inputs.review-level }}
       review-exit-code: ${{ inputs.review-exit-code }}
+    permissions: inherit
