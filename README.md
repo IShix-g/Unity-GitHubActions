@@ -383,7 +383,7 @@ A style check enforces these rules automatically when a pull request is opened o
 
 If there are style issues, the action will fail, and the pull request will display comments highlighting the problems.
 
-<img src="pull_request_style_check.jpg" width="500"/>
+<img src="Docs/pull_request_style_check.jpg" width="500"/>
 
 ### Target of Style Checks
 
@@ -414,7 +414,7 @@ The style check runs on newly committed or modified `.cs` files in the pull requ
 See the execution example at:  
 [https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298)
 
-<img src="dispatch_style_check.jpg" width="500"/>
+<img src="Docs/dispatch_style_check.jpg" width="500"/>
 
 ### Target of Style Checks
 
@@ -424,7 +424,7 @@ The style check runs on all specified `.cs` files.
 
 Click the `Run workflow` button to execute the style check.
 
-<img src="dispatch_style_check2.jpg" width="500"/>
+<img src="Docs/dispatch_style_check2.jpg" width="500"/>
 
 ### Setup Guide
 
