@@ -92,6 +92,7 @@ GitHubアクションを使った、Unityパッケージのリリース自動化
 - [Unity Test Framework (旧 Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)でテストを実行する
 - [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)の生成をする
 - [パッケージ](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)をリリースページにアップロードする
+- [C#のスタイルチェックをする](#cのスタイルチェック)
 
 利用したいタスクのみ実行可能です。
 
@@ -355,10 +356,73 @@ URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExpo
 
 出力したパッケージを適当なプロジェクトにインストールして問題が無いか確認ください。
 
-## GitHub Actionsの使用料について
+## C#のスタイルチェック
 
-GitHub Actionsをprivateリポジトリで使う場合、使用料が発生します。publicリポジトリの場合は無料です。  
-使用料が発生しますが無料分が存在します。詳しくは、[Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary)から確認できます。
+### スタイルチェックとは？
+
+- プライベートフィールドは、`_myField`のように「`_` + キャメルケース」で記述してほしい
+- `if`文は必ず`{}`で囲ってほしい
+- インデントはタブではなくスペースを使ってほしい
+
+など、チームならではのルールがあると思います。  
+それをプルリクエストや、手動実行をトリガーにスタイルチェックをさせる事でレビュワーの負担を減らせます。
+
+## プルリクエストでスタイルチェック
+
+[lint-unity-cs-pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-pull-request.yaml)
+
+### 実行サンプル
+
+スタイルに問題があった場合、アクションが失敗しプルリクエストにコメントが表示されます。
+
+<img src="pull_request_style_check.jpg" width="500"/>
+
+### スタイルチェックの対象
+
+コミットされた新ファイルまたは修正された`.cs`ファイルに対してスタイルチェックが走ります。
+
+### スタイルチェックの流れ
+
+- プルリクエストを作成してもらう
+- 作成したタイミングで自動でスタイルチェックチェックが走ります
+- (修正が発生した場合) 修正後コミットする度にスタイルチェックが走ります
+
+### セットアップガイド
+
+1. [lint-unity-cs-pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-pull-request.yaml)からコードをコピーし、プロジェクトの `.github/workflows`フォルダに YAML ファイルを作成
+2. `branches`にブランチを指定 (例: 'main')
+3. `paths`に対象を指定、複数指定可 (例: `Assets/**`)
+3. (オプション) スタイルチェックの対象を`include-paths`に[正規表現](https://www.gnu.org/software/grep/manual/)を使って指定。`,`区切りで複数指定可 (例: `Assets/.*`)
+4. (オプション) スタイルチェックに含めたくないパスを`exclude-paths`に指定
+5. スタイルルールの設定ファイルを作成。[こちら](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig)を参考に[.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022)を作成してください
+
+## 手動実行でスタイルチェック
+
+[lint-unity-cs-dispatch.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-dispatch.yaml)
+
+### 実行サンプル
+
+[https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298)
+
+<img src="dispatch_style_check.jpg" width="500"/>
+
+### スタイルチェックの対象
+
+指定されたすべての`.cs`ファイルに対してスタイルチェックが走ります。
+
+### スタイルチェックの流れ
+
+`Run workflow`ボタンをクリックで実行します。
+
+<img src="dispatch_style_check2.jpg" width="500"/>
+
+### セットアップガイド
+
+1. [lint-unity-cs-dispatch.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-dispatch.yaml)からコードをコピーし、プロジェクトの `.github/workflows`フォルダに YAML ファイルを作成
+2. (オプション) スタイルチェックの対象を`include-paths`に[正規表現](https://www.gnu.org/software/grep/manual/)を使って指定。`,`区切りで複数指定可 (例: `Assets/.*`)
+3. (オプション) スタイルチェックに含めたくないパスを`exclude-paths`に指定 
+4. スタイルルールの設定ファイルを作成。[こちら](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig)を参考に[.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022)を作成してください
+
 
 ## Jobの説明
 
@@ -625,6 +689,38 @@ Unity Editorをバッチモードで起動する為に必要:
 ```yaml
 hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 ```
+
+---
+
+### C#ファイルのスタイルチェック (Lint C# Files for Unity)
+
+[reusable-lint-cs-files.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-lint-cs-files.yaml)
+
+渡されたファイルに対してスタイルチェックを実行します。
+
+#### 使用しているOSS
+
+- [dotnet format](https://learn.microsoft.com/ja-jp/dotnet/core/tools/dotnet-format) スタイルチェックで使用
+- [StyleCop.Analyzers](https://github.com/DotNetAnalyzers/StyleCopAnalyzers) スタイルチェックで使用
+- [reviewdog](https://github.com/reviewdog/reviewdog) プルリクエストへのメッセージ表示など
+
+#### 入力値 (Inputs)
+
+| ID  | 説明                                                                                                                                  | デフォルト値              |
+|-----|-------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| ref | ブランチまたはコミットIDを指定                                                                                                                    | 未指定の場合、デフォルトブランチを使用 |
+| editorconfig-branch   | .editorconfigファイルのあるブランチを指定                                                                                                         | 未指定の場合、`ref`を使用     |
+| files   | 対象ファイルをAssetsからカンマ区切りで指定                                                                                                            |                     |
+| review-reporter   | [reviewdogのreporter](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporters) を指定                                       | github-pr-review    |
+| review-level   | [reviewdogのlevel](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-pr-checks--reportergithub-pr-check) を指定 | warning             |
+| review-exit-code   | [reviewdogのexit code](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes) を指定                                     | error               |
+
+
+## GitHub Actionsの使用料について
+
+GitHub Actionsをprivateリポジトリで使う場合、使用料が発生します。publicリポジトリの場合は無料です。  
+使用料が発生しますが無料分が存在します。詳しくは、[Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary)から確認できます。
+
 
 ## 参考リポジトリ
 
