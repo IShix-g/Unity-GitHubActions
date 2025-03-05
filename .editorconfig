@@ -20,8 +20,8 @@ tab_width = 4
 
 # StyleCop Diagnostic Rules =================
 
-# Do not indent braces '{}'
-csharp_indent_braces = false
+# Indent braces '{}'
+csharp_indent_braces = true
 # Indent 'case' and 'default' labels within a switch statement
 csharp_indent_switch_labels = true
 # Force a newline before 'catch' blocks
@@ -34,12 +34,8 @@ csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = false
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
-# Insert newlines between query expressions (e.g., 'from', 'select')
-csharp_new_line_between_query_expression_clauses = true
 # Arrange modifiers in a specific order ('public', 'private', 'protected', ...)
 csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:suggestion
-# Allow single-line code blocks (braces '{}')
-csharp_preserve_single_line_blocks = true
 # Insert spaces after cast operators
 csharp_space_after_cast = true
 # Insert a space before colons ':' in inheritance clauses
