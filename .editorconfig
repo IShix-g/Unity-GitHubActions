@@ -33,7 +33,7 @@ csharp_new_line_before_finally = true
 # Do not insert newlines before members in object initializers
 csharp_new_line_before_members_in_object_initializers = false
 # Always insert a newline before opening braces '{'
-csharp_new_line_before_open_brace = all
+csharp_new_line_before_open_brace = none
 # Insert newlines between query expressions (e.g., 'from', 'select')
 csharp_new_line_between_query_expression_clauses = true
 # Arrange modifiers in a specific order ('public', 'private', 'protected', ...)
