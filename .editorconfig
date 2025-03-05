@@ -127,8 +127,8 @@ dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary:n
 dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:none
 # In comparison expressions, omit parentheses when unnecessary (default behavior).
 dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary:none
-# For local variables, parameters, and members, prefer explicit types (e.g., `int` instead of `var`).
-dotnet_style_predefined_type_for_locals_parameters_members = false:suggestion
+# Prefer the language keyword for local variables, method parameters, and class members
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 # For member access, prefer using built-in types (e.g., `int` instead of `System.Int32`).
 dotnet_style_predefined_type_for_member_access = true:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing events.
