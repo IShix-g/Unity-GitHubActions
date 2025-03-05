@@ -1,6 +1,6 @@
 namespace Tests.StyleTest
 {
-    public sealed class StyleTest8
+    public sealed class StyleTest9
     {
         public const string ConstString = "ConstString";
         static string s_staticField = string.Empty;
