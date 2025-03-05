@@ -83,7 +83,7 @@ csharp_space_between_parentheses = control_flow_statements, type_casts
 # Do not insert spaces within square brackets '[]'
 csharp_space_between_square_brackets = false
 # Recommend file-scoped namespace format ('namespace Foo;')
-csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_style_namespace_declarations = block_scoped:suggestion
 # Recommend using UTF-8 string literals ('u8"string"')
 csharp_style_prefer_utf8_string_literals = true:suggestion
 # Recommend using type inference ('var') for variable declarations
@@ -96,23 +96,9 @@ csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_using_directive_placement = outside_namespace:silent
 # Always use braces for control structures
 csharp_prefer_braces = true:warning
-# Place operators on the next line when expressions are split into multiple lines
-csharp_prefer_next_line_for_binary_operators = false:suggestion
 
-# Place 'using' directives at the beginning of the code file
-dotnet_sort_using_directives_first = true:error
 # Prefer omitting 'private' access modifier for fields and methods
 dotnet_style_require_accessibility_modifiers = never:warning
-# Use 'var' for built-in types when the type is obvious
-dotnet_style_var_for_built_in_types = true:suggestion
-# Use 'var' when the type is apparent from the right-hand side
-dotnet_style_var_when_type_is_apparent = true:suggestion
-# Avoid 'var' when the type is not apparent
-dotnet_style_var_elsewhere = false:warning
-# Avoid using expression bodies ('=>')
-dotnet_style_prefer_expression_bodies = false:suggestion
-# Add XML documentation comments for required members
-dotnet_style_require_documentation_comments = false:suggestion
 # Based on this setting, do not separate `using` directives into groups (e.g., System and other Namespaces).
 dotnet_separate_import_directive_groups = false
 # Enforce `using System.*` directives to appear first.
@@ -215,7 +201,7 @@ dotnet_diagnostic.SA1500.severity = warning
 # While, for, do, and if-else statements must use braces.
 dotnet_diagnostic.SA1502.severity = none
 # All control blocks should use braces (e.g., if, for, while).
-dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1503.severity = warning
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
 # Elements should be separated by blank line.
