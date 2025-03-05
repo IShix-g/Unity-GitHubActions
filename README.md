@@ -11,6 +11,8 @@
 # Unity-GitHubActions
 GitHub Actions for Unity.
 
+![](Docs/logo.png)
+
 ## Table of Contents
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -54,7 +56,18 @@ GitHub Actions for Unity.
     - [&#91;Recommended&#93; Package Manager](#recommended-package-manager)
     - [Download the Package](#download-the-package)
   - [&#91;Required&#93; Running Export Tests](#required-running-export-tests)
-- [About GitHub Actions Usage Fees](#about-github-actions-usage-fees)
+- [C&#035; Style Check](#c-style-check)
+  - [What is a Style Check?](#what-is-a-style-check)
+- [Style Check in Pull Requests](#style-check-in-pull-requests)
+  - [Example Execution](#example-execution)
+  - [Target of Style Checks](#target-of-style-checks)
+  - [Workflow of Style Check](#workflow-of-style-check)
+  - [Setup Guide](#setup-guide-2)
+- [Manual Execution for Style Check](#manual-execution-for-style-check)
+  - [Example Execution](#example-execution-1)
+  - [Target of Style Checks](#target-of-style-checks-1)
+  - [Workflow of Style Check](#workflow-of-style-check-1)
+  - [Setup Guide](#setup-guide-3)
 - [Job Descriptions](#job-descriptions)
   - [Validate Tag](#validate-tag)
     - [Inputs](#inputs)
@@ -84,6 +97,10 @@ GitHub Actions for Unity.
   - [Uploading a Package to Release](#uploading-a-package-to-release)
     - [Inputs](#inputs-7)
       - [Generating the SHA-256 Hash](#generating-the-sha-256-hash)
+  - [Style Checking for C&#035; Files (Lint C# Files for Unity)](#style-checking-for-c-files-lint-c-files-for-unity)
+    - [Open Source Software (OSS) Used](#open-source-software-oss-used)
+    - [Input Parameters (Inputs)](#input-parameters-inputs)
+- [About GitHub Actions Usage Fees](#about-github-actions-usage-fees)
 - [Referenced Repository](#referenced-repository)
 
 </details>
@@ -101,6 +118,7 @@ This repository provides automation for Unity package releases using GitHub Acti
 - Run tests using the [Unity Test Framework (formerly Test Runner)](https://docs.unity3d.com/2022.3/Documentation/Manual/testing-editortestsrunner.html)
 - Build [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html)
 - Upload the [packages](https://docs.unity3d.com/2022.3/Documentation/Manual/CustomPackages.html) to the release page
+- [Perform C# style checks](#c-style-check)
 
 You can choose to execute only specific tasks you need.
 
@@ -360,10 +378,78 @@ Download the package from the `Assets` section of the [release page](https://git
 
 Install the exported package in a test project to verify its functionality.
 
-## About GitHub Actions Usage Fees
 
-When using GitHub Actions in a private repository, usage fees apply. For public repositories, it remains free.  
-While fees are incurred, there is a free usage allowance available. You can check the details via [Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary).
+## C# Style Check
+
+### What is a Style Check?
+
+In many teams, there are specific coding conventions such as:
+
+- Private fields should be named using `_myField` style (`_` + camelCase)
+- `if` statements must always use `{}` braces
+- Indentation should use spaces instead of tabs
+
+A style check enforces these rules automatically when a pull request is opened or a manual trigger is executed, reducing the burden on reviewers.
+
+
+## Style Check in Pull Requests
+
+[lint-unity-cs-pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-pull-request.yaml)
+
+### Example Execution
+
+If there are style issues, the action will fail, and the pull request will display comments highlighting the problems.
+
+<img src="Docs/pull_request_style_check.jpg" width="500"/>
+
+### Target of Style Checks
+
+The style check runs on newly committed or modified `.cs` files in the pull request.
+
+### Workflow of Style Check
+
+1. A pull request is created.
+2. The style check runs automatically when the pull request is created.
+3. (If issues are found) Fix the issues and commit, triggering another style check.
+
+### Setup Guide
+
+1. Copy the code from [lint-unity-cs-pull-request.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-pull-request.yaml) and create a YAML file in the `.github/workflows` folder of your project.
+2. Specify the branch for style checks under `branches` (e.g., `'main'`).
+3. Specify the target paths under `paths` (e.g., `Assets/**`). Multiple paths can be specified.
+4. *(Optional)* Configure style check targets with `include-paths` using [regular expressions](https://www.gnu.org/software/grep/manual/), separated by `,` (e.g., `Assets/.*`).
+5. *(Optional)* Exclude paths from style checks with `exclude-paths`.
+6. Create a style rule configuration file. Refer to [this example](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig) to create an [.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022).
+
+
+## Manual Execution for Style Check
+
+[lint-unity-cs-dispatch.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-dispatch.yaml)
+
+### Example Execution
+
+See the execution example at:  
+[https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298](https://github.com/IShix-g/Unity-GitHubActions/actions/runs/13626333298)
+
+<img src="Docs/dispatch_style_check.jpg" width="500"/>
+
+### Target of Style Checks
+
+The style check runs on all specified `.cs` files.
+
+### Workflow of Style Check
+
+Click the `Run workflow` button to execute the style check.
+
+<img src="Docs/dispatch_style_check2.jpg" width="500"/>
+
+### Setup Guide
+
+1. Copy the code from [lint-unity-cs-dispatch.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/lint-unity-cs-dispatch.yaml) and create a YAML file in the `.github/workflows` folder of your project.
+2. *(Optional)* Configure style check targets with `include-paths` using [regular expressions](https://www.gnu.org/software/grep/manual/), separated by `,` (e.g., `Assets/.*`).
+3. *(Optional)* Exclude paths from style checks with `exclude-paths`.
+4. Create a style rule configuration file. Refer to [this example](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig) to create an [.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022).
+
 
 ## Job Descriptions
 
@@ -630,6 +716,37 @@ Note that the [artifact-digest](https://github.com/actions/upload-artifact#outpu
 ```yaml
 hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 ```
+
+---
+
+### Style Checking for C# Files (Lint C# Files for Unity)
+
+[reusable-lint-cs-files.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-lint-cs-files.yaml)
+
+This action performs style checks on the specified C# files.
+
+#### Open Source Software (OSS) Used
+
+- [dotnet format](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format): Used for performing style checks.
+- [StyleCop.Analyzers](https://github.com/DotNetAnalyzers/StyleCopAnalyzers): Used for enforcing style guidelines during checks.
+- [reviewdog](https://github.com/reviewdog/reviewdog): Used for posting messages to pull requests and other reporting purposes.
+
+#### Input Parameters (Inputs)
+
+| ID                 | Description                                                                                                                          | Default Value          |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|
+| ref               | Specifies the branch or commit ID to use.                                                                                            | Default branch is used if unspecified. |
+| editorconfig-branch | Specifies the branch where the `.editorconfig` file is located.                                                                     | Uses `ref` if unspecified.  |
+| files             | Specifies the target files in the `Assets` directory, separated by commas.                                                           |                        |
+| review-reporter   | Specifies the [reviewdog reporter](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporters).                              | github-pr-review       |
+| review-level      | Specifies the [reviewdog level](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-pr-checks--reportergithub-pr-check). | warning                |
+| review-exit-code  | Specifies the [reviewdog exit code](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes).                             | error                  |
+
+
+## About GitHub Actions Usage Fees
+
+When using GitHub Actions in a private repository, usage fees apply. For public repositories, it remains free.  
+While fees are incurred, there is a free usage allowance available. You can check the details via [Billing and plans > Plans and usage > Usage this month](https://github.com/settings/billing/summary).
 
 ## Referenced Repository
 
