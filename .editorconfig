@@ -20,8 +20,6 @@ tab_width = 4
 
 # StyleCop Diagnostic Rules =================
 
-# Indent braces '{}'
-csharp_indent_braces = true
 # Indent 'case' and 'default' labels within a switch statement
 csharp_indent_switch_labels = true
 # Force a newline before 'catch' blocks
@@ -30,8 +28,6 @@ csharp_new_line_before_catch = true
 csharp_new_line_before_else = true
 # Force a newline before 'finally' blocks
 csharp_new_line_before_finally = true
-# Do not insert newlines before members in object initializers
-csharp_new_line_before_members_in_object_initializers = false
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
 # Arrange modifiers in a specific order ('public', 'private', 'protected', ...)
