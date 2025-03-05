@@ -30,48 +30,6 @@ csharp_new_line_before_else = true
 csharp_new_line_before_finally = true
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
-# Insert spaces after cast operators
-csharp_space_after_cast = true
-# Insert a space before colons ':' in inheritance clauses
-csharp_space_before_colon_in_inheritance_clause = true
-# Insert spaces after colons ':' in inheritance clauses
-csharp_space_after_colon_in_inheritance_clause = true
-# Do not insert a space before commas ','
-csharp_space_before_comma = false
-# Insert a space after commas ','
-csharp_space_after_comma = true
-# Do not insert a space before dots '.'
-csharp_space_before_dot = false
-# Do not insert a space after dots '.'
-csharp_space_after_dot = false
-# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
-csharp_space_after_keywords_in_control_flow_statements = true
-# Insert a space after semicolons ';' in 'for' statements
-csharp_space_after_semicolon_in_for_statement = true
-# Insert spaces before and after binary operators
-csharp_space_around_binary_operators = before_and_after
-# Do not insert a space before open square brackets '['
-csharp_space_before_open_square_brackets = false
-# Do not insert a space before semicolons ';' in 'for' statements
-csharp_space_before_semicolon_in_for_statement = false
-# Do not insert spaces inside empty square brackets '[]'
-csharp_space_between_empty_square_brackets = false
-# Do not insert spaces within empty parameter lists in method calls
-csharp_space_between_method_call_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '('
-csharp_space_between_method_call_name_and_opening_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method calls
-csharp_space_between_method_call_parameter_list_parentheses = false
-# Do not insert spaces within empty parameter lists in method declarations
-csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '(' in declarations
-csharp_space_between_method_declaration_name_and_open_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method declarations
-csharp_space_between_method_declaration_parameter_list_parentheses = false
-# Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = control_flow_statements, type_casts
-# Do not insert spaces within square brackets '[]'
-csharp_space_between_square_brackets = false
 # Recommend using type inference ('var') for variable declarations
 csharp_style_var_elsewhere = true:suggestion
 # Recommend using type inference ('var') for built-in types (e.g., 'int')
