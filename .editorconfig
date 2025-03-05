@@ -17,7 +17,6 @@ indent_size = 4
 indent_style = space
 indent_size = 4
 tab_width = 4
-trim_trailing_whitespace = true
 
 # StyleCop Diagnostic Rules =================
 
@@ -43,10 +42,16 @@ csharp_preferred_modifier_order = public, private, protected, internal, file, ne
 csharp_preserve_single_line_blocks = true
 # Insert spaces after cast operators
 csharp_space_after_cast = true
+# Insert a space before colons ':' in inheritance clauses
+csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
 csharp_space_after_colon_in_inheritance_clause = true
+# Do not insert a space before commas ','
+csharp_space_before_comma = false
 # Insert a space after commas ','
 csharp_space_after_comma = true
+# Do not insert a space before dots '.'
+csharp_space_before_dot = false
 # Do not insert a space after dots '.'
 csharp_space_after_dot = false
 # Insert a space after control flow keywords ('if', 'while', 'for', etc.)
@@ -55,12 +60,6 @@ csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_after_semicolon_in_for_statement = true
 # Insert spaces before and after binary operators
 csharp_space_around_binary_operators = before_and_after
-# Insert a space before colons ':' in inheritance clauses
-csharp_space_before_colon_in_inheritance_clause = true
-# Do not insert a space before commas ','
-csharp_space_before_comma = false
-# Do not insert a space before dots '.'
-csharp_space_before_dot = false
 # Do not insert a space before open square brackets '['
 csharp_space_before_open_square_brackets = false
 # Do not insert a space before semicolons ';' in 'for' statements
@@ -80,7 +79,7 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 # Do not insert spaces inside parameter list parentheses in method declarations
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 # Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = false
+csharp_space_between_parentheses = control_flow_statements, type_casts
 # Do not insert spaces within square brackets '[]'
 csharp_space_between_square_brackets = false
 # Recommend file-scoped namespace format ('namespace Foo;')
@@ -114,10 +113,6 @@ dotnet_style_var_elsewhere = false:warning
 dotnet_style_prefer_expression_bodies = false:suggestion
 # Add XML documentation comments for required members
 dotnet_style_require_documentation_comments = false:suggestion
-# Avoid writing comments longer than three lines
-# comment_max_line_length = 120
-# Insert a single space at the start of a comment
-dotnet_comment_style_leading_space = true:warning
 # Based on this setting, do not separate `using` directives into groups (e.g., System and other Namespaces).
 dotnet_separate_import_directive_groups = false
 # Enforce `using System.*` directives to appear first.
@@ -220,7 +215,7 @@ dotnet_diagnostic.SA1500.severity = warning
 # While, for, do, and if-else statements must use braces.
 dotnet_diagnostic.SA1502.severity = none
 # All control blocks should use braces (e.g., if, for, while).
-dotnet_diagnostic.SA1503.severity = warning
+dotnet_diagnostic.SA1503.severity = none
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
 # Elements should be separated by blank line.
