@@ -1,8 +1,7 @@
-
 namespace Tests.StyleTest
+{
+    public sealed class StyleTest6
     {
-    public sealed class StyleTest5
-        {
         public const string ConstString = "ConstString";
         static string s_staticField = string.Empty;
         string _stringField;
@@ -10,8 +9,8 @@ namespace Tests.StyleTest
         string stringField3;
         
         void Method()
-            {
+        {
             
-            }
         }
     }
+}
