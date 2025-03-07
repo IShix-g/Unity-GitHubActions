@@ -127,7 +127,7 @@ jobs:
       - name: Install StyleCop and dotnet-format
         run: |
           dotnet new tool-manifest
-          dotnet tool install dotnet-format
+          dotnet tool install --include-rule IDE0055
           dotnet add package StyleCop.Analyzers
 
       - name: Collect Style Violations Log
