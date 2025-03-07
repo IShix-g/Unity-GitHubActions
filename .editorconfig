@@ -103,6 +103,12 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # StyleCop Diagnostic Rules =================
 
+dotnet_diagnostic.IDE0055.severity = warning
+dotnet_diagnostic.IDE0017.severity = warning
+dotnet_diagnostic.IDE0028.severity = none
+dotnet_diagnostic.IDE0049.severity = warning
+
+
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
 # Naming rule violation
