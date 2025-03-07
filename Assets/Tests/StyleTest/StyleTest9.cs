@@ -13,7 +13,7 @@ namespace Tests.StyleTest
             
         }
 
-        void Method2()
+        void Method3()
         {
             
         }
