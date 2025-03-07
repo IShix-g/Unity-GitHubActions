@@ -102,6 +102,9 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_allow_multiple_blank_lines_experimental = true:silent
 
+csharp_format_keep_blank_lines_between_declarations = true
+csharp_format_keep_blank_lines_between_members = true
+
 # StyleCop Diagnostic Rules =================
 
 dotnet_diagnostic.IDE0055.severity = warning
