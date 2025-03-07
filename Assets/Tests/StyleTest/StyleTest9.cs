@@ -10,7 +10,7 @@ namespace Tests.StyleTest
 
         void Method()
         {
-
+            
         }
 
         void Method2()
