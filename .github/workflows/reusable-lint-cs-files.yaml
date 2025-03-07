@@ -133,7 +133,7 @@ jobs:
       - name: Collect Style Violations Log
         id: violations-log
         run: |
-          output=$(dotnet format style TempProject.csproj 2>&1 || echo "Style violation detected")
+          output=$(dotnet format style TempProject.csproj --verify-no-changes 2>&1 || echo "Style violation detected")
 
           if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
@@ -211,12 +211,13 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          reviewdog -name="StyleCop" \
-            -diff="git diff FETCH_HEAD"
+          reviewdog -f=sarif \
+            -name="StyleCop" \
             -reporter=${{ inputs.review-reporter }} \
             -filter-mode=nofilter \
             -level=${{ inputs.review-level }} \
-            -fail-level=${{ inputs.review-exit-code }}
+            -fail-level=${{ inputs.review-exit-code }} \
+            < output.sarif
 
       - name: Cleanup temporary files
         if: ${{ steps.violations-log.outputs.exits == '1' && always() }}
