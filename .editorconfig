@@ -101,6 +101,9 @@ dotnet_style_qualification_for_method = false:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
 dotnet_style_qualification_for_property = false:suggestion
 
+csharp_format_keep_blank_lines_between_declarations = true
+csharp_format_keep_blank_lines_between_members = true
+
 # StyleCop Diagnostic Rules =================
 
 dotnet_diagnostic.IDE0055.severity = warning
