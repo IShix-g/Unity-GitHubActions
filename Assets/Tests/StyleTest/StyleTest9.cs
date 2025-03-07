@@ -13,5 +13,9 @@ namespace Tests.StyleTest
             
         }
 
+        void Method2()
+        {
+            
+        }
     }
 }
