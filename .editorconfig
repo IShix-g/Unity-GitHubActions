@@ -195,7 +195,7 @@ dotnet_diagnostic.SA1513.severity = none
 # Blank lines should be properly used within methods.
 dotnet_diagnostic.SA1515.severity = none
 # One or more adjacent elements must not be missing blank lines.
-dotnet_diagnostic.SA1516.severity = warning
+dotnet_diagnostic.SA1516.severity = none
 # No blank lines should exist at the start of the file
 dotnet_diagnostic.SA1517.severity = none
 # Elements must have XML documentation.
