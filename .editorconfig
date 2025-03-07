@@ -101,19 +101,18 @@ dotnet_style_qualification_for_method = false:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
 dotnet_style_qualification_for_property = false:suggestion
 
-csharp_format_keep_blank_lines_between_declarations = true
-csharp_format_keep_blank_lines_between_members = true
-
 # StyleCop Diagnostic Rules =================
-
-dotnet_diagnostic.IDE0055.severity = warning
-dotnet_diagnostic.IDE0017.severity = warning
-dotnet_diagnostic.IDE0028.severity = none
-dotnet_diagnostic.IDE0049.severity = warning
-
 
 # Add braces (`{}`) to if or while statements
 dotnet_diagnostic.IDE0011.severity = warning
+# Object initializer can be simplified.
+dotnet_diagnostic.IDE0017.severity = none
+# Collection initialization can be simplified.
+dotnet_diagnostic.IDE0028.severity = none
+# Simplify built-in type names.
+dotnet_diagnostic.IDE0049.severity = warning
+# Format code consistently.
+dotnet_diagnostic.IDE0055.severity = none
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
