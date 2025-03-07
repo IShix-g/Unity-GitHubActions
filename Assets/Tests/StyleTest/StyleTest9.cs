@@ -12,9 +12,14 @@ namespace Tests.StyleTest
         {
             
         }
-
+        
         void _method2()
         {
+        }
+
+        void _Method3()
+        {
+            
         }
     }
 }
