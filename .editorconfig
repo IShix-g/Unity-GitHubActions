@@ -26,8 +26,12 @@ csharp_new_line_before_open_brace = methods, properties, control_blocks, types
 csharp_preserve_single_line_statements = false
 # Allow code blocks to remain on a single line if they fit
 csharp_preserve_single_line_blocks = true
+# switch case Indent the content.
+csharp_indent_case_contents = true
 # Indent switch label
 csharp_indent_switch_labels = true
+# Indent label
+csharp_indent_labels = flush_left
 # Indent the contents of the block.
 csharp_indent_block_contents = true
 # Ensure opening and closing braces are indented correctly
