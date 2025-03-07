@@ -88,6 +88,7 @@ csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 # Always use braces for control structures
 csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:warning
 
 # Prefer omitting 'private' access modifier for fields and methods
 dotnet_style_require_accessibility_modifiers = never:warning
@@ -99,6 +100,7 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
 dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_allow_multiple_blank_lines_experimental = true:silent
 
 # StyleCop Diagnostic Rules =================
 
