@@ -100,6 +100,7 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 # Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
 dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_allow_multiple_blank_lines_experimental = true:silent
 
 # StyleCop Diagnostic Rules =================
 
