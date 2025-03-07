@@ -36,8 +36,14 @@ csharp_indent_labels = flush_left
 csharp_indent_block_contents = true
 # Ensure opening and closing braces are indented correctly
 csharp_indent_braces = false
+# Indent the statement list and curly braces in the case of a switch statement.
+csharp_indent_case_contents_when_block = false
 # Insert spaces after cast operators
 csharp_space_after_cast = true
+# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
+csharp_space_after_keywords_in_control_flow_statements = true
+# Do not insert spaces within parentheses '()'
+csharp_space_between_parentheses = control_flow_statements, type_casts
 # Insert a space before colons ':' in inheritance clauses
 csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
@@ -50,8 +56,6 @@ csharp_space_after_comma = true
 csharp_space_before_dot = false
 # Do not insert a space after dots '.'
 csharp_space_after_dot = false
-# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
-csharp_space_after_keywords_in_control_flow_statements = true
 # Insert a space after semicolons ';' in 'for' statements
 csharp_space_after_semicolon_in_for_statement = true
 # Insert spaces before and after binary operators
@@ -74,8 +78,6 @@ csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
 csharp_space_between_method_declaration_name_and_open_parenthesis = false
 # Do not insert spaces inside parameter list parentheses in method declarations
 csharp_space_between_method_declaration_parameter_list_parentheses = false
-# Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = control_flow_statements, type_casts
 # Do not insert spaces within square brackets '[]'
 csharp_space_between_square_brackets = false
 # Recommend using type inference ('var') for variable declarations
