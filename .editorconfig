@@ -20,12 +20,18 @@ tab_width = 4
 
 # StyleCop Diagnostic Rules =================
 
-# Ensure opening and closing braces are indented correctly
-csharp_indent_braces = true
-# Allow code blocks to remain on a single line if they fit
-csharp_preserve_single_line_blocks = true
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
+# Display multiple statements and member declarations on a single line
+csharp_preserve_single_line_statements = false
+# Allow code blocks to remain on a single line if they fit
+csharp_preserve_single_line_blocks = true
+# Indent switch label
+csharp_indent_switch_labels = true
+# Indent the contents of the block.
+csharp_indent_block_contents = true
+# Ensure opening and closing braces are indented correctly
+csharp_indent_braces = false
 # Insert spaces after cast operators
 csharp_space_after_cast = true
 # Insert a space before colons ':' in inheritance clauses
