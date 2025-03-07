@@ -8,12 +8,12 @@ namespace Tests.StyleTest
         string _stringField2;
         string _stringField3;
         
-        void _method()
+        void Method()
         {
             
         }
 
-        void Method2()
+        void _Method2()
         {
         }
     }
