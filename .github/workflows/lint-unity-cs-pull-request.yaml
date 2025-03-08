@@ -18,5 +18,6 @@ jobs:
       head-branch: ${{ github.event.pull_request.head.ref }}
       base-branch: ${{ github.event.pull_request.base.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
-      include-paths: 'Assets/Tests/StyleTest/.*'
-      exclude-paths: 'Assets/Tests/StyleTest/FileNameIssueStyleViolationTest.cs'
+      # regex https://www.gnu.org/software/grep/manual/
+      include-paths: 'Assets/Scripts/.*'
+      exclude-paths: 'Assets/Scripts/.*Violations\.cs$'
