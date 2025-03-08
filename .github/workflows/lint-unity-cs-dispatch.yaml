@@ -7,7 +7,7 @@ on:
         description: 'Comma-separated regex patterns for files or directories to include. More info: https://www.gnu.org/software/grep/manual/'
         required: true
         type: string
-        default: 'Assets/Tests/StyleTest/.*'
+        default: 'Assets/Scripts/.*'
       exclude-paths:
         description: 'Exclude files or directories (regex, comma-separated)'
         required: false
