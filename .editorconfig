@@ -1,11 +1,10 @@
-# https://EditorConfig.org
-# With more recent updates Visual Studio 2017 supports EditorConfig files out of the box
-# Visual Studio Code needs an extension: https://github.com/editorconfig/editorconfig-vscode
-# For emacs, vim, np++ and other editors, see here: https://github.com/editorconfig
+# EditorConfig is awesome: https://editorconfig.org
+# IDE0055 reports many issues related to spaces and line breaks, so it is disabled.
 
+# top-most EditorConfig file
 root = true
 
-# General formatting properties
+# General
 [*]
 charset = utf-8
 end_of_line = lf
@@ -21,7 +20,7 @@ indent_size = 4
 tab_width = 4
 
 # Always insert a newline before opening braces '{'
-csharp_new_line_before_open_brace = methods, properties, control_blocks, types
+csharp_new_line_before_open_brace = all
 
 # switch case Indent the content.
 csharp_indent_case_contents = true
@@ -41,7 +40,7 @@ csharp_space_after_cast = true
 # Insert a space after control flow keywords ('if', 'while', 'for', etc.)
 csharp_space_after_keywords_in_control_flow_statements = true
 # Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = control_flow_statements
+csharp_space_between_parentheses = false
 # Insert a space before colons ':' in inheritance clauses
 csharp_space_before_colon_in_inheritance_clause = true
 # Insert spaces after colons ':' in inheritance clauses
