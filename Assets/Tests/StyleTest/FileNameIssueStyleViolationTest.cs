@@ -10,9 +10,9 @@ namespace CodeStyleExample
 
         // 正しい名前のフィールド
         private string _exampleField = "Valid";
-
-        // Staticメンバー配置順序の違反（推奨: 静的要素 → インスタンスメンバーの順序）
-        public static readonly string StaticExample = "Static Value";
+       
+        // スペースが1つ足りない違反
+       public static readonly string StaticExample = "Static Value";
 
         // メソッド名の命名規則違反（PascalCaseが推奨される）
         public void printmessage() // 【違反】PascalCaseでない
@@ -31,6 +31,12 @@ namespace CodeStyleExample
         {
             if (value > 0) // 【違反】波括弧が無い
                 Debug.Log("Value is positive.");
+            
+            float x = 10;
+            // 【違反】キャストと値の間に空白
+            int y = (int)x;
+            // 【違反】制御フロー ステートメントのキーワードの後に空白文字を配置
+            for (var i=0;i<x;i++) { }
         }
 
         // 正しい条件分岐
