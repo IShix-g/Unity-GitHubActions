@@ -152,7 +152,7 @@ jobs:
             }
             print
           }')
-          
+
           output=$(echo "$output" | awk '{
             if (match($0, /\\n+/)) {
             count = gsub(/\\n/, "newline ↵")
