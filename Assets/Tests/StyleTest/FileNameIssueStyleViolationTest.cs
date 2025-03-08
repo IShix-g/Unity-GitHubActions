@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace CodeStyleExample
 {
-    // クラス名はPascalCaseが推奨されているが、lowercase名を使った例（スタイル違反）
     public class FileNameIssueStyleViolationTest
     {
         // メンバー変数の命名規則違反（推奨: _camelCase または PascalCase）
@@ -48,7 +47,5 @@ namespace CodeStyleExample
 
         // 正しいプロパティ定義
         public int MyProperty { get; set; } = 100;
-
-        // 最後に改行がない（スタイル違反: `insert_final_newline=true`）
     }
 }
