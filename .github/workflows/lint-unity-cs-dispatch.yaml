@@ -24,5 +24,6 @@ jobs:
     with:
       base-branch: ${{ github.ref }}
       editorconfig-branch: ${{ github.event.repository.default_branch }}
+      # regex https://www.gnu.org/software/grep/manual/
       include-paths: ${{ inputs.include-paths }}
       exclude-paths: ${{ inputs.exclude-paths }}
