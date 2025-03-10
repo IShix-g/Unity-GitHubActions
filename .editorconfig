@@ -13,231 +13,182 @@ indent_style = space
 indent_size = 2
 
 [*.cs]
-trim_trailing_whitespace = true
+trim_trailing_whitespace = false
 insert_final_newline = true
 indent_style = space
 indent_size = 4
 tab_width = 4
 
-# Always insert a newline before opening braces '{'
+# Organize usings
+dotnet_separate_import_directive_groups = false
+dotnet_sort_system_directives_first = false
+file_header_template = unset
+
+# this. and Me. preferences
+dotnet_style_qualification_for_event = false
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_property = false
+
+# Language keywords vs BCL types preferences
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_predefined_type_for_member_access = true
+
+# Parentheses preferences
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers = for_non_interface_members
+
+# Expression-level preferences
+dotnet_style_coalesce_expression = true
+dotnet_style_collection_initializer = true
+dotnet_style_explicit_tuple_names = true
+dotnet_style_namespace_match_folder = true
+dotnet_style_null_propagation = true
+dotnet_style_object_initializer = true
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_style_prefer_auto_properties = true
+dotnet_style_prefer_collection_expression = when_types_loosely_match
+dotnet_style_prefer_compound_assignment = true
+dotnet_style_prefer_conditional_expression_over_assignment = true
+dotnet_style_prefer_conditional_expression_over_return = true
+dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed
+dotnet_style_prefer_inferred_anonymous_type_member_names = true
+dotnet_style_prefer_inferred_tuple_names = true
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true
+dotnet_style_prefer_simplified_boolean_expressions = true
+dotnet_style_prefer_simplified_interpolation = true
+
+# Field preferences
+dotnet_style_readonly_field = true
+
+# Parameter preferences
+dotnet_code_quality_unused_parameters = all:silent
+
+# Suppression preferences
+dotnet_remove_unnecessary_suppression_exclusions = none
+
+# New line preferences
+dotnet_style_allow_multiple_blank_lines_experimental = true
+dotnet_style_allow_statement_immediately_after_block_experimental = true
+
+#### C# Coding Conventions ####
+
+# var preferences
+csharp_style_var_elsewhere = false
+csharp_style_var_for_built_in_types = false
+csharp_style_var_when_type_is_apparent = false
+
+# Expression-bodied members
+csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_constructors = false
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_lambdas = true
+csharp_style_expression_bodied_local_functions = false
+csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_operators = false
+csharp_style_expression_bodied_properties = true
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_prefer_extended_property_pattern = true
+csharp_style_prefer_not_pattern = true
+csharp_style_prefer_pattern_matching = true
+csharp_style_prefer_switch_expression = true
+
+# Null-checking preferences
+csharp_style_conditional_delegate_call = true
+
+# Modifier preferences
+csharp_prefer_static_local_function = true
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
+csharp_style_prefer_readonly_struct = true
+csharp_style_prefer_readonly_struct_member = true
+
+# Code-block preferences
+csharp_prefer_braces = true
+csharp_prefer_simple_using_statement = true
+csharp_style_namespace_declarations = block_scoped
+csharp_style_prefer_method_group_conversion = true
+csharp_style_prefer_primary_constructors = true
+csharp_style_prefer_top_level_statements = true
+
+# Expression-level preferences
+csharp_prefer_simple_default_expression = true
+csharp_style_deconstructed_variable_declaration = true
+csharp_style_implicit_object_creation_when_type_is_apparent = true
+csharp_style_inlined_variable_declaration = true
+csharp_style_prefer_index_operator = true
+csharp_style_prefer_local_over_anonymous_function = true
+csharp_style_prefer_null_check_over_type_check = true
+csharp_style_prefer_range_operator = true
+csharp_style_prefer_tuple_swap = true
+csharp_style_prefer_utf8_string_literals = true
+csharp_style_throw_expression = true
+csharp_style_unused_value_assignment_preference = discard_variable
+csharp_style_unused_value_expression_statement_preference = discard_variable
+
+# 'using' directive preferences
+csharp_using_directive_placement = outside_namespace
+
+# New line preferences
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true
+csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true
+csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true
+csharp_style_allow_embedded_statements_on_same_line_experimental = true
+
+#### C# Formatting Rules ####
+
+# New line preferences
+csharp_new_line_before_catch = true
+csharp_new_line_before_else = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_open_brace = all
+csharp_new_line_between_query_expression_clauses = true
 
-# switch case Indent the content.
-csharp_indent_case_contents = true
-# Indent switch label
-csharp_indent_switch_labels = true
-# Indent label
-csharp_indent_labels = flush_left
-# Indent the contents of the block.
+# Indentation preferences
 csharp_indent_block_contents = true
-# Ensure opening and closing braces are indented correctly
 csharp_indent_braces = false
-# Indent the statement list and curly braces in the case of a switch statement.
-csharp_indent_case_contents_when_block = false
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_switch_labels = true
 
-# Insert spaces after cast operators
-csharp_space_after_cast = true
-# Insert a space after control flow keywords ('if', 'while', 'for', etc.)
-csharp_space_after_keywords_in_control_flow_statements = true
-# Do not insert spaces within parentheses '()'
-csharp_space_between_parentheses = false
-# Insert a space before colons ':' in inheritance clauses
-csharp_space_before_colon_in_inheritance_clause = true
-# Insert spaces after colons ':' in inheritance clauses
+# Space preferences
+csharp_space_after_cast = false
 csharp_space_after_colon_in_inheritance_clause = true
-# Do not insert a space before commas ','
-csharp_space_before_comma = false
-# Insert a space after commas ','
 csharp_space_after_comma = true
-# Do not insert a space before dots '.'
-csharp_space_before_dot = false
-# Do not insert a space after dots '.'
 csharp_space_after_dot = false
-# Insert a space after semicolons ';' in 'for' statements
+csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_after_semicolon_in_for_statement = true
-# Insert spaces before and after binary operators
 csharp_space_around_binary_operators = before_and_after
-# Do not insert a space before open square brackets '['
+csharp_space_around_declaration_statements = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
 csharp_space_before_open_square_brackets = false
-# Do not insert a space before semicolons ';' in 'for' statements
 csharp_space_before_semicolon_in_for_statement = false
-# Do not insert spaces inside empty square brackets '[]'
 csharp_space_between_empty_square_brackets = false
-# Do not insert spaces within empty parameter lists in method calls
 csharp_space_between_method_call_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '('
 csharp_space_between_method_call_name_and_opening_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method calls
 csharp_space_between_method_call_parameter_list_parentheses = false
-# Do not insert spaces within empty parameter lists in method declarations
 csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
-# Do not insert a space between method names and opening parentheses '(' in declarations
 csharp_space_between_method_declaration_name_and_open_parenthesis = false
-# Do not insert spaces inside parameter list parentheses in method declarations
 csharp_space_between_method_declaration_parameter_list_parentheses = false
-# Do not insert spaces within square brackets '[]'
+csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
-# Display multiple statements and member declarations on a single line
-csharp_preserve_single_line_statements = false
-# Allow code blocks to remain on a single line if they fit
+# Wrapping preferences
 csharp_preserve_single_line_blocks = true
-
-# Recommend using type inference ('var') for variable declarations
-csharp_style_var_elsewhere = true:suggestion
-# Recommend using type inference ('var') for built-in types (e.g., 'int')
-csharp_style_var_for_built_in_types = true:suggestion
-# Recommend using type inference ('var') when the type is apparent
-csharp_style_var_when_type_is_apparent = true:suggestion
-
-# Always use braces for control structures
-csharp_prefer_braces = true:warning
-csharp_prefer_simple_using_statement = true:warning
-
-# Prefer omitting 'private' access modifier for fields and methods
-dotnet_style_require_accessibility_modifiers = never:warning
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing events.
-dotnet_style_qualification_for_event = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing fields.
-dotnet_style_qualification_for_field = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing methods.
-dotnet_style_qualification_for_method = false:suggestion
-# Avoid requiring explicit qualifiers (e.g., `this.`) when accessing properties.
-dotnet_style_qualification_for_property = false:suggestion
-
-
-# Add braces (`{}`) to if or while statements
-dotnet_diagnostic.IDE0011.severity = warning
-# Object initializer can be simplified.
-dotnet_diagnostic.IDE0017.severity = none
-# Collection initialization can be simplified.
-dotnet_diagnostic.IDE0028.severity = none
-# Simplify built-in type names.
-dotnet_diagnostic.IDE0049.severity = warning
-# Format code consistently.
-dotnet_diagnostic.IDE0055.severity = warning
-# Naming rule violation
-dotnet_diagnostic.IDE1006.severity = error
-# Keywords must be spaced correctly.
-dotnet_diagnostic.SA1000.severity = none
-# Commas should be spaced correctly.
-dotnet_diagnostic.SA1001.severity = none
-# Semicolons should be spaced correctly.
-dotnet_diagnostic.SA1002.severity = none
-# Binary operators should be spaced correctly.
-dotnet_diagnostic.SA1003.severity = none
-# Documentation lines should not begin with a space.
-dotnet_diagnostic.SA1004.severity = none
-# Single-line comments should begin with a space.
-dotnet_diagnostic.SA1005.severity = none
-# Preprocessor directives should not be preceded by space.
-dotnet_diagnostic.SA1006.severity = none
-# Closing parenthesis should not be preceded by a space.
-dotnet_diagnostic.SA1009.severity = none
-# Use spaces instead of tabs for indentations.
-dotnet_diagnostic.SA1027.severity = none
-# Code must not contain trailing whitespace.
-dotnet_diagnostic.SA1028.severity = none
-# Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
-dotnet_diagnostic.SA1101.severity = none
-# Closing parenthesis should be on line of last parameter
-dotnet_diagnostic.SA1111.severity = none
-# Use string.Empty for empty strings
-dotnet_diagnostic.SA1122.severity = warning
-# Elements should have the same indentation
-dotnet_diagnostic.SA1137.severity = warning
-# Using directives should be placed correctly (either top of file or inside namespace).
-dotnet_diagnostic.SA1200.severity = none
-# Static elements should appear before instance elements.
-dotnet_diagnostic.SA1201.severity = none
-# Elements must be ordered by access level (public, internal, protected, private).
-dotnet_diagnostic.SA1202.severity = none
-# Constants must appear before fields.
-dotnet_diagnostic.SA1203.severity = none
-# Static read-only fields must appear before static read/write fields.
-dotnet_diagnostic.SA1204.severity = none
-# Partial elements should be declared last.
-dotnet_diagnostic.SA1205.severity = none
-# Declared accessibility must be ordered (e.g., public before internal, etc.)
-dotnet_diagnostic.SA1206.severity = none
-# The "this." prefix should be used consistently in the code base.
-dotnet_diagnostic.SA1208.severity = none
-# Readonly fields should appear before non-readonly fields
-dotnet_diagnostic.SA1214.severity = none
-# Class, method, and member names should start with an uppercase letter.
-dotnet_diagnostic.SA1300.severity = none
-# Interface names must begin with an `I`
-dotnet_diagnostic.SA1302.severity = none
-# Fields should use camelCase naming style.
-dotnet_diagnostic.SA1306.severity = none
-# Field names should not use the "m_" prefix.
-dotnet_diagnostic.SA1307.severity = none
-# Local variables should not use underscores in their names.
-dotnet_diagnostic.SA1308.severity = none
-# Elements should be named in PascalCase, except for certain exceptional cases.
-dotnet_diagnostic.SA1309.severity = none
-# Static members should not use underscores in their names.
-dotnet_diagnostic.SA1311.severity = none
-# Parameter names should begin with a lowercase letter.
-dotnet_diagnostic.SA1312.severity = warning
-# Access modifier should always be specified explicitly.
-dotnet_diagnostic.SA1400.severity = none
-# Fields must be private.
-dotnet_diagnostic.SA1401.severity = none
-# File may only contain a single class, struct, or interface.
-dotnet_diagnostic.SA1402.severity = none
-# File should contain a single namespace declaration.
-dotnet_diagnostic.SA1403.severity = none
-# Braces, indentation, and spacing should follow the standard pattern.
-dotnet_diagnostic.SA1500.severity = warning
-# While, for, do, and if-else statements must use braces.
-dotnet_diagnostic.SA1502.severity = none
-# All control blocks should use braces (e.g., if, for, while).
-dotnet_diagnostic.SA1503.severity = warning
-# Optional: Re-enable specific diagnostics
-dotnet_diagnostic.SA1505.severity = none
-# Elements should be separated by blank line.
-dotnet_diagnostic.SA1507.severity = none
-# Ensures no blank lines appear before closing braces.
-dotnet_diagnostic.SA1508.severity = none
-# Single-line comment should be formatted correctly.
-dotnet_diagnostic.SA1511.severity = none
-# All files must end with a single newline.
-dotnet_diagnostic.SA1512.severity = none
-# Closing brace should be followed by blank line
-dotnet_diagnostic.SA1513.severity = none
-# Blank lines should be properly used within methods.
-dotnet_diagnostic.SA1515.severity = none
-# One or more adjacent elements must not be missing blank lines.
-dotnet_diagnostic.SA1516.severity = none
-# No blank lines should exist at the start of the file
-dotnet_diagnostic.SA1517.severity = none
-# Elements must have XML documentation.
-dotnet_diagnostic.SA1600.severity = none
-# XML headers must contain summary tags.
-dotnet_diagnostic.SA1601.severity = none
-# All enumeration items must be documented.
-dotnet_diagnostic.SA1602.severity = none
-# All exception types must be documented in XML.
-dotnet_diagnostic.SA1612.severity = none
-# Properties must have appropriate XML documentation.
-dotnet_diagnostic.SA1613.severity = none
-# Missing required file header comment at the top of the file
-dotnet_diagnostic.SA1633.severity = none
-# The file name should match the first defined type (e.g., class or struct name)
-dotnet_diagnostic.SA1649.severity = none
-# Field names must not match the names of methods.
-dotnet_diagnostic.SA1700.severity = none
-# Dispose objects according to IDisposable pattern.
-dotnet_diagnostic.SA2000.severity = none
-# Use correct behavior for bitwise or logical operators.
-dotnet_diagnostic.SA2010.severity = none
-# Async methods must have "Async" suffix in their names.
-dotnet_diagnostic.SA3000.severity = none
-# Reserved for custom or experimental rules.
-dotnet_diagnostic.SA9001.severity = none
-# Reserved for custom or experimental rules.
-dotnet_diagnostic.SA9002.severity = none
+csharp_preserve_single_line_statements = true
 
 
 # C# Naming Rules (Classes and Interfaces) =================
