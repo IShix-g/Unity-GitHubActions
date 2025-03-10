@@ -1,4 +1,5 @@
 namespace Tests.StyleTest
+﻿
 {
     public sealed class StyleTest18
     {
