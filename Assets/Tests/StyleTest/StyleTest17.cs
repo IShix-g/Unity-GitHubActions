@@ -1,7 +1,7 @@
 
 namespace Tests.StyleTest
 {
-    public sealed class StyleTest16
+    public sealed class StyleTest17
     {
       static string s_staticField = string.Empty;
         string _test;
