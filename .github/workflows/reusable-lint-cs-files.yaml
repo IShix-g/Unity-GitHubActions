@@ -133,7 +133,7 @@ jobs:
       - name: Collect Style Violations Log
         id: violations-log
         run: |
-          output=$(dotnet format TempProject.csproj --include $(echo "${{ inputs.files }}" | tr ',|;' ' ') --verbosity diagnostic || true)
+          output=$(dotnet format TempProject.csproj --verbosity diagnostic || true)
 
           if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
