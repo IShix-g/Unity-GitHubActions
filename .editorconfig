@@ -198,6 +198,7 @@ dotnet_diagnostic.SA1500.severity = warning
 dotnet_diagnostic.SA1502.severity = none
 # All control blocks should use braces (e.g., if, for, while).
 dotnet_diagnostic.SA1503.severity = warning
+dotnet_diagnostic.SA1504.severity = none
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
 # Element documentation headers should not be followed by blank line
@@ -220,6 +221,9 @@ dotnet_diagnostic.SA1515.severity = none
 dotnet_diagnostic.SA1516.severity = none
 # No blank lines should exist at the start of the file
 dotnet_diagnostic.SA1517.severity = none
+dotnet_diagnostic.SA1518.severity = none
+dotnet_diagnostic.SA1519.severity = none
+dotnet_diagnostic.SA1520.severity = none
 # Elements must have XML documentation.
 dotnet_diagnostic.SA1600.severity = none
 # XML headers must contain summary tags.
