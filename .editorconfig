@@ -115,7 +115,7 @@ dotnet_diagnostic.IDE0028.severity = none
 # Simplify built-in type names.
 dotnet_diagnostic.IDE0049.severity = warning
 # Format code consistently.
-dotnet_diagnostic.IDE0055.severity = none
+dotnet_diagnostic.IDE0055.severity = warning
 # Naming rule violation
 dotnet_diagnostic.IDE1006.severity = error
 # Keywords must be spaced correctly.
@@ -135,7 +135,7 @@ dotnet_diagnostic.SA1006.severity = none
 # Closing parenthesis should not be preceded by a space.
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
-dotnet_diagnostic.SA1027.severity = warning
+dotnet_diagnostic.SA1027.severity = none
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
 # Enforces the use of the `this` keyword when referencing instance members of a class to improve clarity.
