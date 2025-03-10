@@ -135,6 +135,8 @@ dotnet_diagnostic.SA1006.severity = none
 # Closing parenthesis should not be preceded by a space.
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
+dotnet_diagnostic.SA1025.severity = none
+dotnet_diagnostic.SA1026.severity = none
 dotnet_diagnostic.SA1027.severity = none
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
@@ -196,6 +198,7 @@ dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1503.severity = warning
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
+dotnet_diagnostic.SA1506.severity = none
 # Elements should be separated by blank line.
 dotnet_diagnostic.SA1507.severity = none
 # Ensures no blank lines appear before closing braces.
