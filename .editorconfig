@@ -136,7 +136,9 @@ dotnet_diagnostic.SA1006.severity = none
 dotnet_diagnostic.SA1009.severity = none
 # Use spaces instead of tabs for indentations.
 dotnet_diagnostic.SA1025.severity = none
+# Declaration keywords should follow order
 dotnet_diagnostic.SA1026.severity = none
+# Protected should come before internal
 dotnet_diagnostic.SA1027.severity = none
 # Code must not contain trailing whitespace.
 dotnet_diagnostic.SA1028.severity = none
@@ -198,11 +200,14 @@ dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1503.severity = warning
 # Optional: Re-enable specific diagnostics
 dotnet_diagnostic.SA1505.severity = none
-dotnet_diagnostic.SA1506.severity = none
+# Element documentation headers should not be followed by blank line
+dotnet_diagnostic.SA1506.severity = warning
 # Elements should be separated by blank line.
 dotnet_diagnostic.SA1507.severity = none
 # Ensures no blank lines appear before closing braces.
 dotnet_diagnostic.SA1508.severity = none
+dotnet_diagnostic.SA1509.severity = none
+dotnet_diagnostic.SA1510.severity = none
 # Single-line comment should be formatted correctly.
 dotnet_diagnostic.SA1511.severity = none
 # All files must end with a single newline.
