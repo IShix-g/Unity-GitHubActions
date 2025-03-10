@@ -19,6 +19,10 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
+csharp_new_line_between_members = true
+csharp_space_around_declaration_statements = ignore
+csharp_space_between_empty_braces = fals
+
 # Always insert a newline before opening braces '{'
 csharp_new_line_before_open_brace = all
 
