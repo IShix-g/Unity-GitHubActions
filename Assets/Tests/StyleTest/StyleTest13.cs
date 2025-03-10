@@ -1,6 +1,6 @@
 namespace Tests.StyleTest
 {
-    public sealed class StyleTest12
+    public sealed class StyleTest13
     {
         private int TestVariable = 10;
 
