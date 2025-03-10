@@ -32,6 +32,7 @@ csharp_indent_labels = flush_left
 csharp_indent_block_contents = true
 # Ensure opening and closing braces are indented correctly
 csharp_indent_braces = false
+csharp_indent_case_contents = true
 # Indent the statement list and curly braces in the case of a switch statement.
 csharp_indent_case_contents_when_block = false
 
