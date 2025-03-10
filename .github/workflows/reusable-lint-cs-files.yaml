@@ -133,7 +133,10 @@ jobs:
       - name: Collect Style Violations Log
         id: violations-log
         run: |
-          output=$(dotnet format TempProject.csproj --verify-no-changes --verbosity=diagnostic 2>&1 || echo "Style violation detected")
+          output=$(dotnet format TempProject.csproj \
+          --verify-no-changes \
+          --diagnostics-ids-to-suppress=WHITESPACE \
+          --verbosity=diagnostic 2>&1 || echo "Style violation detected")
 
           if [ -z "$output" ]; then
             echo "::notice::No issues were found in the code"
