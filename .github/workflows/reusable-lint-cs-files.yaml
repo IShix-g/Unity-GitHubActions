@@ -130,6 +130,20 @@ jobs:
           dotnet tool install dotnet-format
           dotnet add package StyleCop.Analyzers
 
+      - name: Ensure UTF-8 Encoding
+        run: |
+          for file in $(echo "${{ inputs.files }}" | tr ',|;' ' '); do
+            if file -i "$file" | grep -qv 'utf-8'; then
+              echo "Converting $file to UTF-8"
+              iconv -f $(file -bi "$file" | awk -F'=' '{print $2}') -t utf-8 "$file" -o "$file"
+            fi
+
+            if [ "$(head -c 3 "$file" | od -An -tx1 | tr -d ' ')" != "efbbbf" ]; then
+              echo "Adding BOM to $file"
+              echo -e '\xEF\xBB\xBF' | cat - "$file" > tmpfile && mv tmpfile "$file"
+            fi
+          done
+
       - name: Collect Style Violations Log
         id: violations-log
         run: |
