@@ -172,6 +172,11 @@ dotnet_diagnostic.IDE0055.severity = warning
 dotnet_diagnostic.IDE1006.severity = error
 
 
+# Code Style Rules =================
+
+
+
+
 # C# Naming Rules (Classes and Interfaces) =================
 
 # Public classes
