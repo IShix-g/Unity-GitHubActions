@@ -11,7 +11,7 @@ namespace Tests.StyleTest
 
         }
         
-        void _Test2()
+        void test2()
         {
 
         }

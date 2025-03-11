@@ -166,6 +166,11 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = false
 
+# Format code consistently.
+dotnet_diagnostic.IDE0055.severity = warning
+# Naming rule violation
+dotnet_diagnostic.IDE1006.severity = error
+
 
 # C# Naming Rules (Classes and Interfaces) =================
 
