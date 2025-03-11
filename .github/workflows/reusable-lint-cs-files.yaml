@@ -133,7 +133,7 @@ jobs:
       - name: Collect Style Violations Log
         id: violations-log
         run: |
-          output=$(dotnet format TempProject.csproj \
+          output=$(dotnet format style TempProject.csproj \
             --verify-no-changes \
             --verbosity=diagnostic 2>&1 || echo "Style violation detected")
 
