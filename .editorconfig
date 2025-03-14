@@ -439,4 +439,4 @@ dotnet_naming_style.interface_pascal_case.capitalization = pascal_case
 
 [Assets/Tests/StyleTest/IgnoreStyleTest.cs]
 
-dotnet_diagnostic.IDE1006.severity = error
+dotnet_diagnostic.IDE1006.severity = none
