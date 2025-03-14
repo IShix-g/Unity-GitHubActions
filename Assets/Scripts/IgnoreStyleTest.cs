@@ -1,7 +1,6 @@
 
-namespace Tests.StyleTest
+namespace Tests
 {
-
     public sealed class IgnoreStyleTest
     {
         string test;
