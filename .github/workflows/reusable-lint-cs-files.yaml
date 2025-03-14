@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       ref:
-        description: "Specify a branch or commit ID"
+        description: 'Specify a branch or commit ID'
         required: true
         type: string
       editorconfig-branch:
