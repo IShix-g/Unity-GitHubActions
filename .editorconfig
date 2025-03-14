@@ -437,6 +437,6 @@ dotnet_naming_style.interface_pascal_case.capitalization = pascal_case
 
 # File-specific C# Naming Style Settings =================
 
-[Assets/Tests/StyleTest/IgnoreStyleTest.cs]
+[Assets/Scripts/IgnoreStyleTest.cs]
 
 dotnet_diagnostic.IDE1006.severity = none
