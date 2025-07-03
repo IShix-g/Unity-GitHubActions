@@ -359,7 +359,9 @@ Unity Editorの対応バージョンは[こちら](https://game.ci/docs/docker/v
 
 Unity Editorで"Window > Package Manager > Add package from git URL..."にURLを入力してインストールしてください。
 
-URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter`
+```
+https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter
+```
 
 #### パッケージをダウンロード
 

@@ -364,7 +364,9 @@ Install it using one of the following methods:
 
 Open Unity Editor, and go to "Window > Package Manager > Add package from git URL...". Enter the following URL to install:
 
-URL: `https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter`
+```
+https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter
+```
 
 #### Download the Package
 
