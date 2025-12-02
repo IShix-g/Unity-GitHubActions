@@ -11,6 +11,10 @@ on:
         description: 'Git tag to move (e.g., v1).'
         required: true
         type: string
+      target-tag:
+        description: 'Target tag to point to. If provided, the major tag will point to the same commit as this tag. If empty, it points to the latest commit of the branch.'
+        required: false
+        type: string
     secrets:
       BOT_APP_ID:
         required: false
@@ -25,7 +29,7 @@ jobs:
   update-major-tag:
     runs-on: ubuntu-22.04
     outputs:
-      sha: ${{ steps.show-commit.outputs.sha }}
+      sha: ${{ steps.resolve-commit.outputs.sha }}
     steps:
       - name: Check secrets availability
         id: check-secrets
@@ -48,14 +52,31 @@ jobs:
           token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.branch }}
 
-      - name: Show current commit
-        id: show-commit
+      - name: Resolve target commit
+        id: resolve-commit
         run: |
           echo "::notice::Tag: ${{ inputs.tag }}"
           echo "::notice::Current Branch/Ref: ${{ inputs.branch }}"
-          echo "::notice::Target Commit SHA: $(git rev-parse HEAD)"
+          
+          if [ -n "${{ inputs.target-tag }}" ]; then
+            echo "::notice::Target Tag Provided: ${{ inputs.target-tag }}"
+            # Check if target tag exists
+            if git rev-parse "${{ inputs.target-tag }}" >/dev/null 2>&1; then
+              TARGET_SHA=$(git rev-parse "${{ inputs.target-tag }}")
+              # Checkout to that specific commit so HEAD points to it
+              git checkout "$TARGET_SHA"
+            else
+              echo "::error::Target tag '${{ inputs.target-tag }}' not found!"
+              exit 1
+            fi
+          else
+            echo "::notice::No Target Tag provided, using HEAD of branch"
+            TARGET_SHA=$(git rev-parse HEAD)
+          fi
+          
+          echo "::notice::Target Commit SHA: $TARGET_SHA"
           git show --summary
-          echo "sha=$(git rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+          echo "sha=$TARGET_SHA" | tee -a "$GITHUB_OUTPUT"
 
       - name: Update ${{ inputs.tag }} tag
         run: |

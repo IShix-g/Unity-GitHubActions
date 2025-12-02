@@ -11,6 +11,10 @@ on:
         description: 'Git tag to move (e.g., v1).'
         type: string
         default: ''
+      target-tag:
+        description: 'Target tag to point to. If provided, the major tag will point to the same commit as this tag. If empty, it points to the latest commit of the branch.'
+        type: string
+        default: ''
   workflow_call:
     inputs:
       branch:
@@ -18,6 +22,10 @@ on:
         type: string
         default: ''
       tag:
+        required: false
+        type: string
+        default: ''
+      target-tag:
         required: false
         type: string
         default: ''
@@ -105,6 +113,7 @@ jobs:
     with:
       branch: ${{ needs.set-branch.outputs.branch }}
       tag: ${{ needs.set-tag.outputs.tag }}
+      target-tag: ${{ inputs.target-tag }}
 
   verify-tag:
     runs-on: ubuntu-22.04
