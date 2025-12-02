@@ -1,0 +1,45 @@
+name: Update Major Tag (V1)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-tag:
+        description: '(Optional) Target tag to point to. If provided, the major tag will point to the same commit as this tag. If empty, the latest tag in the 1.x series will be used.'
+        type: string
+        default: ''
+
+env:
+  TAG: v1
+  TARGET_VERSION: 1
+
+jobs:
+  set-target-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.set-target-tag.outputs.tag }}
+    steps:
+      - name: Set Target Tag
+        id: set-target-tag
+        run: |
+          if [ -n "${{ inputs.target-tag }}" ]; then
+            tag="${{ inputs.target-tag }}"
+          else
+            tag=$(git tag --merged HEAD --sort=-committerdate | grep -E '^${{ env.TARGET_VERSION }}\.[0-9]+\.[0-9]+$' | head -n 1)
+          
+            if [ -z "$tag" ]; then
+              echo "::error::No valid ${{ env.TARGET_VERSION }}.x.x tag found in history."
+              exit 1
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  update-major-tag:
+    needs: [set-target-tag]
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-update-major-tag.yml@main
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ github.ref }}
+      tag: ${{ env.TAG }}
+      target-tag: ${{ needs.set-target-tag.outputs.tag }}
