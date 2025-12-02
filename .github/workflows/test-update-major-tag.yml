@@ -15,6 +15,10 @@ on:
         description: 'Target tag to point to. If provided, the major tag will point to the same commit as this tag. If empty, it points to the latest commit of the branch.'
         type: string
         default: ''
+      clean-tag:
+        description: 'Clean the repository before updating the tag. Set to true to remove all untracked files and directories.'
+        type: boolean
+        default: true
   workflow_call:
     inputs:
       branch:
@@ -29,6 +33,10 @@ on:
         required: false
         type: string
         default: ''
+      clean-tag:
+        required: false
+        type: boolean
+        default: true
     secrets:
       BOT_APP_ID:
         required: true
@@ -141,6 +149,7 @@ jobs:
   cleanup-tag:
     runs-on: ubuntu-22.04
     needs: [set-tag, set-branch, setup-initial-tag, update-major-tag, verify-tag]
+    if: ${{ inputs.clean-tag }}
     steps:
       - name: Check secrets availability
         id: check-secrets
