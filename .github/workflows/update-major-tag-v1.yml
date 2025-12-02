@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       tag: ${{ steps.set-target-tag.outputs.tag }}
+      target-tag: ${{ steps.set-target-tag.outputs.target-tag }}
     steps:
       - name: Set Target Tag
         id: set-target-tag
@@ -31,7 +32,8 @@ jobs:
               exit 1
             fi
           fi
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "target-tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "tag=${{ env.TAG }}" >> "$GITHUB_OUTPUT"
 
   update-major-tag:
     needs: [set-target-tag]
@@ -41,5 +43,5 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       branch: ${{ github.ref }}
-      tag: ${{ env.TAG }}
-      target-tag: ${{ needs.set-target-tag.outputs.tag }}
+      tag: ${{ needs.set-target-tag.outputs.tag }}
+      target-tag: ${{ needs.set-target-tag.outputs.target-tag }}
