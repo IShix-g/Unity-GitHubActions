@@ -78,13 +78,20 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_tag=$(gh api repos/"$GITHUB_REPOSITORY"/tags --jq '.[0].name')
+          # Fetch all tags, filter for strictly X.Y.Z format (ignoring alpha/beta/rc or incomplete versions),
+          # strip 'v', sort by version, and pick the highest one.
+          latest_tag=$(gh api repos/"$GITHUB_REPOSITORY"/tags --paginate --jq '.[].name' \
+            | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' \
+            | sed 's/^v//' \
+            | sort -V \
+            | tail -n 1)
+          
           if [[ -z "$latest_tag" ]]; then
-            echo "::notice::No tags found in the repository. Skipping validation."
+            echo "::notice::No valid semantic version tags found (searching for X.Y.Z format). Skipping validation."
             echo "validated=true" | tee -a "$GITHUB_OUTPUT"
             exit 0
           fi
-
+          
           sorted_latest=$(echo -e "$latest_tag\n${{ steps.trim.outputs.normalized-tag }}" | sort -V | tail -n 1)
           if [[ "$sorted_latest" == "$latest_tag" ]]; then
             if [[ "${{ inputs.require-validation }}" == "true" ]]; then
