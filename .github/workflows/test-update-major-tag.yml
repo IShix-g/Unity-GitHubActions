@@ -1,0 +1,166 @@
+name: (Test) Update Major Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to set the tag on. The tag will be set on the latest commit.'
+        type: string
+        default: ''
+      tag:
+        description: 'Git tag to move (e.g., v1).'
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      branch:
+        required: false
+        type: string
+        default: ''
+      tag:
+        required: false
+        type: string
+        default: ''
+    secrets:
+      BOT_APP_ID:
+        required: true
+      BOT_PRIVATE_KEY:
+        required: true
+
+jobs:
+  set-branch:
+    runs-on: ubuntu-22.04
+    outputs:
+      branch: ${{ steps.set-branch.outputs.branch }}
+    steps:
+      - name: Set branch
+        id: set-branch
+        run: |
+          if [ -n "${{ inputs.branch }}" ]; then
+            branch="${{ inputs.branch }}"
+          else
+            branch="${{ github.ref }}"
+          fi
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+  set-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - name: Set Tag
+        id: set-tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="__testTag"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  setup-initial-tag:
+    runs-on: ubuntu-22.04
+    needs: [set-branch, set-tag]
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate GitHub App Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-branch.outputs.branch }}
+          fetch-depth: 2 # Fetch at least 2 commits to retrieve the previous commit
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+
+      - name: Setup initial tag position
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          
+          TAG="${{ needs.set-tag.outputs.tag }}"
+          # For testing purposes, intentionally tag the commit before the latest (HEAD~1), or HEAD if there aren't enough commits
+          TARGET_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+          
+          echo "Setting initial tag $TAG to $TARGET_COMMIT (HEAD~1 or HEAD)"
+          git tag -f "$TAG" "$TARGET_COMMIT"
+          git push origin "$TAG" -f
+
+  update-major-tag:
+    needs: [set-branch, set-tag, setup-initial-tag]
+    uses: ./.github/workflows/reusable-update-major-tag.yml
+    secrets:
+      BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+    with:
+      branch: ${{ needs.set-branch.outputs.branch }}
+      tag: ${{ needs.set-tag.outputs.tag }}
+
+  verify-tag:
+    runs-on: ubuntu-22.04
+    needs: [set-branch, set-tag, setup-initial-tag, update-major-tag]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag position
+        run: |
+          TAG="${{ needs.set-tag.outputs.tag }}"
+          EXPECTED_SHA="${{ needs.update-major-tag.outputs.sha }}"
+
+          git fetch origin tag "$TAG"
+          ACTUAL_SHA=$(git rev-parse FETCH_HEAD^{})
+
+          echo "Expected SHA: $EXPECTED_SHA"
+          echo "Actual SHA:   $ACTUAL_SHA"
+
+          if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
+            echo "::error::Verification Failed: Tag $TAG is not on the expected commit!"
+            exit 1
+          fi
+          echo "::notice::Verification Passed: Tag $TAG is on $ACTUAL_SHA"
+
+  cleanup-tag:
+    runs-on: ubuntu-22.04
+    needs: [set-tag, set-branch, setup-initial-tag, update-major-tag, verify-tag]
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate GitHub App Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+
+      - name: Wait for 15 seconds
+        run: sleep 15
+
+      - name: Delete tag
+        run: |
+          TAG="${{ needs.set-tag.outputs.tag }}"
+          SHA="${{ needs.update-major-tag.outputs.sha }}"
+          
+          echo "Target Tag: $TAG"
+          echo "Target Commit SHA: $SHA"
+          
+          git push origin --delete "$TAG"

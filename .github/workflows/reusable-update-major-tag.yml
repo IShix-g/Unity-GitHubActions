@@ -1,0 +1,67 @@
+name: (Reusable) Update Major Tag
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to set the tag on. The tag will be set on the latest commit.'
+        required: true
+        type: string
+      tag:
+        description: 'Git tag to move (e.g., v1).'
+        required: true
+        type: string
+    secrets:
+      BOT_APP_ID:
+        required: false
+      BOT_PRIVATE_KEY:
+        required: false
+    outputs:
+      sha:
+        description: 'SHA of the commit where the tag was set'
+        value: ${{ jobs.update-major-tag.outputs.sha }}
+
+jobs:
+  update-major-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      sha: ${{ steps.show-commit.outputs.sha }}
+    steps:
+      - name: Check secrets availability
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.BOT_APP_ID }}" ] && [ -n "${{ secrets.BOT_PRIVATE_KEY }}" ]; then
+            echo "available=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate GitHub App Token
+        id: app-token
+        if: ${{ steps.check-secrets.outputs.available == '1' }}
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.branch }}
+          persist-credentials: ${{ steps.check-secrets.outputs.available != '1' }}
+
+      - name: Show current commit
+        id: show-commit
+        run: |
+          echo "::notice::Tag: ${{ inputs.tag }}"
+          echo "::notice::Current Branch/Ref: ${{ inputs.branch }}"
+          echo "::notice::Target Commit SHA: $(git rev-parse HEAD)"
+          git show --summary
+          echo "sha=$(git rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Update ${{ inputs.tag }} tag
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git tag -f ${{ inputs.tag }}
+          git push origin ${{ inputs.tag }} -f
