@@ -19,6 +19,10 @@ jobs:
       tag: ${{ steps.set-target-tag.outputs.tag }}
       target-tag: ${{ steps.set-target-tag.outputs.target-tag }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+ 
       - name: Set Target Tag
         id: set-target-tag
         run: |
