@@ -3,20 +3,22 @@ name: Update Major Tag (V1)
 on:
   workflow_dispatch:
     inputs:
+      tag:
+        description: '(Optional) Git tag to move (e.g., v1).'
+        type: string
+        default: 'v1'
       target-tag:
         description: '(Optional) Target tag to point to. If provided, the major tag will point to the same commit as this tag. If empty, the latest tag in the 1.x series will be used.'
         type: string
         default: ''
 
 env:
-  TAG: v1
   TARGET_VERSION: 1
 
 jobs:
   set-target-tag:
     runs-on: ubuntu-22.04
     outputs:
-      tag: ${{ steps.set-target-tag.outputs.tag }}
       target-tag: ${{ steps.set-target-tag.outputs.target-tag }}
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +39,6 @@ jobs:
             fi
           fi
           echo "target-tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "tag=${{ env.TAG }}" >> "$GITHUB_OUTPUT"
 
   update-major-tag:
     needs: [set-target-tag]
@@ -47,5 +48,5 @@ jobs:
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
     with:
       branch: ${{ github.ref }}
-      tag: ${{ needs.set-target-tag.outputs.tag }}
+      tag: ${{ inputs.tag }}
       target-tag: ${{ needs.set-target-tag.outputs.target-tag }}
