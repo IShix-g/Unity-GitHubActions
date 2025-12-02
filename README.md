@@ -69,6 +69,7 @@ GitHub Actions for Unity.
   - [Target of Style Checks](#target-of-style-checks-1)
   - [Workflow of Style Check](#workflow-of-style-check-1)
   - [Setup Guide](#setup-guide-3)
+- [Update Tags](#update-tags)
 - [Job Descriptions](#job-descriptions)
   - [Validate Tag](#validate-tag)
     - [Inputs](#inputs)
@@ -101,6 +102,9 @@ GitHub Actions for Unity.
   - [Style Checking for C&#035; Files (Lint C# Files for Unity)](#style-checking-for-c-files-lint-c-files-for-unity)
     - [Open Source Software (OSS) Used](#open-source-software-oss-used)
     - [Input Parameters (Inputs)](#input-parameters-inputs)
+  - [Update Major Tag](#update-major-tag)
+    - [Inputs](#inputs-8)
+    - [Secrets](#secrets-5)
 - [About GitHub Actions Usage Fees](#about-github-actions-usage-fees)
 - [Referenced Repository](#referenced-repository)
 
