@@ -15,6 +15,9 @@ on:
 env:
   TARGET_VERSION: 1
 
+permissions:
+  contents: write
+
 jobs:
   set-target-tag:
     runs-on: ubuntu-22.04
