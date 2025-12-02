@@ -55,11 +55,14 @@ jobs:
       - name: Resolve target commit
         id: resolve-commit
         run: |
-          echo "::notice::Tag: ${{ inputs.tag }}"
-          echo "::notice::Current Branch/Ref: ${{ inputs.branch }}"
+          NOTICE_MSG="Tag: ${{ inputs.tag }}"
+          NOTICE_MSG="${NOTICE_MSG}
+          Current Branch/Ref: ${{ inputs.branch }}"
           
           if [ -n "${{ inputs.target-tag }}" ]; then
-            echo "::notice::Target Tag Provided: ${{ inputs.target-tag }}"
+            NOTICE_MSG="${NOTICE_MSG}
+            Target Tag Provided: ${{ inputs.target-tag }}"
+          
             # Check if target tag exists
             if git rev-parse "${{ inputs.target-tag }}" >/dev/null 2>&1; then
               TARGET_SHA=$(git rev-parse "${{ inputs.target-tag }}")
@@ -70,11 +73,18 @@ jobs:
               exit 1
             fi
           else
-            echo "::notice::No Target Tag provided, using HEAD of branch"
+            NOTICE_MSG="${NOTICE_MSG}
+            No Target Tag provided, using HEAD of branch"
             TARGET_SHA=$(git rev-parse HEAD)
           fi
           
-          echo "::notice::Target Commit SHA: $TARGET_SHA"
+          NOTICE_MSG="${NOTICE_MSG}
+          Target Commit SHA: $TARGET_SHA"
+          
+          # 改行を %0A に置換して1つのnoticeとして出力
+          NOTICE_MSG="${NOTICE_MSG//$'\n'/'%0A'}"
+          echo "::notice::$NOTICE_MSG"
+          
           git show --summary
           echo "sha=$TARGET_SHA" | tee -a "$GITHUB_OUTPUT"
 
