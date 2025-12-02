@@ -5,6 +5,7 @@
 [![Test Build Package](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml)  
 [![Test Unity Test](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml)  
 [![Test Unity C# Linter](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml)  
+[![Test Update Major Tag](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yml)
 
 [README - 日本語版](Docs/README_jp.md)
 
@@ -453,6 +454,18 @@ Click the `Run workflow` button to execute the style check.
 4. Create a style rule configuration file. Refer to [this example](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig) to create an [.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022).
 
 
+## Update Tags
+
+[update-major-tag-v1.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yml)
+
+Moves a specified tag to the commit referenced by another tag. For example, this can be used to maintain a major version tag (like `v1`) that always points to the latest stable release of the 1.x series.
+
+| Option     | Description                                                           | Default | Example |
+|------------|-----------------------------------------------------------------------|---------|---------|
+| tag        | The tag to move                                                       |         | v1      |
+| target-tag | The target tag. If empty, the commit with the latest tag is targeted. |         | 1.1.0   |
+
+
 ## Job Descriptions
 
 Main Job Descriptions.
@@ -723,7 +736,7 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 
 ### Style Checking for C# Files (Lint C# Files for Unity)
 
-[reusable-lint-cs-files.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-lint-cs-files.yaml)
+[.github/workflows/reusable-lint-cs-files.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-lint-cs-files.yaml)
 
 This action performs style checks on the specified C# files.
 
@@ -743,6 +756,31 @@ This action performs style checks on the specified C# files.
 | review-reporter   | Specifies the [reviewdog reporter](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporters).                              | github-pr-review       |
 | review-level      | Specifies the [reviewdog level](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-pr-checks--reportergithub-pr-check). | warning                |
 | review-exit-code  | Specifies the [reviewdog exit code](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes).                             | error                  |
+
+---
+
+### Update Major Tag
+
+[.github/workflows/reusable-update-major-tag.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yml)
+
+This action moves an existing tag to the commit associated with a target tag.
+
+#### Inputs
+
+| ID         | Description                                                                   | Default |
+|------------|-------------------------------------------------------------------------------|---------|
+| branch     | Commit ID used for creating the release and tag.                              |         |
+| tag        | The tag to move (e.g., `v1`).                                                 |         |
+| target-tag | The commit with the target tag. If empty, the latest commit will be targeted. |         |
+
+#### Secrets
+
+Required for branch or tag protection:
+
+| ID              | Description                      |
+|-----------------|----------------------------------|
+| BOT_APP_ID      | Specify the application ID.      |
+| BOT_PRIVATE_KEY | Set the private key for the app. |
 
 
 ## About GitHub Actions Usage Fees

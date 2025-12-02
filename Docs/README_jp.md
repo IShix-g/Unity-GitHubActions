@@ -443,6 +443,18 @@ https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter
 4. スタイルルールの設定ファイルを作成。[こちら](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig)を参考に[.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022)を作成してください
 
 
+## タグの更新
+
+[update-major-tag-v1.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yml)
+
+任意のタグを、任意のタグを持つコミットに移動します。例えば、1系バージョンの安定版として、`v1`タグをコミットにつけるなどの運用で使えます。
+
+| Option     | Description                   | Default | Example |
+|------------|-------------------------------|---------|---------|
+| tag        | 移動するタグ                        |         | v1      |
+| target-tag | 対象のタグ、空の場合最終のタグを持つコミットを対象とします |         | 1.1.0   |
+
+
 ## Jobの説明
 
 主なJobを説明です。
@@ -733,6 +745,31 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 | review-reporter   | [reviewdogのreporter](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporters) を指定                                       | github-pr-review    |
 | review-level   | [reviewdogのlevel](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#reporter-github-pr-checks--reportergithub-pr-check) を指定 | warning             |
 | review-exit-code   | [reviewdogのexit code](https://github.com/reviewdog/reviewdog?tab=readme-ov-file#exit-codes) を指定                                     | error               |
+
+---
+
+### タグの更新 (Update Major Tag)
+
+[reusable-update-major-tag.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yml)
+
+このアクションは、存在するタグを対象のタグを持つコミットに移動させます。
+
+#### 入力値 (Inputs)
+
+| ID        | 説明                                | デフォルト値      |
+|-----------|-----------------------------------|-----------------|
+| branch | リリースおよびタグ作成用のコミット ID              |                 |
+| tag | 移動対象のタグ (例: `v1`)                 |                 |
+| target-tag | 対象のタグを持つコミット。空の場合、最終コミットが対象となります。 |                 |
+
+#### Secrets (機密情報)
+
+ブランチまたはタグの保護に必要:
+
+| ID               | 説明                              |
+|-------------------|-----------------------------------|
+| BOT_APP_ID        | アプリケーション ID を指定する    |
+| BOT_PRIVATE_KEY   | アプリ用の秘密鍵を設定する        |
 
 
 ## GitHub Actionsの使用料について
