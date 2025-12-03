@@ -103,10 +103,10 @@ jobs:
         id: determine-range
         run: |
           echo "Checking the specified tags..."
-          # If the start tag is empty, fetch the hash of the first commit
+          # If the start tag is empty, we treat it as "from the beginning"
           if [ -z "${{ env.from-tag }}" ]; then
-            from_commit=$(git rev-list --max-parents=0 HEAD)
-            echo "Start tag is not specified. Using the first commit ($from_commit) as the start point."
+            echo "Start tag is not specified. Collecting logs from the beginning."
+            from_commit=""
           else
             from_commit="${{ env.from-tag }}"
             echo "Specified start tag: $from_commit"
@@ -131,16 +131,25 @@ jobs:
           echo "End: ${{ steps.determine-range.outputs.to_commit }}"
           echo "Format: ${{ inputs.commit-message-format }}"
           echo "Filter conditions: $FILTER_CONDITION"
-
+          
           IFS='|' read -r -a filter_conditions <<< "$FILTER_CONDITION"
           echo "Conditions: ${filter_conditions[@]}"
-
+          
+          # 修正: 範囲文字列の構築
+          if [ -z "${{ steps.determine-range.outputs.from_commit }}" ]; then
+            range="${{ steps.determine-range.outputs.to_commit }}"
+          else
+            range="${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }}"
+          fi
+          
+          echo "Git Log Range: $range"
+          
           sorted_notes=""
-
+          
           for condition in "${filter_conditions[@]}"; do
-
+          
             filtered_notes=$(
-              git log ${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }} \
+              git log $range \
               --reverse \
               --pretty=format:"${{ inputs.commit-message-format }}####UNIQUE####%cn" \
               | grep -vi "github-actions\[bot\]" \
@@ -148,7 +157,7 @@ jobs:
               | grep -iE "\b($condition)\s*:" \
               || echo ""
             )
-
+          
             if [ ! -z "$filtered_notes" ]; then
               echo "Found commits for condition: $condition"
               echo "$filtered_notes"
