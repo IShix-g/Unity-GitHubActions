@@ -165,39 +165,6 @@ jobs:
               echo "No commits found for condition: $condition"
             fi
           done
-
-          all_notes=$(
-            git log $range \
-            --reverse \
-            --pretty=format:"${{ inputs.commit-message-format }}" \
-            | grep -vi "github-actions\[bot\]" \
-            | sed 's/####UNIQUE####.*$//' \
-            || echo ""
-          )
-          
-          echo "$sorted_notes" | sed '/^$/d' > temp_classified_notes.txt
-          
-          uncategorized_notes=$(
-            echo "$all_notes" \
-            | grep -v -F -f temp_classified_notes.txt \
-            | sed 's/^- //'
-          )
-          
-          if [ ! -z "$uncategorized_notes" ]; then
-            echo "Found uncategorized commits."
-
-            other_section=$'\n\n'"**Other:**"$'\n'
-
-            formatted_other_notes=$(
-              echo "$uncategorized_notes" \
-              | sed 's/^/- Other: /'
-            )
-            
-            # sorted_notesに結合
-            sorted_notes="$sorted_notes"$other_section"$formatted_other_notes"
-          fi
-          
-          rm temp_classified_notes.txt
           
           sorted_notes=$(echo "$sorted_notes" | sed '/^$/d')
 
