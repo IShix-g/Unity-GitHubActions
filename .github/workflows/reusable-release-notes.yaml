@@ -134,8 +134,7 @@ jobs:
           
           IFS='|' read -r -a filter_conditions <<< "$FILTER_CONDITION"
           echo "Conditions: ${filter_conditions[@]}"
-          
-          # 修正: 範囲文字列の構築
+
           if [ -z "${{ steps.determine-range.outputs.from_commit }}" ]; then
             range="${{ steps.determine-range.outputs.to_commit }}"
           else
@@ -167,6 +166,45 @@ jobs:
             fi
           done
 
+          all_notes=$(
+            git log $range \
+            --reverse \
+            --pretty=format:"${{ inputs.commit-message-format }}" \
+            | grep -vi "github-actions\[bot\]" \
+            | sed 's/####UNIQUE####.*$//' \
+            || echo ""
+          )
+          
+          # 2. 既に分類されたコミット（sorted_notesに含まれるもの）を一時ファイルに保存
+          echo "$sorted_notes" | sed '/^$/d' > temp_classified_notes.txt
+          
+          # 3. 全コミットログから分類済みコミットを除外
+          #    grep -v -F -f を使用して、ファイルにリストされた行を除外する
+          uncategorized_notes=$(
+            echo "$all_notes" \
+            | grep -v -F -f temp_classified_notes.txt \
+            | sed 's/^- //'  # 先頭のハイフンを除去してプレフィックスがないことを確認
+          )
+          
+          # 4. 未分類コミットが存在する場合、それを 'Other' として追加
+          if [ ! -z "$uncategorized_notes" ]; then
+            echo "Found uncategorized commits."
+            
+            # 見出しを追加
+            other_section=$'\n\n'"**Other:**"$'\n'
+            
+            # プレフィックスを付けて整形
+            formatted_other_notes=$(
+              echo "$uncategorized_notes" \
+              | sed 's/^/- Other: /'
+            )
+            
+            # sorted_notesに結合
+            sorted_notes="$sorted_notes"$other_section"$formatted_other_notes"
+          fi
+          
+          rm temp_classified_notes.txt
+          
           sorted_notes=$(echo "$sorted_notes" | sed '/^$/d')
 
           length=$(echo "$sorted_notes" | wc -l)
