@@ -175,25 +175,19 @@ jobs:
             || echo ""
           )
           
-          # 2. 既に分類されたコミット（sorted_notesに含まれるもの）を一時ファイルに保存
           echo "$sorted_notes" | sed '/^$/d' > temp_classified_notes.txt
           
-          # 3. 全コミットログから分類済みコミットを除外
-          #    grep -v -F -f を使用して、ファイルにリストされた行を除外する
           uncategorized_notes=$(
             echo "$all_notes" \
             | grep -v -F -f temp_classified_notes.txt \
-            | sed 's/^- //'  # 先頭のハイフンを除去してプレフィックスがないことを確認
+            | sed 's/^- //'
           )
           
-          # 4. 未分類コミットが存在する場合、それを 'Other' として追加
           if [ ! -z "$uncategorized_notes" ]; then
             echo "Found uncategorized commits."
-            
-            # 見出しを追加
+
             other_section=$'\n\n'"**Other:**"$'\n'
-            
-            # プレフィックスを付けて整形
+
             formatted_other_notes=$(
               echo "$uncategorized_notes" \
               | sed 's/^/- Other: /'
