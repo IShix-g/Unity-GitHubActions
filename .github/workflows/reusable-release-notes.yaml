@@ -140,41 +140,61 @@ jobs:
           else
             range="${{ steps.determine-range.outputs.from_commit }}..${{ steps.determine-range.outputs.to_commit }}"
           fi
-          
+
+          all_notes=$(
+            git log $range \
+            --reverse \
+            --pretty=format:"${{ inputs.commit-message-format }}####UNIQUE####%cn" \
+            | grep -vi "github-actions\[bot\]" \
+            | sed 's/####UNIQUE####.*$//' \
+            || echo ""
+          )
+        
           echo "Git Log Range: $range"
           
           sorted_notes=""
+          declare -a unmatched_notes
+
+          unmatched_notes_raw=$(echo "$all_notes" | tr '\n' '\001' | sed 's/\x01$//')
           
           for condition in "${filter_conditions[@]}"; do
-          
-            filtered_notes=$(
-              git log $range \
-              --reverse \
-              --pretty=format:"${{ inputs.commit-message-format }}####UNIQUE####%cn" \
-              | grep -vi "github-actions\[bot\]" \
-              | sed 's/####UNIQUE####.*$//' \
-              | grep -iE "\b($condition)\s*:" \
-              || echo ""
+        
+          filtered_notes=$(
+            echo "$all_notes" \
+            | grep -iE "\b($condition)\s*:" \
+            || echo ""
+          )
+        
+          if [ ! -z "$filtered_notes" ]; then
+            echo "Found commits for condition: $condition"
+            echo "$filtered_notes"
+            sorted_notes="$sorted_notes"$'\n'"$filtered_notes"
+            unmatched_notes_raw=$(
+            echo "$unmatched_notes_raw" | tr '\001' '\n' \
+              | grep -vFf <(echo "$filtered_notes") \
+              | tr '\n' '\001' | sed 's/\x01$//'
             )
-          
-            if [ ! -z "$filtered_notes" ]; then
-              echo "Found commits for condition: $condition"
-              echo "$filtered_notes"
-              sorted_notes="$sorted_notes"$'\n'"$filtered_notes"
-            else
-              echo "No commits found for condition: $condition"
-            fi
+          else
+            echo "No commits found for condition: $condition"
+          fi
           done
           
+          if [ ! -z "$unmatched_notes_raw" ]; then
+            unmatched_log=$(echo "$unmatched_notes_raw" | tr '\001' '\n')
+            echo "::group::❌ Unmatched Commit Messages"
+            echo "$unmatched_log"
+            echo "::endgroup::"
+          fi
+          
           sorted_notes=$(echo "$sorted_notes" | sed '/^$/d')
-
+          
           length=$(echo "$sorted_notes" | wc -l)
           echo "::notice::Release Notes: $length items"
-
-          echo "::group::Notebook Contents"
+          
+          echo "::group::✅ Matched Notebook Contents"
           echo "$sorted_notes"
           echo "::endgroup::"
-
+          
           {
             echo "notes<<EOF"
             echo "$sorted_notes"
