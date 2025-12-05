@@ -469,6 +469,14 @@ Moves a specified tag to the commit referenced by another tag. For example, this
 | tag        | The tag to move                                                       |         | v1      |
 | target-tag | The target tag. If empty, the commit with the latest tag is targeted. |         | 1.1.0   |
 
+#### Checking Tags Locally
+
+Even after fetching, moved tags may not be updated. In that case, run the following command:
+
+```shell
+git fetch origin --tags --force
+```
+
 
 ## Job Descriptions
 
@@ -786,6 +794,13 @@ Required for branch or tag protection:
 | BOT_APP_ID      | Specify the application ID.      |
 | BOT_PRIVATE_KEY | Set the private key for the app. |
 
+#### Checking Tags Locally
+
+Even after fetching, moved tags may not be updated. In that case, run the following command:
+
+```shell
+git fetch origin --tags --force
+```
 
 ## About GitHub Actions Usage Fees
 

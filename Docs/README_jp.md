@@ -458,6 +458,13 @@ https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter
 | tag        | 移動するタグ                        |         | v1      |
 | target-tag | 対象のタグ、空の場合最終のタグを持つコミットを対象とします |         | 1.1.0   |
 
+### ローカルでのタグ確認
+
+フェッチしても、移動したタグが更新されない可能性が高いです。その場合は、下記を実行してください。
+
+```shell
+git fetch origin --tags --force
+```
 
 ## Jobの説明
 
@@ -775,6 +782,13 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 | BOT_APP_ID        | アプリケーション ID を指定する    |
 | BOT_PRIVATE_KEY   | アプリ用の秘密鍵を設定する        |
 
+#### ローカルでのタグ確認
+
+フェッチしても、移動したタグが更新されない可能性が高いです。その場合は、下記を実行してください。
+
+```shell
+git fetch origin --tags --force
+```
 
 ## GitHub Actionsの使用料について
 
