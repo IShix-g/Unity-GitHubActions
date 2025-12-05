@@ -70,6 +70,7 @@ GitHub Actions for Unity.
   - [Workflow of Style Check](#workflow-of-style-check-1)
   - [Setup Guide](#setup-guide-3)
 - [Update Tags](#update-tags)
+    - [Checking Tags Locally](#checking-tags-locally)
 - [Job Descriptions](#job-descriptions)
   - [Validate Tag](#validate-tag)
     - [Inputs](#inputs)
@@ -105,6 +106,7 @@ GitHub Actions for Unity.
   - [Update Major Tag](#update-major-tag)
     - [Inputs](#inputs-8)
     - [Secrets](#secrets-5)
+    - [Checking Tags Locally](#checking-tags-locally-1)
 - [About GitHub Actions Usage Fees](#about-github-actions-usage-fees)
 - [Referenced Repository](#referenced-repository)
 

@@ -60,6 +60,7 @@ GitHub Actions for Unity.
   - [スタイルチェックの流れ](#%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%AE%E6%B5%81%E3%82%8C-1)
   - [セットアップガイド](#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%82%AC%E3%82%A4%E3%83%89-3)
 - [タグの更新](#%E3%82%BF%E3%82%B0%E3%81%AE%E6%9B%B4%E6%96%B0)
+  - [ローカルでのタグ確認](#%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%81%A7%E3%81%AE%E3%82%BF%E3%82%B0%E7%A2%BA%E8%AA%8D)
 - [Jobの説明](#job%E3%81%AE%E8%AA%AC%E6%98%8E)
   - [タグの検証 (Validate Tag)](#%E3%82%BF%E3%82%B0%E3%81%AE%E6%A4%9C%E8%A8%BC-validate-tag)
     - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs)
@@ -95,6 +96,7 @@ GitHub Actions for Unity.
   - [タグの更新 (Update Major Tag)](#%E3%82%BF%E3%82%B0%E3%81%AE%E6%9B%B4%E6%96%B0-update-major-tag)
     - [入力値 (Inputs)](#%E5%85%A5%E5%8A%9B%E5%80%A4-inputs-9)
     - [Secrets (機密情報)](#secrets-%E6%A9%9F%E5%AF%86%E6%83%85%E5%A0%B1-5)
+    - [ローカルでのタグ確認](#%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%81%A7%E3%81%AE%E3%82%BF%E3%82%B0%E7%A2%BA%E8%AA%8D-1)
 - [GitHub Actionsの使用料について](#github-actions%E3%81%AE%E4%BD%BF%E7%94%A8%E6%96%99%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 - [参考リポジトリ](#%E5%8F%82%E8%80%83%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA)
 
