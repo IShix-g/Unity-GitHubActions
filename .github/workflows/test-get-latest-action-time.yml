@@ -11,7 +11,7 @@ jobs:
       id: encode
       run: |
         WORKFLOW_NAME="Manual Release (Merge to Default)"
-        echo "ENCODED_WORKFLOW_NAME=$(echo "$WORKFLOW_NAME" | jq -s -R -r @uri)" >> $GITHUB_OUTPUT
+        echo "ENCODED_WORKFLOW_NAME=$(echo "$WORKFLOW_NAME" | tr -d '\n' | jq -s -R -r @uri)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Call API in Next Step
