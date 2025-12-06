@@ -7,7 +7,7 @@ jobs:
   check_and_run:
     runs-on: ubuntu-latest
     steps:
-      - name: Get Last Completed Run Time using Variable
+      - name: Get Last Completed Run Time using Single Step
         id: get_time
         run: |
           WORKFLOW_NAME="Manual Release (Merge to Default)"
@@ -15,7 +15,7 @@ jobs:
           LAST_COMPLETED_TIME=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$ENCODED_WORKFLOW_NAME/runs?status=success&per_page=1" | \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${ENCODED_WORKFLOW_NAME}/runs?status=success&per_page=1" | \
             jq -r '.workflow_runs[0].completed_at')
           
           echo "Last completed time: $LAST_COMPLETED_TIME"
