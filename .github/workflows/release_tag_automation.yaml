@@ -28,5 +28,5 @@ jobs:
 
   update-major-tag:
     needs: check-statuses
-    if: success() && contains(needs.check-statuses.outputs.*.condition, '1')
+    if: success() && contains(needs.check-statuses.outputs.*, '1')
     uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@main
