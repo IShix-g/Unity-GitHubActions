@@ -1,0 +1,30 @@
+name: (Test) Check Last Run Status & Age
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow-id:
+        description: 'Workflow ID (filename also acceptable)'
+        type: string
+        default: 'build-release_merge.yaml'
+        options:
+          - 'build-release_merge.yaml'
+          - 'build-release_pull-request.yaml'
+          - 'build-release_merge_package.yaml'
+          - 'build-release_merge_test.yaml'
+      min-days:
+        description: 'Minimum age in days for workflow run'
+        type: number
+        default: 1
+      max-days:
+        description: 'Maximum age in days for workflow run'
+        type: number
+        default: 2
+
+jobs:
+  check-status:
+    - uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
+      with:
+        workflow-id: ${{ inputs.workflow-id }}
+        min-days: ${{ inputs.min-days }}
+        max-days: ${{ inputs.max-days }}

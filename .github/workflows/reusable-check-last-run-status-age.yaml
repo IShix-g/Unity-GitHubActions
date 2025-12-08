@@ -1,29 +1,33 @@
-name: (Test) Get Latest Action Time
+name: (Reusable) Check Last Run Status & Age
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       workflow-id:
         description: 'Workflow ID (filename also acceptable)'
+        required: true
         type: string
-        default: 'build-release_merge.yaml'
       min-days:
         description: 'Minimum age in days for workflow run'
-        type: string
-        default: '3'
+        required: true
+        type: number
       max-days:
         description: 'Maximum age in days for workflow run'
-        type: string
-        default: '7'
+        required: true
+        type: number
+    outputs:
+      condition:
+        description: 'Returns 1 if the specified action last run was successful and within the specified date range'
+        value: ${{ jobs.check-status.outputs.condition }}
 
 jobs:
-  check_and_run:
+  check-status:
     runs-on: ubuntu-latest
     outputs:
-      conditions: ${{ steps.check_conditions.outputs.conditions }}
+      condition: ${{ steps.check-conditions.outputs.condition }}
     steps:
       - name: 🚀 Get Latest Workflow Info via API
-        id: get_info
+        id: get-info
         run: |
           api_response=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -43,10 +47,10 @@ jobs:
         shell: bash
 
       - name: 📝 Use Retrieved Info and Check Conditions
-        id: check_conditions
+        id: check-conditions
         run: |
-          latestUpdate="${{ steps.get_info.outputs.latest_update }}"
-          latestConclusion="${{ steps.get_info.outputs.latest_conclusion }}"
+          latestUpdate="${{ steps.get-info.outputs.updated_at }}"
+          latestConclusion="${{ steps.get-info.outputs.conclusion }}"
           
           minDays=${{ inputs.min-days }}
           maxDays=${{ inputs.max-days }}
@@ -77,7 +81,7 @@ jobs:
           
           if $is_success && $is_in_range; then
             echo "::notice::🎉 All conditions are met!"
-            echo "conditions=1" >> "$GITHUB_OUTPUT"
+            echo "condition=1" >> "$GITHUB_OUTPUT"
           else
             echo "::notice::❌ Conditions are not met." 
           fi
