@@ -20,8 +20,7 @@ jobs:
   check_and_run:
     runs-on: ubuntu-latest
     outputs:
-      latest_update: ${{ steps.get_info.outputs.updated_at }}
-      latest_conclusion: ${{ steps.get_info.outputs.conclusion }}
+      conditions: ${{ steps.check_conditions.outputs.conditions }}
     steps:
       - name: 🚀 Get Latest Workflow Info via API
         id: get_info
@@ -43,36 +42,32 @@ jobs:
           echo "conclusion=$conclusion" >> $GITHUB_OUTPUT
         shell: bash
 
-  use_info:
-    runs-on: ubuntu-latest
-    needs: check_and_run
-    
-    steps:
       - name: 📝 Use Retrieved Info and Check Conditions
+        id: check_conditions
         run: |
-          latestUpdate="${{ needs.check_and_run.outputs.latest_update }}"
-          latestConclusion="${{ needs.check_and_run.outputs.latest_conclusion }}"
+          latestUpdate="${{ needs.get_info.outputs.latest_update }}"
+          latestConclusion="${{ needs.get_info.outputs.latest_conclusion }}"
           
           minDays=${{ inputs.min-days }}
           maxDays=${{ inputs.max-days }}
           current_ts=$(date +%s)
           updated_ts=$(date -d "$latestUpdate" +%s)
-  
+          
           minSecs=$(( minDays * 24 * 60 * 60 ))
           maxSecs=$(( maxDays * 24 * 60 * 60 ))
-  
+          
           age_secs=$(( current_ts - updated_ts ))
-  
+          
           is_success=false
           is_in_range=false
-  
+          
           if [ "$latestConclusion" == "success" ]; then
             is_success=true
             echo "✅ Conclusion: success"
           else
             echo "❌ Conclusion: $latestConclusion (Not success)"
           fi
-  
+          
           if [ $age_secs -ge $minSecs ] && [ $age_secs -le $maxSecs ]; then
             is_in_range=true
             echo "✅ Date Range: Within $minDays and $maxDays days range."
@@ -82,8 +77,9 @@ jobs:
           
           if $is_success && $is_in_range; then
             echo "::notice::🎉 All conditions are met!"
+            echo "conditions=1" >> "$GITHUB_OUTPUT"
           else
             echo "::notice::⚠️ Conditions are not met." 
           fi
-  
+        
         shell: bash
