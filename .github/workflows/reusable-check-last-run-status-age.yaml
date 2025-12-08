@@ -10,11 +10,11 @@ on:
       min-day:
         description: 'Minimum age in days for workflow run'
         required: true
-        type: number
+        type: string
       max-day:
         description: 'Maximum age in days for workflow run'
         required: true
-        type: number
+        type: string
     outputs:
       condition:
         description: 'Returns 1 if the specified action last run was successful and within the specified date range'
@@ -52,13 +52,13 @@ jobs:
           latestUpdate="${{ steps.get-info.outputs.updated_at }}"
           latestConclusion="${{ steps.get-info.outputs.conclusion }}"
           
-          minDays=${{ inputs.min-day }}
-          maxDays=${{ inputs.max-day }}
+          minDay=${{ inputs.min-day }}
+          maxDay=${{ inputs.max-day }}
           current_ts=$(date +%s)
           updated_ts=$(date -d "$latestUpdate" +%s)
           
-          minSecs=$(( minDays * 24 * 60 * 60 ))
-          maxSecs=$(( maxDays * 24 * 60 * 60 ))
+          minSec=$(( minDay * 24 * 60 * 60 ))
+          maxSec=$(( maxDay * 24 * 60 * 60 ))
           
           age_secs=$(( current_ts - updated_ts ))
           
@@ -72,9 +72,9 @@ jobs:
             echo "❌ Conclusion: $latestConclusion (Not success)"
           fi
           
-          if [ $age_secs -ge $minSecs ] && [ $age_secs -le $maxSecs ]; then
+          if [ $age_secs -ge $minSec ] && [ $age_secs -le $maxSec ]; then
             is_in_range=true
-            echo "✅ Date Range: Within $minDays and $maxDays days range."
+            echo "✅ Date Range: Within $minDay and $maxDay days range."
           else
             echo "❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
           fi
