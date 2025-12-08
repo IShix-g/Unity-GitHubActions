@@ -1,0 +1,33 @@
+name: Check Last Run Status & Age with Matrix
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  MIN_DAY: 0
+  MAX_DAY: 1
+  WORKFLOW_IDS: '["build-release_merge.yaml", "build-release_pull-request.yaml", "build-release_merge_package.yaml", "build-release_merge_test.yaml"]'
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  check-statuses:
+    name: Check Status (${{ matrix.workflow_id }})
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-check-last-run-status-age.yaml@main
+    with:
+      workflow-id: ${{ matrix.workflow_id }}
+      min-day: ${{ env.MIN_DAY }}
+      max-day: ${{ env.MAX_DAY }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        workflow_id: ${{ fromJson(env.WORKFLOW_IDS) }}
+
+  update-major-tag:
+    needs: check-statuses
+    if: success() && contains(needs.check-statuses.outputs.*.condition, '1')
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@main
