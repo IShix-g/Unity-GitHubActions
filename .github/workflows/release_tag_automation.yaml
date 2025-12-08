@@ -1,4 +1,4 @@
-name: Check Last Run Status & Age with Matrix
+name: Release Tag Automation (V1)
 
 on:
   workflow_dispatch:
@@ -29,4 +29,4 @@ jobs:
   update-major-tag:
     needs: check-statuses
     if: success() && contains(needs.check-statuses.outputs.*.condition, '1')
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@v1
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@main
