@@ -15,8 +15,13 @@ on:
 jobs:
   check-statuses:
     name: Check Status (${{ matrix.workflow_id }})
-    runs-on: ubuntu-22.04
-    
+
+    uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
+    with:
+      workflow-id: ${{ matrix.workflow_id }}
+      min-day: ${{ inputs.min-day }}
+      max-day: ${{ inputs.max-day }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -25,13 +30,6 @@ jobs:
           - 'build-release_pull-request.yaml'
           - 'build-release_merge_package.yaml'
           - 'build-release_merge_test.yaml'
-
-    uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
-    id: status-check
-    with:
-      workflow-id: ${{ matrix.workflow_id }}
-      min-day: ${{ inputs.min-day }}
-      max-day: ${{ inputs.max-day }}
 
   next-job:
     name: Execute Next Required Process
