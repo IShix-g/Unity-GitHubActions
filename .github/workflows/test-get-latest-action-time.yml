@@ -45,8 +45,8 @@ jobs:
       - name: 📝 Use Retrieved Info and Check Conditions
         id: check_conditions
         run: |
-          latestUpdate="${{ needs.get_info.outputs.latest_update }}"
-          latestConclusion="${{ needs.get_info.outputs.latest_conclusion }}"
+          latestUpdate="${{ steps.get_info.outputs.latest_update }}"
+          latestConclusion="${{ steps.get_info.outputs.latest_conclusion }}"
           
           minDays=${{ inputs.min-days }}
           maxDays=${{ inputs.max-days }}
@@ -79,7 +79,7 @@ jobs:
             echo "::notice::🎉 All conditions are met!"
             echo "conditions=1" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::⚠️ Conditions are not met." 
+            echo "::notice::❌ Conditions are not met." 
           fi
         
         shell: bash
