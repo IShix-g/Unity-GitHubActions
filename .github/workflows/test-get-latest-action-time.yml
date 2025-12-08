@@ -68,16 +68,16 @@ jobs:
   
           if [ "$latestConclusion" == "success" ]; then
             is_success=true
-            echo "::notice::✅ Conclusion: success"
+            echo "✅ Conclusion: success"
           else
-            echo "::notice::❌ Conclusion: $latestConclusion (Not success)"
+            echo "❌ Conclusion: $latestConclusion (Not success)"
           fi
   
           if [ $age_secs -ge $minSecs ] && [ $age_secs -le $maxSecs ]; then
             is_in_range=true
-            echo "::notice::✅ Date Range: Within $minDays and $maxDays days range."
+            echo "✅ Date Range: Within $minDays and $maxDays days range."
           else
-            echo "::notice::❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
+            echo "❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
           fi
           
           if $is_success && $is_in_range; then
