@@ -13,11 +13,11 @@ on:
           - 'build-release_pull-request.yaml'
           - 'build-release_merge_package.yaml'
           - 'build-release_merge_test.yaml'
-      min-days:
+      min-day:
         description: 'Minimum age in days for workflow run'
         type: number
         default: 1
-      max-days:
+      max-day:
         description: 'Maximum age in days for workflow run'
         type: number
         default: 2
@@ -27,5 +27,5 @@ jobs:
     uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
     with:
       workflow-id: ${{ inputs.workflow-id }}
-      min-days: '${{ inputs.min-days }}'
-      max-days: '${{ inputs.max-days }}'
+      min-day: ${{ inputs.min-day }}
+      max-day: ${{ inputs.max-day }}

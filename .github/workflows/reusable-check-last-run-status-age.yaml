@@ -7,11 +7,11 @@ on:
         description: 'Workflow ID (filename also acceptable)'
         required: true
         type: string
-      min-days:
+      min-day:
         description: 'Minimum age in days for workflow run'
         required: true
         type: number
-      max-days:
+      max-day:
         description: 'Maximum age in days for workflow run'
         required: true
         type: number
@@ -52,8 +52,8 @@ jobs:
           latestUpdate="${{ steps.get-info.outputs.updated_at }}"
           latestConclusion="${{ steps.get-info.outputs.conclusion }}"
           
-          minDays=${{ inputs.min-days }}
-          maxDays=${{ inputs.max-days }}
+          minDays=${{ inputs.min-day }}
+          maxDays=${{ inputs.max-day }}
           current_ts=$(date +%s)
           updated_ts=$(date -d "$latestUpdate" +%s)
           
