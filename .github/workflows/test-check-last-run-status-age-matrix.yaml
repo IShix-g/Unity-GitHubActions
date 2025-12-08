@@ -3,7 +3,6 @@ name: (Test) Check Last Run Status & Age with Matrix
 on:
   workflow_dispatch:
     inputs:
-      # ... (input定義は省略) ...
       min-day:
         description: 'Minimum age in days for workflow run'
         type: number
