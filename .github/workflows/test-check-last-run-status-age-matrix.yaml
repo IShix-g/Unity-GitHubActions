@@ -1,0 +1,48 @@
+name: (Test) Check Last Run Status & Age with Matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      # ... (input定義は省略) ...
+      min-day:
+        description: 'Minimum age in days for workflow run'
+        type: number
+        default: 1
+      max-day:
+        description: 'Maximum age in days for workflow run'
+        type: number
+        default: 2
+
+jobs:
+  check-statuses:
+    name: Check Status (${{ matrix.workflow_id }})
+    runs-on: ubuntu-22.04
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        workflow_id:
+          - 'build-release_merge.yaml'
+          - 'build-release_pull-request.yaml'
+          - 'build-release_merge_package.yaml'
+          - 'build-release_merge_test.yaml'
+
+    uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
+    id: status-check
+    with:
+      workflow-id: ${{ matrix.workflow_id }}
+      min-day: ${{ inputs.min-day }}
+      max-day: ${{ inputs.max-day }}
+
+  next-job:
+    name: Execute Next Required Process
+    runs-on: ubuntu-latest
+    needs: check-statuses
+
+    if: success() && contains(needs.check-statuses.outputs.*, '1')
+    
+    steps:
+      - name: Required Process
+        run: |
+          echo "いずれかのワークフローが条件を満たしました。次の処理を実行します。"
+          echo "集約された結果 (needs.check-statuses.outputs.*) は ${{ toJson(needs.check-statuses.outputs) }} です。"
