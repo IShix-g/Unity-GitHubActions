@@ -5,7 +5,8 @@ on:
     inputs:
       workflow-id:
         description: 'Workflow ID (filename also acceptable)'
-        type: string
+        type: choice
+        required: true
         default: 'build-release_merge.yaml'
         options:
           - 'build-release_merge.yaml'
