@@ -36,8 +36,8 @@ jobs:
           updated_at=$(echo "$run_info" | jq -r '.updated_at')
           conclusion=$(echo "$run_info" | jq -r '.conclusion')
           
-          echo "::notice::Last completed updated_at: $updated_at"
-          echo "::notice::Last completed conclusion: $conclusion"
+          echo "Last completed updated_at: $updated_at"
+          echo "Last completed conclusion: $conclusion"
           
           echo "updated_at=$updated_at" >> $GITHUB_OUTPUT
           echo "conclusion=$conclusion" >> $GITHUB_OUTPUT
@@ -68,28 +68,22 @@ jobs:
   
           if [ "$latestConclusion" == "success" ]; then
             is_success=true
-            echo "✅ Conclusion: success"
+            echo "::notice::✅ Conclusion: success"
           else
-            echo "❌ Conclusion: $latestConclusion (Not success)"
+            echo "::notice::❌ Conclusion: $latestConclusion (Not success)"
           fi
   
           if [ $age_secs -ge $minSecs ] && [ $age_secs -le $maxSecs ]; then
             is_in_range=true
-            echo "✅ Date Range: Within $minDays and $maxDays days range."
+            echo "::notice::✅ Date Range: Within $minDays and $maxDays days range."
           else
-            echo "❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
+            echo "::notice::❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
           fi
-  
+          
           if $is_success && $is_in_range; then
-            echo "================================================="
-            echo "🎉 すべての条件を満たしました！"
-            echo "================================================="
-  
+            echo "::notice::🎉 All conditions are met!"
           else
-            echo "================================================="
-            echo "⚠️ 条件を満たしませんでした。"
-            echo "================================================="
-  
+            echo "::notice::⚠️ Conditions are not met." 
           fi
   
         shell: bash
