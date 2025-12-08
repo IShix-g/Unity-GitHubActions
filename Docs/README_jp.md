@@ -451,7 +451,7 @@ https://github.com/IShix-g/Unity-GitHubActions.git?path=Assets/PackageExporter
 
 ## タグの更新
 
-[update-major-tag-v1.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yml)
+[update-major-tag-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yaml)
 
 任意のタグを、任意のタグを持つコミットに移動します。例えば、1系バージョンの安定版として、`v1`タグをコミットにつけるなどの運用で使えます。
 
@@ -763,7 +763,7 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 
 ### タグの更新 (Update Major Tag)
 
-[reusable-update-major-tag.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yml)
+[reusable-update-major-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yaml)
 
 このアクションは、存在するタグを対象のタグを持つコミットに移動させます。
 

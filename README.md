@@ -5,7 +5,7 @@
 [![Test Build Package](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-build-package.yaml)  
 [![Test Unity Test](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-test.yaml)  
 [![Test Unity C# Linter](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-unity-cs-linter-dispatch.yaml)  
-[![Test Update Major Tag](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yml)
+[![Test Update Major Tag](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yaml/badge.svg)](https://github.com/IShix-g/Unity-GitHubActions/actions/workflows/test-update-major-tag.yaml)
 
 [README - 日本語版](Docs/README_jp.md)
 
@@ -462,9 +462,9 @@ Click the `Run workflow` button to execute the style check.
 
 ## Update Tags
 
-[update-major-tag-v1.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yml)
+[update-major-tag-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yaml)
 
-Moves a specified tag to the commit referenced by another tag. For example, this can be used to maintain a major version tag (like `v1`) that always points to the latest stable release of the 1.x series.
+Moves a specified tag to the com~~~~mit referenced by another tag. For example, this can be used to maintain a major version tag (like `v1`) that always points to the latest stable release of the 1.x series.
 
 | Option     | Description                                                           | Default | Example |
 |------------|-----------------------------------------------------------------------|---------|---------|
@@ -775,7 +775,7 @@ This action performs style checks on the specified C# files.
 
 ### Update Major Tag
 
-[.github/workflows/reusable-update-major-tag.yml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yml)
+[.github/workflows/reusable-update-major-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yaml)
 
 This action moves an existing tag to the commit associated with a target tag.
 
