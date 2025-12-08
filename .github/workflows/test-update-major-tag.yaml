@@ -114,7 +114,7 @@ jobs:
 
   update-major-tag:
     needs: [set-branch, set-tag, setup-initial-tag]
-    uses: ./.github/workflows/reusable-update-major-tag.yml
+    uses: ./.github/workflows/reusable-update-major-tag.yaml
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
       BOT_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
