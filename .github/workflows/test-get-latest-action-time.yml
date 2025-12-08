@@ -4,21 +4,92 @@ on:
   workflow_dispatch:
     inputs:
       workflow-id:
-        description: ''
+        description: 'Workflow ID (filename also acceptable)'
         type: string
         default: 'build-release_merge.yaml'
+      min-days:
+        description: 'Minimum age in days for workflow run'
+        type: string
+        default: '3'
+      max-days:
+        description: 'Maximum age in days for workflow run'
+        type: string
+        default: '7'
 
 jobs:
   check_and_run:
     runs-on: ubuntu-latest
+    outputs:
+      latest_update: ${{ steps.get_info.outputs.updated_at }}
+      latest_conclusion: ${{ steps.get_info.outputs.conclusion }}
     steps:
-    - name: Call API in Next Step
-      run: |
-        lastCompletedTime=$(curl -s \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ inputs.workflow-id }}/runs?per_page=1" | \
-          jq -r '.workflow_runs[0].updated_at')
+      - name: 🚀 Get Latest Workflow Info via API
+        id: get_info
+        run: |
+          api_response=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ inputs.workflow-id }}/runs?per_page=1")
+          
+          run_info=$(echo "$api_response" | jq -r '.workflow_runs[0]')
+          
+          updated_at=$(echo "$run_info" | jq -r '.updated_at')
+          conclusion=$(echo "$run_info" | jq -r '.conclusion')
+          
+          echo "::notice::Last completed updated_at: $updated_at"
+          echo "::notice::Last completed conclusion: $conclusion"
+          
+          echo "updated_at=$updated_at" >> $GITHUB_OUTPUT
+          echo "conclusion=$conclusion" >> $GITHUB_OUTPUT
+        shell: bash
 
-        echo "Last completed time: $lastCompletedTime"
-      shell: bash
+  use_info:
+    runs-on: ubuntu-latest
+    needs: check_and_run
+    
+    steps:
+      - name: 📝 Use Retrieved Info and Check Conditions
+        run: |
+          latestUpdate="${{ needs.check_and_run.outputs.latest_update }}"
+          latestConclusion="${{ needs.check_and_run.outputs.latest_conclusion }}"
+          
+          minDays=${{ inputs.min-days }}
+          maxDays=${{ inputs.max-days }}
+          current_ts=$(date +%s)
+          updated_ts=$(date -d "$latestUpdate" +%s)
+  
+          minSecs=$(( minDays * 24 * 60 * 60 ))
+          maxSecs=$(( maxDays * 24 * 60 * 60 ))
+  
+          age_secs=$(( current_ts - updated_ts ))
+  
+          is_success=false
+          is_in_range=false
+  
+          if [ "$latestConclusion" == "success" ]; then
+            is_success=true
+            echo "✅ Conclusion: success"
+          else
+            echo "❌ Conclusion: $latestConclusion (Not success)"
+          fi
+  
+          if [ $age_secs -ge $minSecs ] && [ $age_secs -le $maxSecs ]; then
+            is_in_range=true
+            echo "✅ Date Range: Within $minDays and $maxDays days range."
+          else
+            echo "❌ Date Range: Outside the range ($(( age_secs / 86400 )) days old)."
+          fi
+  
+          if $is_success && $is_in_range; then
+            echo "================================================="
+            echo "🎉 すべての条件を満たしました！"
+            echo "================================================="
+  
+          else
+            echo "================================================="
+            echo "⚠️ 条件を満たしませんでした。"
+            echo "================================================="
+  
+          fi
+  
+        shell: bash
