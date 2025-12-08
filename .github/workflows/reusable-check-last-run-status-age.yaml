@@ -10,11 +10,11 @@ on:
       min-days:
         description: 'Minimum age in days for workflow run'
         required: true
-        type: string
+        type: number
       max-days:
         description: 'Maximum age in days for workflow run'
         required: true
-        type: string
+        type: number
     outputs:
       condition:
         description: 'Returns 1 if the specified action last run was successful and within the specified date range'
