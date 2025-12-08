@@ -10,11 +10,11 @@ on:
       min-days:
         description: 'Minimum age in days for workflow run'
         required: true
-        type: number
+        type: string
       max-days:
         description: 'Maximum age in days for workflow run'
         required: true
-        type: number
+        type: string
     outputs:
       condition:
         description: 'Returns 1 if the specified action last run was successful and within the specified date range'
@@ -22,7 +22,7 @@ on:
 
 jobs:
   check-status:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       condition: ${{ steps.check-conditions.outputs.condition }}
     steps:
