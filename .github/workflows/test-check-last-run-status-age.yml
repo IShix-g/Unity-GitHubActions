@@ -23,8 +23,8 @@ on:
 
 jobs:
   check-status:
-    - uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
-      with:
-        workflow-id: ${{ inputs.workflow-id }}
-        min-days: ${{ inputs.min-days }}
-        max-days: ${{ inputs.max-days }}
+    uses: ./.github/workflows/reusable-check-last-run-status-age.yaml
+    with:
+      workflow-id: ${{ inputs.workflow-id }}
+      min-days: ${{ inputs.min-days }}
+      max-days: ${{ inputs.max-days }}
