@@ -2,7 +2,8 @@ name: Release Tag Automation (V1)
 
 on:
   workflow_dispatch:
-  workflow_call:
+  schedule:
+    - cron: "0 0 * * *"
 
 permissions:
   actions: read
@@ -11,7 +12,7 @@ permissions:
 jobs:
   check-statuses:
     name: Check Status (${{ matrix.workflow_id }})
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-check-last-run-status-age.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-check-last-run-status-age.yaml@v1
     with:
       workflow-id: ${{ matrix.workflow_id }}
       min-day: 0
@@ -29,4 +30,4 @@ jobs:
   update-major-tag:
     needs: check-statuses
     if: success() && contains(needs.check-statuses.outputs.*, '1')
-    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@main
+    uses: IShix-g/Unity-GitHubActions/.github/workflows/update-major-tag-v1.yaml@v1

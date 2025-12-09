@@ -460,7 +460,7 @@ Click the `Run workflow` button to execute the style check.
 4. Create a style rule configuration file. Refer to [this example](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.editorconfig) to create an [.editorconfig](https://learn.microsoft.com/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022).
 
 
-## Update Tags
+## Update Major Tags
 
 [update-major-tag-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/update-major-tag-v1.yaml)
 
@@ -478,6 +478,22 @@ Even after fetching, moved tags may not be updated. In that case, run the follow
 ```shell
 git fetch origin --tags --force
 ```
+
+#### Automatic Tag Updates
+
+Since major tag updates can be forgotten, this action checks at specified times and updates them if they haven't been
+updated.
+
+[release_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/release_tag_automation-v1.yaml)
+
+If the last executed release workflow falls within the release date range, the tag will be updated.
+
+| ID          | Description                   | Example                      |
+|-------------|-------------------------------|------------------------------|
+| cron        | When to check?                | 0 0 * * *                    |
+| min-day     | Target release date - Minimum | 1                            |
+| max-day     | Target release date - Maximum | 2                            |
+| workflow_id | Release workflow              | - 'build-release_merge.yaml' |
 
 
 ## Job Descriptions

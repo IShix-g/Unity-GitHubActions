@@ -761,7 +761,7 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 
 ---
 
-### タグの更新 (Update Major Tag)
+### メジャータグの更新 (Update Major Tag)
 
 [reusable-update-major-tag.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/reusable-update-major-tag.yaml)
 
@@ -774,6 +774,21 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 | branch | リリースおよびタグ作成用のコミット ID              |                 |
 | tag | 移動対象のタグ (例: `v1`)                 |                 |
 | target-tag | 対象のタグを持つコミット。空の場合、最終コミットが対象となります。 |                 |
+
+#### 自動でタグを更新
+
+メジャータグの更新を忘れる事もあるので指定時間に確認して更新されていなければ更新するアクションです。
+
+[release_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/release_tag_automation-v1.yaml)
+
+最後に実行したリリースのWorkflowが、リリース日の範囲内であればタグを更新します。
+
+| ID        | 説明            | 例                            |
+|-----------|---------------|------------------------------|
+| cron | 何時に確認するか？     | 0 0 * * *            |
+| min-day | 対象のリリース日 - 最小 | 1                            |
+| max-day | 対象のリリース日 - 最大 | 2                            |
+| workflow_id | リリースのworkflow | - 'build-release_merge.yaml' |
 
 #### Secrets (機密情報)
 
