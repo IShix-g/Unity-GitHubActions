@@ -780,7 +780,7 @@ hash=$(sha256sum "$package_path" | awk '{ print $1 }')
 
 メジャータグの更新を忘れる事もあるので指定時間に確認して更新されていなければ更新するアクションです。
 
-[release_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/release_tag_automation-v1.yaml)
+[major_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/major_tag_automation-v1.yaml)
 
 最後に実行したリリースのWorkflowが、リリース日の範囲内であればタグを更新します。
 

@@ -485,7 +485,7 @@ git fetch origin --tags --force
 Since major tag updates can be forgotten, this action checks at specified times and updates them if they haven't been
 updated.
 
-[release_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/release_tag_automation-v1.yaml)
+[major_tag_automation-v1.yaml](https://github.com/IShix-g/Unity-GitHubActions/blob/main/.github/workflows/major_tag_automation-v1.yaml)
 
 If the last executed release workflow falls within the release date range, the tag will be updated.
 
