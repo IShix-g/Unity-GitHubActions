@@ -3,7 +3,7 @@ name: Release Tag Automation (V1)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "22 9 * * *"
+    - cron: "30 0 * * *"
 
 permissions:
   actions: read
