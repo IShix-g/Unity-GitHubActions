@@ -36,20 +36,21 @@ jobs:
           
           run_info=$(echo "$api_response" | jq -r '.workflow_runs[0]')
           
-          updated_at=$(echo "$run_info" | jq -r '.updated_at')
+          updated-at=$(echo "$run_info" | jq -r '.updated-at')
           conclusion=$(echo "$run_info" | jq -r '.conclusion')
           
-          echo "Last completed updated_at: $updated_at"
+          echo "Last completed updated-at: $updated-at"
           echo "Last completed conclusion: $conclusion"
           
-          echo "updated_at=$updated_at" >> $GITHUB_OUTPUT
+          echo "updated-at=$updated-at" >> $GITHUB_OUTPUT
           echo "conclusion=$conclusion" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: 📝 Use Retrieved Info and Check Conditions
         id: check-conditions
+        if: ${{ steps.get-info.outputs.updated-at != 'null' && steps.get-info.outputs.conclusion != 'null' }}
         run: |
-          latestUpdate="${{ steps.get-info.outputs.updated_at }}"
+          latestUpdate="${{ steps.get-info.outputs.updated-at }}"
           latestConclusion="${{ steps.get-info.outputs.conclusion }}"
           
           minDay=${{ inputs.min-day }}
