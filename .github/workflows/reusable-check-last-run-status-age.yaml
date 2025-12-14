@@ -36,7 +36,7 @@ jobs:
           
           run_info=$(echo "$api_response" | jq -r '.workflow_runs[0]')
           
-          updated-at=$(echo "$run_info" | jq -r '.updated-at')
+          updated-at=$(echo "$run_info" | jq -r '.updated_at')
           conclusion=$(echo "$run_info" | jq -r '.conclusion')
           
           echo "Last completed updated-at: $updated-at"
