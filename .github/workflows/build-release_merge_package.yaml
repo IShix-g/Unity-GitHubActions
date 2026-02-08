@@ -98,12 +98,19 @@ jobs:
 
   release-notes:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package]
+    if: |
+      always()
+      && needs.validate-branch.result == 'success'
+      && needs.update-packagejson.result == 'success'
+      && (needs.merge-and-push.result == 'success' || needs.merge-and-push.result == 'skipped')
+      && needs.build-package.result == 'success'
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-notes.yaml@v1
     with:
       commit-id: ${{ needs.merge-and-push.outputs.sha || needs.update-packagejson.outputs.sha || github.sha }}
 
   create-release:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes]
+    if: ${{ always() && needs.release-notes.result == 'success' }}
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-create-release.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
@@ -117,6 +124,7 @@ jobs:
 
   release-package-upload:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes, create-release]
+    if: ${{ always() && needs.create-release.result == 'success' }}
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-release-package-upload.yaml@v1
     with:
       release-tag: ${{ needs.update-packagejson.outputs.normalized-tag }}
@@ -126,7 +134,11 @@ jobs:
 
   clean-branch:
     needs: [validate-branch, update-packagejson, merge-and-push, build-package, release-notes, create-release, release-package-upload]
-    if: ${{ inputs.clean-branch && needs.update-packagejson.outputs.changed == '1' }}
+    if: |
+      always()
+      && inputs.clean-branch
+      && !contains(needs.*.result, 'failure')
+      && !contains(needs.*.result, 'cancelled')
     uses: IShix-g/Unity-GitHubActions/.github/workflows/reusable-clean-branch.yaml@v1
     secrets:
       BOT_APP_ID: ${{ secrets.BOT_APP_ID }}
