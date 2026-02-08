@@ -70,6 +70,15 @@ jobs:
             echo "validated=true" | tee -a "$GITHUB_OUTPUT"
           fi
 
+      - name: Debug and Validate
+        run: |
+          echo "Checking raw API response..."
+          RAW_OUTPUT=$(gh api repos/"$GITHUB_REPOSITORY"/tags --jq '.[].name' || echo "API_FAILED")
+          echo "Raw output: $RAW_OUTPUT"
+          
+          FILTERED_TAGS=$(echo "$RAW_OUTPUT" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' || true)
+          echo "Filtered: $FILTERED_TAGS"
+
       - name: Validate tag is not reverting
         id: validate-tag
         if: ${{ !inputs.validate-semantic-versioning || steps.validate-format.outputs.validated == 'true' }}
