@@ -126,7 +126,7 @@ jobs:
           echo "name=$license_name" >> "$GITHUB_OUTPUT"
           echo "::notice title=Unity License::$license_type"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.commit-id }}
           fetch-depth: 0

@@ -57,7 +57,7 @@ jobs:
       tag: ${{ steps.latest-release.outputs.tag }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get Latest Release
         id: latest-release
@@ -112,7 +112,7 @@ jobs:
     needs: [verify-branch, latest-release, update-packagejson, build-package, merge-and-push]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

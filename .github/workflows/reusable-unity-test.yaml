@@ -100,7 +100,7 @@ jobs:
         testMode: ${{ fromJson(needs.prepare-test-modes.outputs.array) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
 

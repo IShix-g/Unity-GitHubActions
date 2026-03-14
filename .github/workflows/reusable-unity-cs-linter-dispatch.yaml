@@ -89,7 +89,7 @@ jobs:
       files: ${{ steps.detect-cs-files.outputs.files }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.branch-conf.outputs.base-branch }}
           fetch-depth: 0

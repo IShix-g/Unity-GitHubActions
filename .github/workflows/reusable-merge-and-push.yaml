@@ -58,7 +58,7 @@ jobs:
       - name: Generate Token
         id: app-token
         if: ${{ steps.check-secrets.outputs.available == '1' }}
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_PRIVATE_KEY }}
@@ -97,7 +97,7 @@ jobs:
 
       - name: Checkout Repository and Target Branch
         if: ${{ inputs.dry-run || steps.branches-match.outputs.identical != '1' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ steps.normalize-branches.outputs.push-branch }}
           fetch-depth: 0
